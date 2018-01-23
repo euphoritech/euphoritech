@@ -8,12 +8,23 @@ export default {
   server: {
     isProduction:   process.env.NODE_ENV === 'production',
     port:           process.env.PORT || 8080,
-    concurrency:    parseInt(process.env.WEB_CONCURRENCY || 1)
+    concurrency:    parseInt(process.env.WEB_CONCURRENCY || 1),
+    host:           process.env.HOSTNAME || "http://localhost:8080"
+  },
+
+  session: {
+    sessionSecret: process.env.SESSION_SECRET,
+    sessionCookieKey: process.env.SESSION_COOKIE_KEY
   },
 
   newrelic: {
     key:    process.env.NEWRELIC_KEY,
     level:  process.env.NEWRELIC_LEVEL || 'info'
+  },
+
+  cryptography: {
+    algorithm: "aes256",
+    password: process.env.CRYPT_SECRET
   },
 
   redis: {
@@ -35,6 +46,18 @@ export default {
 
   slack: {
     webhookUrl: process.env.SLACK_WEBHOOK_URL
+  },
+
+  github: {
+    appId: process.env.GITHUB_APP_ID,
+    appSecret: process.env.GITHUB_APP_SECRET,
+    loginCallbackUrl: `${process.env.HOSTNAME}/auth/github/callback`
+  },
+
+  google: {
+    appId: process.env.GOOGLE_APP_ID,
+    appSecret: process.env.GOOGLE_APP_SECRET,
+    loginCallbackUrl: `${process.env.HOSTNAME}/auth/google/callback`
   },
 
   logger: {

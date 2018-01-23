@@ -1,7 +1,7 @@
 const forever = require('forever-monitor')
 
 const times = 10
-const child = new (forever.Monitor)('bin/server.js', {
+const child = new (forever.Monitor)('bin/app.js', {
   max: times,
   silent: false,
   args: []

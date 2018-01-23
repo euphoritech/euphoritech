@@ -14,8 +14,8 @@
   import moment from 'moment'
 
   export default {
-    // methods: {
-    //
-    // }
+    created() {
+      console.log('loggedInUser', this.$store.state.loggedInUser)
+    }
   }
 </script>

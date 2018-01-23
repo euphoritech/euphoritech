@@ -6,8 +6,8 @@
 </template>
 
 <script>
-  import EuphoritechHeader from './components/EuphoritechHeader'
-  import ApiData from './factories/ApiData'
+  import EuphoritechHeader from './EuphoritechHeader'
+  import ApiData from '../factories/ApiData'
 
   export default {
     name: 'euphoritech',

@@ -9,7 +9,7 @@ export default function Aws(options={}) {
 
   return {
     S3: {
-      _s3: new AWS.S3({accessKeyId:accessKeyId, secretAccessKey:secretAccessKey}),
+      _s3: new AWS.S3({ accessKeyId: accessKeyId, secretAccessKey: secretAccessKey }),
       defaultbucket: options.bucket || config.aws.s3.bucket,
 
       getFile(options) {

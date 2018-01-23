@@ -3,7 +3,8 @@
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import * as FastClick from 'fastclick'
-import Euphoritech from './Euphoritech'
+import store from './vuex/store'
+import Euphoritech from './components/Euphoritech'
 import router from './router'
 
 // external libraries and components
@@ -30,6 +31,7 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
+  store,
   el: '#euphoritech',
   router,
   template: '<Euphoritech/>',

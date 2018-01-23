@@ -5,7 +5,7 @@
 import "babel-polyfill"
 // import newrelic from 'newrelic'
 import throng from 'throng'
-import startServer from './startServer'
+import startServer from '../libs/startServer'
 import config from '../config'
 
 // entry point to start server

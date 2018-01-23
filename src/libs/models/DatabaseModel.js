@@ -18,7 +18,7 @@ export default function DatabaseModel(postgres, table) {
       return rows
     },
 
-    async findByColumn(value, column='name') {
+    async findByColumn(value, column='id') {
       const { rows } = await postgres.query(`select * from ${table} where ${column} = $1`, [value])
       if (rows.length > 0)
         return this.record = rows[0]
