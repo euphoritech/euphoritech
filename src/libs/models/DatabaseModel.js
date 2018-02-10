@@ -72,7 +72,7 @@ export default function DatabaseModel(postgres, table) {
             paramIndTracker = 1
 
         if (this.record.id) {
-          queryAry = [`update ${table} set`]
+          queryAry = [ `update ${table} set` ]
 
           keysInRecord.forEach(key => {
             if (this.accessibleColumns.indexOf(key) === -1) return
@@ -88,16 +88,17 @@ export default function DatabaseModel(postgres, table) {
           paramsAry.push(this.record.id)
 
           const queryString = queryAry.join(' ')
-          return await postgres.query(queryString, paramsAry)
+          await postgres.query(queryString, paramsAry)
+          return this.record.id
 
-        } else if (uniqueColumnIfNoId && this.record[uniqueColumnIfNoId]) {
+        } else if (this.record[ uniqueColumnIfNoId ]) {
           const currentRecord = Object.assign({}, this.record)
-          await this.findOrCreateBy({ [uniqueColumnIfNoId]: this.record[uniqueColumnIfNoId] })
+          await this.findOrCreateByColumn(this.record[uniqueColumnIfNoId], uniqueColumnIfNoId)
           this.record = Object.assign(this.record, currentRecord)
           return await this.save()
 
         } else { // insert new record
-          queryAry = [`insert into ${table} (`]
+          queryAry = [ `insert into ${table} (` ]
           let paramList = []
 
           keysInRecord.forEach(key => {
@@ -111,8 +112,9 @@ export default function DatabaseModel(postgres, table) {
 
           queryAry.push(`created_at, updated_at) values (${paramList.join(',')}, now() at time zone 'utc', now() at time zone 'utc') returning id`)
           const qs = queryAry.join(' ')
-          return await postgres.query(qs, paramsAry)
-        }
+          const { rows } = await postgres.query(qs, paramsAry)
+          return (rows.length > 0) ? rows[0].id : false
+         }
       }
       return false
     }

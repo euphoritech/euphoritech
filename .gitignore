@@ -6,9 +6,12 @@
 /logs
 /files
 /node_modules
-/libs
 /bin
+/conf
+/libs
+/passport_strategies
 /routes
 /tasks
+/tests
 /config.js
 *.env
