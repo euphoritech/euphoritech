@@ -1,4 +1,5 @@
 import oauth2Module from 'simple-oauth2'
+import { buildConfig } from './index'
 import config from '../../config'
 
 const oauthConf = {
@@ -8,29 +9,12 @@ const oauthConf = {
     authorizePath:  '/login/oauth/authorize'
   },
 
-  client_id: config.github.appId,
-  client_secret: config.github.appSecret,
+  client_id:      config.github.appId,
+  client_secret:  config.github.appSecret,
 
   // https://developer.github.com/apps/building-oauth-apps/scopes-for-oauth-apps/
-  // scopes: [],
+  scopes: [ 'repo', 'read:org', 'user' ].join(', '),
 }
 
-
-export default {
-  oauthConf,
-
-  oauth2: oauth2Module.create({
-    client: {
-      id: oauthConf.client_id,
-      secret: oauthConf.client_secret,
-    },
-    auth: oauthConf.auth,
-  }),
-
-  authorizationUri(oauthType) {
-    return this.oauth2.authorizationCode.authorizeURL({
-      redirect_uri: `${config.host}/oauth/${oauthType}/callback`,
-      scope: this.oauthConf.scopes
-    })
-  }
-}
+const githubConf = buildConfig('github', oauthConf, config.server.host)
+export default githubConf

@@ -9,7 +9,7 @@ export default {
     isProduction:   process.env.NODE_ENV === 'production',
     port:           process.env.PORT || 8080,
     concurrency:    parseInt(process.env.WEB_CONCURRENCY || 1),
-    host:           process.env.HOSTNAME || "http://localhost:8080"
+    host:           process.env.HOSTNAME || "http://localhost:8000"
   },
 
   session: {
@@ -52,6 +52,11 @@ export default {
     appId: process.env.GITHUB_APP_ID,
     appSecret: process.env.GITHUB_APP_SECRET,
     loginCallbackUrl: `${process.env.HOSTNAME}/auth/github/callback`
+  },
+
+  salesforce: {
+    appId: process.env.SALESFORCE_APP_ID,
+    appSecret: process.env.SALESFORCE_APP_SECRET
   },
 
   google: {
