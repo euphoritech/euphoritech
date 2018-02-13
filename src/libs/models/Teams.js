@@ -1,4 +1,4 @@
-import config from '../config'
+import config from '../../config'
 import DatabaseModel from './DatabaseModel'
 
 export default function Teams(postgres) {
@@ -8,7 +8,7 @@ export default function Teams(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-
+        'name', 'parent_team_id'
       ],
 
       async getTeamHierarchy(topMostTeamId=null) {
@@ -73,5 +73,5 @@ export function buildTeamNestedObject(databaseResults) {
   //   }, {})
   // }
 
-  return {}
+  return databaseResults
 }

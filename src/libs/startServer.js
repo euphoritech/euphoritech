@@ -11,6 +11,7 @@ import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
 import express from 'express'
+import socket_io from 'socket.io'
 import throng from 'throng'
 import bunyan from 'bunyan'
 import PostgresClient from '../libs/PostgresClient'
@@ -19,6 +20,7 @@ import config from '../config'
 
 const app         = express()
 const httpServer  = http.Server(app)
+const io          = socket_io(httpServer)
 const pgClient    = new PostgresClient()
 const log         = bunyan.createLogger(config.logger.options)
 
@@ -36,18 +38,20 @@ export default async function startApp() {
     app.use(cookieParser(config.session.sessionSecret))
 
     const RedisStore = ConnectRedis(session)
-    app.use(
-      session({
-        store:              new RedisStore({client: config.redis.client, ttl: 60 * 60 * 24 * 30}),
-        secret:             config.session.sessionSecret,
-        key:                config.session.sessionCookieKey,
-        resave:             true,
-        saveUninitialized:  true
-        //cookie: { secure: true }
-      })
-    )
+    const sessionMiddleware = session({
+      store:              new RedisStore({client: config.redis.client, ttl: 60 * 60 * 24 * 30}),
+      secret:             config.session.sessionSecret,
+      key:                config.session.sessionCookieKey,
+      resave:             true,
+      saveUninitialized:  true
+      //cookie: { secure: true }
+    })
+    app.use(sessionMiddleware)
     app.use(passport.initialize())
     app.use(passport.session())
+    io.use((socket, next) => sessionMiddleware(socket.request, socket.request.res, next))
+
+    // TODO create socket.io handler and event handlers
 
     //static files
     app.use('/public', express.static(path.join(__dirname, '..', '/public')))
@@ -88,6 +92,7 @@ export default async function startApp() {
     passport.deserializeUser((user, done) => done(null, user))
 
     httpServer.listen(config.server.port, () => log.info(`listening on *: ${config.server.port}`))
+    return httpServer
 
   } catch(err) {
     log.error("Error starting server", err)

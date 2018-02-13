@@ -1,5 +1,5 @@
 import requireFromString from 'require-from-string'
-import config from '../config'
+import config from '../../config'
 import Aws from '../Aws'
 import DatabaseModel from './DatabaseModel'
 

@@ -57,7 +57,7 @@
     "request-promise-native": "^1.0.5",
     "require-from-string": "^2.0.1",
     "simple-oauth2": "^1.5.0",
-    "socket.io": "^1.7.3",
+    "socket.io": "^1.7.4",
     "throng": "^4.0.0"
   },
   "author": "Lance Whatley <whatl3y@gmail.com>",
