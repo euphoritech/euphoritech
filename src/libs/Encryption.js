@@ -61,12 +61,12 @@ export default class Encryption {
     return map[this._algorithm]
   }
 
-  static hashPassword(plainPassword, saltRounds=10) {
-    return bcrypt.hash(plainPassword, saltRounds)
+  static async hashPassword(plainPassword, saltRounds=10) {
+    return await bcrypt.hash(plainPassword, saltRounds)
   }
 
-  static comparePassword(plainPassword, hashedPassword) {
-    return bcrypt.compare(plainPassword, hashedPassword)
+  static async comparePassword(plainPassword, hashedPassword) {
+    return await bcrypt.compare(plainPassword, hashedPassword)
   }
 }
 

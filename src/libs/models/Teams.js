@@ -8,7 +8,8 @@ export default function Teams(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'name', 'parent_team_id'
+        'is_global', 'name', 'parent_team_id', 'type', 'primary_contact_email',
+        'primary_contact_name'
       ],
 
       async getTeamHierarchy(topMostTeamId=null) {

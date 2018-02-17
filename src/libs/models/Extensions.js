@@ -22,7 +22,7 @@ export default function Extensions(postgres) {
         if (methodToInvoke)
           return await localExports[methodToInvoke]
 
-        return true
+        return localExports
       }
     }
   )

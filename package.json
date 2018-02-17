@@ -23,7 +23,6 @@
   "dependencies": {
     "@octokit/rest": "^14.0.9",
     "@slack/client": "^3.13.0",
-    "async": "^2.6.0",
     "aws-sdk": "^2.107.0",
     "babel-core": "^6.26.0",
     "babel-polyfill": "^6.26.0",
@@ -43,6 +42,7 @@
     "gulp-babel": "latest",
     "gulp-concat": "^2.6.0",
     "gulp-plumber": "^1.1.0",
+    "ioredis": "^3.2.2",
     "minimist": "^1.2.0",
     "moment": "^2.18.1",
     "newrelic": "^1.40.0",
@@ -52,7 +52,6 @@
     "pg": "^6.1.5",
     "pg-query-stream": "^1.0.0",
     "pug": "^2.0.0-rc.3",
-    "redis": "^2.8.0",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.5",
     "require-from-string": "^2.0.1",

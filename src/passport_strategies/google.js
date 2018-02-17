@@ -1,5 +1,6 @@
 import PassportGoogle from 'passport-google-oauth20'
-// import Auth from '../libs/Auth'
+import Users from '../libs/models/Users'
+import UserOauthIntegrations from '../libs/models/UserOauthIntegrations'
 import config from '../config'
 
 const GoogleStrategy = PassportGoogle.Strategy
@@ -15,7 +16,11 @@ export default function GooglePassportStrategy(postgresClient) {
     },
     handler: async function GooglePassportHandler(req, accessToken, refreshToken, profile, done) {
       try {
-        // const auth = new Auth({ postgres: postgresClient, session: req.session })
+        const users   = Users(postgresClient, req.session)
+        const userInt = UserOauthIntegrations(postgresClient)
+        console.log('GOOGLE PROFILE', profile)
+
+        const emailAddress = profile.emails[0].value
 
         const intInfo = Object.assign({}, profile, {
           type:           'google',
@@ -23,15 +28,20 @@ export default function GooglePassportStrategy(postgresClient) {
           name:           `${profile.name.givenName} ${profile.name.familyName}`,
           first_name:     profile.name.givenName,
           last_name:      profile.name.familyName,
-          email:          userEmail,
+          email:          emailAddress,
           access_token:   accessToken,
           refresh_token:  refreshToken
         })
 
-        // const userId      = await auth.findOrCreateUser(intInfo)
-        // const userRecord  = await auth.getUser(userId)
-        // auth.login({ id: userId })
+        const userRecord  = await users.findOrCreateBy({ username_email: emailAddress })
+        users.setRecord({ first_name: userRecord.first_name || intInfo.first_name, last_name: userRecord.last_name || intInfo.last_name })
+        await users.save()
 
+        const intRecord   = await userInt.findOrCreateBy({ user_id: userRecord.id, type: 'google', unique_id: profile.id })
+        userInt.setRecord(intInfo)
+        await intInfo.save()
+
+        const didLogin = users.login(userRecord)
         return done(null, intInfo.unique_id)
 
       } catch(err) {

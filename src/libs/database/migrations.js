@@ -1,16 +1,12 @@
-import minimist from 'minimist'
 import bunyan from 'bunyan'
 import PostgresClient from '../../libs/PostgresClient'
 import config from '../../config'
 
-const argv = minimist(process.argv.slice(2))
 const log = bunyan.createLogger(config.logger.options)
-const postgresUrl = argv.c || argv.connection_string || config.postgres.connection_string
 
-const postgres = new PostgresClient(postgresUrl, { max: 1 })
-
-export default async function runMigrations() {
+export default async function runMigrations(postgresUrl) {
   try {
+    const postgres = new PostgresClient(postgresUrl, { max: 1 })
     await Promise.all([
       createTeams(postgres),
       createTeamsIndexes(postgres),
@@ -21,6 +17,8 @@ export default async function runMigrations() {
       createTeamsUsersRolesMapIndexes(postgres),
       createUserOauthIntegrations(postgres),
       createUserOauthIntegrationsIndexes(postgres),
+      createTeamIntegrations(postgres),
+      createTeamIntegrationsIndexes(postgres),
       createExtensions(postgres),
       createExtensionsIndexes(postgres)
     ])
@@ -40,6 +38,7 @@ async function createTeams(postgres) {
       id serial PRIMARY KEY,
       parent_team_id integer DEFAULT null REFERENCES teams,
       is_global boolean,
+      type varchar(255),
       name varchar(255),
       primary_contact_email varchar(255),
       primary_contact_name varchar(255),
@@ -65,8 +64,9 @@ async function createUsers(postgres) {
       id serial PRIMARY KEY,
       name varchar(255) not null,
       username_email varchar(255) not null,
-      password varchar(255),
-      password_iv varchar(255),
+      password_hash varchar(255),
+      first_name varchar(255),
+      last_name varchar(255),
       created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
       updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
     );
@@ -117,6 +117,24 @@ async function createUserOauthIntegrations(postgres) {
 
 async function createUserOauthIntegrationsIndexes(postgres) {
   await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS user_oauth_integrations_user_id_idx on user_oauth_integrations (user_id)`)
+}
+
+async function createTeamIntegrations(postgres) {
+  await postgres.query(`
+    CREATE TABLE IF NOT EXISTS team_integrations (
+      id serial PRIMARY KEY,
+      team_id integer REFERENCES teams,
+      user_oauth_int_id integer REFERENCES user_oauth_integrations,
+      integration_type varchar(255),
+      created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
+      updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
+    );
+  `)
+}
+
+async function createTeamIntegrationsIndexes(postgres) {
+  await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_integrations_team_id_idx on team_integrations (team_id)`)
+  await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_integrations_user_oauth_int_id_idx on team_integrations (user_oauth_int_id)`)
 }
 
 async function createExtensions(postgres) {

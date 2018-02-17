@@ -20,7 +20,6 @@ describe('Encryption', function() {
 
   describe('#decrypt()', function() {
     it(`should decrypt cipher string without issue`, async () => {
-      console.log('cipherText', cipherText)
       plainText = await enc.decrypt(cipherText, iv)
       assert.equal(typeof plainText, 'string')
       assert.equal(plainText, originalText)

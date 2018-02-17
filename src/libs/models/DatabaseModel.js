@@ -19,9 +19,9 @@ export default function DatabaseModel(postgres, table) {
     },
 
     async findByColumn(value, column='id') {
-      const { rows } = await postgres.query(`select * from ${table} where ${column} = $1`, [value])
+      const { rows } = await postgres.query(`select * from ${table} where ${column} = $1`, [ value ])
       if (rows.length > 0)
-        return this.record = rows[0]
+        return rows[0]
       return null
     },
 
@@ -37,7 +37,7 @@ export default function DatabaseModel(postgres, table) {
       const filterString  = filters.join(' AND ')
       const { rows }      = await postgres.query(`select * from ${table} where ${filterString}`, paramsAry)
       if (rows.length > 0)
-        return this.record = rows[0]
+        return rows[0]
       return null
     },
 
