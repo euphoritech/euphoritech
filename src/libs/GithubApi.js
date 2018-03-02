@@ -8,8 +8,12 @@ export default function GithubApi(oauthToken, owner=null, repo=null) {
   return {
     client,
 
-    auth(oauthToken) {
-      return this.client.authenticate({ type: 'oauth', token: oauthToken })
+    auth(token=oauthToken) {
+      return this.client.authenticate({ type: 'oauth', token })
+    },
+
+    async emails() {
+      return await this.client.users.getEmails()
     },
 
     async listOrgRepos(org) {

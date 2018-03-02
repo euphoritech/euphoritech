@@ -48,8 +48,8 @@ export default function DatabaseModel(postgres, table) {
         return this.record = check
 
       this.record   = Object.assign(this.record, keyValuePairs)
-      const result  = await this.save()
-      const newId   = (this.record.id) ? this.record.id : result.rows[0].id
+      const curId   = await this.save()
+      const newId   = (this.record.id) ? this.record.id : curId
       this.record   = Object.assign(this.record, { id: newId })
       return this.record
     },

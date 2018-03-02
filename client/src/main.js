@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
+import fetchDefaults from 'fetch-defaults'
 import * as FastClick from 'fastclick'
 import store from './vuex/store'
 import Euphoritech from './components/Euphoritech'
@@ -17,6 +18,8 @@ import 'vue-toastr/src/vue-toastr.less'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './css/main.scss'
+
+window.euphoritechFetch = fetchDefaults(fetch, { credentials: 'same-origin' })
 
 // Initiate FastClick for mobile devices to remove the built-in 300ms
 // delay. Read more in https://github.com/ftlabs/fastclick

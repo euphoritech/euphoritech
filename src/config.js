@@ -1,4 +1,5 @@
-const appName = process.env.APP_NAME || "euphoritech"
+const appName   = process.env.APP_NAME || "euphoritech"
+const hostName  = process.env.HOSTNAME || "http://localhost:8000"
 
 export default {
   app: {
@@ -9,7 +10,7 @@ export default {
     isProduction:   process.env.NODE_ENV === 'production',
     port:           process.env.PORT || 8080,
     concurrency:    parseInt(process.env.WEB_CONCURRENCY || 1),
-    host:           process.env.HOSTNAME || "http://localhost:8000"
+    host:           hostName
   },
 
   session: {
@@ -40,7 +41,7 @@ export default {
     access_secret:  process.env.AWS_SECRET_ACCESS_KEY,
 
     s3: {
-      bucket: process.env.AWS_S3_BUCKET || 'whatl3y'
+      bucket: process.env.AWS_S3_BUCKET || 'euphoritech'
     }
   },
 
@@ -51,7 +52,7 @@ export default {
   github: {
     appId: process.env.GITHUB_APP_ID,
     appSecret: process.env.GITHUB_APP_SECRET,
-    loginCallbackUrl: `${process.env.HOSTNAME}/auth/github/callback`
+    loginCallbackUrl: `${hostName}/auth/github/callback`
   },
 
   salesforce: {
@@ -62,7 +63,7 @@ export default {
   google: {
     appId: process.env.GOOGLE_APP_ID,
     appSecret: process.env.GOOGLE_APP_SECRET,
-    loginCallbackUrl: `${process.env.HOSTNAME}/auth/google/callback`
+    loginCallbackUrl: `${hostName}/auth/google/callback`
   },
 
   logger: {

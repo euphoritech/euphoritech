@@ -11,3 +11,7 @@ export function insertQuery(table, keyValuePairs) {
     (${values.map(v => (typeof v === 'string') ? `'${v}'` : v).join(',')})
   `
 }
+
+export async function truncateTable(postgres, table) {
+  await postgres.query(`truncate ${table} cascade`)
+}

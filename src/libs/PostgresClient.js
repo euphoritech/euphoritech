@@ -68,43 +68,42 @@ export default class PostgresClient {
     }
   }
 
-  // ISSUE: https://github.com/brianc/node-pg-query-stream/issues/28
-  // queryStream(query, ...args) {
-  //   return new Promise((resolve, reject) => {
-  //     let values = []
-  //     let individualCallback = NOOP
-  //     switch (args.length) {
-  //       case 2:
-  //         values = args[0]
-  //         individualCallback = args[1]
-  //       case 1:
-  //         individualCallback = args[0]
-  //     }
-  //
-  //     const queryStream = new QueryStream(query, values)
-  //     const streamPromise = this.pool.query(queryStream)
-  //
-  //     console.log('streamPromise', streamPromise)
-  //     streamPromise.then(stream => {
-  //       console.log('got here...')
-  //       stream.on('data', individualCallback)
-  //
-  //       stream.on('error', err => {
-  //         stream.pause()
-  //         reject(err)
-  //       })
-  //
-  //       stream.on('end', function() {
-  //         const resolveFinal = () => {
-  //           if (isReadyToEnd)
-  //             return resolve(readableStream)
-  //           setTimeout(resolveFinal, 250)
-  //         }
-  //         resolveFinal()
-  //       })
-  //     })
-  //   })
-  // }
+  queryStream(query, ...args) {
+    return new Promise(async (resolve, reject) => {
+      const client = await this.pool.connect()
+      try {
+        let values = []
+        let individualCallback = NOOP
+        switch (args.length) {
+          case 2:
+            values = args[0]
+            individualCallback = args[1]
+          case 1:
+            individualCallback = args[0]
+        }
+
+        const queryStream = new QueryStream(query, values)
+        const stream = client.query(queryStream)
+
+        stream.on('data', individualCallback)
+
+        stream.on('error', err => {
+          stream.pause()
+          client.release()
+          reject(err)
+        })
+
+        stream.on('end', function() {
+          client.release()
+          resolve()
+        })
+
+      } catch(err) {
+        client.release()
+        reject(err)
+      }
+    })
+  }
 
   bindPoolErrorEvent() {
     this.pool.on('error', (err, client) => {

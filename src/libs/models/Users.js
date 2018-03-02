@@ -37,7 +37,7 @@ export default function Users(postgres, session=null) {
       setSession(object, sessionObj=session) {
         if (session && sessionObj) {
           for (var _key in object) {
-            if (object[_key].toString() === '[object Object]') {
+            if (object[_key] && object[_key].toString() === '[object Object]') {
               sessionObj[_key] = sessionObj[_key] || {}
               this.setSession(object[_key], sessionObj[_key])
             } else {

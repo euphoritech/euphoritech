@@ -1,10 +1,6 @@
 export default {
-  ADD_COMMENT(state) {
-  //   const newNote = {
-  //     text: 'New note',
-  //     favorite: false
-  //   }
-  //   state.notes.push(newNote)
-  //   state.activeNote = newNote
+  SET_LOGGED_IN_USER(state, userObj) {
+    state.user = userObj
+    console.log('state.user', state.user)
   }
 }

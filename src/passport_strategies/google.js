@@ -18,7 +18,6 @@ export default function GooglePassportStrategy(postgresClient) {
       try {
         const users   = Users(postgresClient, req.session)
         const userInt = UserOauthIntegrations(postgresClient)
-        console.log('GOOGLE PROFILE', profile)
 
         const emailAddress = profile.emails[0].value
 
@@ -31,15 +30,18 @@ export default function GooglePassportStrategy(postgresClient) {
           email:          emailAddress,
           access_token:   accessToken,
           refresh_token:  refreshToken
-        })
+        }, { id: undefined })
 
-        const userRecord  = await users.findOrCreateBy({ username_email: emailAddress })
-        users.setRecord({ first_name: userRecord.first_name || intInfo.first_name, last_name: userRecord.last_name || intInfo.last_name })
+        const userRecord = await users.findOrCreateBy({ username_email: emailAddress })
+        users.setRecord(Object.assign({}, intInfo, {
+          first_name: userRecord.first_name || intInfo.first_name,
+          last_name: userRecord.last_name || intInfo.last_name
+        }, { id: userRecord.id }))
         await users.save()
 
-        const intRecord   = await userInt.findOrCreateBy({ user_id: userRecord.id, type: 'google', unique_id: profile.id })
-        userInt.setRecord(intInfo)
-        await intInfo.save()
+        const intRecord = await userInt.findOrCreateBy({ user_id: userRecord.id, type: 'google', unique_id: profile.id })
+        userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
+        await userInt.save()
 
         const didLogin = users.login(userRecord)
         return done(null, intInfo.unique_id)

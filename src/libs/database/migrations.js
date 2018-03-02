@@ -62,9 +62,10 @@ async function createUsers(postgres) {
   await postgres.query(`
     CREATE TABLE IF NOT EXISTS users (
       id serial PRIMARY KEY,
-      name varchar(255) not null,
+      name varchar(255),
       username_email varchar(255) not null,
       password_hash varchar(255),
+      password_iv varchar(255),
       first_name varchar(255),
       last_name varchar(255),
       created_at timestamp(6) without time zone NOT NULL DEFAULT now(),

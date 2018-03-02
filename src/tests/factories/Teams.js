@@ -1,4 +1,4 @@
-import { insertQuery } from './Helpers'
+import { insertQuery, truncateTable } from './Helpers'
 
 export async function createShortHierarchy(postgres) {
   await Promise.all([
@@ -10,5 +10,5 @@ export async function createShortHierarchy(postgres) {
 }
 
 export async function truncateTeams(postgres) {
-  await postgres.query('truncate teams cascade')
+  await truncateTable(postgres, 'teams')
 }

@@ -7,7 +7,7 @@
 
 <script>
   import EuphoritechHeader from './EuphoritechHeader'
-  import ApiData from '../factories/ApiData'
+  import AuthFactory from '../factories/ApiAuth'
 
   export default {
     name: 'euphoritech',
@@ -17,8 +17,8 @@
       this.$refs.toastr.defaultPosition = "toast-bottom-right"
     },
 
-    async created() {
-      // GET ANY SESSION INFO HERE TO BE PUT IN euphoritech-header
+    created() {
+      this.$store.dispatch('getLoggedInUser')
     },
 
     components: {
