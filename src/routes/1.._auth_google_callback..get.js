@@ -1,9 +1,14 @@
 import passport from 'passport'
 import Routes from '../libs/Routes'
 
-export default [
-  passport.authenticate("google", { failureRedirect: '/' }),
-  async function afterSuccessfulAuthGoogle(req, res) {
-    Routes.checkAndRedirect(req, res, '/')
-  }
-]
+export default function AuthGoogleCallback(req, res, next) {
+  passport.authenticate("google", function(err, user, info) {
+    if (err)
+      return next(err)
+
+    if (!user)
+      return res.redirect('/login')
+
+    return Routes.checkAndRedirect(req, res, '/')
+  })(req, res, next)
+}

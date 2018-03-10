@@ -1,7 +1,9 @@
 import PassportGithub from 'passport-github2'
 import Users from '../libs/models/Users'
 import UserOauthIntegrations from '../libs/models/UserOauthIntegrations'
+import TeamsUsersRolesMap from '../libs/models/TeamsUsersRolesMap'
 import GithubApi from '../libs/GithubApi'
+import Errors from '../libs/errors'
 import config from '../config'
 
 const GithubStrategy = PassportGithub.Strategy
@@ -19,12 +21,13 @@ export default function PassportGithubPassportStrategy(postgresClient) {
       try {
         const users   = Users(postgresClient, req.session)
         const userInt = UserOauthIntegrations(postgresClient)
+        const teamMap = TeamsUsersRolesMap(postgresClient)
 
         const emailResponse = await GithubApi(accessToken).emails()
         const emailAddress = (emailResponse.data[0]) ? emailResponse.data[0].email : null
 
         if (!emailAddress)
-          throw new Error('No email address found for this user.')
+          throw new Errors.NoEmailAddress('No email address found for this user.')
 
         const intInfo = Object.assign({}, profile, {
           type:           'github',
@@ -47,6 +50,10 @@ export default function PassportGithubPassportStrategy(postgresClient) {
         const intRecord = await userInt.findOrCreateBy({ user_id: userRecord.id, type: 'github', unique_id: profile.id })
         userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
         await userInt.save()
+
+        const teamRoleMapRecords = await teamMap.getAllByUserId(userRecord.id)
+        if (teamRoleMapRecords.length === 0)
+          throw new Errors.NoTeamError('No team found for this user yet.')
 
         const didLogin = users.login(userRecord)
         return done(null, intInfo.unique_id)

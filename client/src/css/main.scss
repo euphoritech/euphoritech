@@ -4,6 +4,8 @@
 // #c6d5f3
 
 $body_color: #2e529a;
+$soft_color1: #f8f8f8;
+$soft_color2: #c0c0c0;
 
 html, body {
   -webkit-text-size-adjust: none;    /* This is attempting to not have the text change on a mobile device */
@@ -136,6 +138,34 @@ html, body {
 
 .text-tiny {
   font-size: 0.5em;
+}
+
+.main-left-nav {
+  border: 1px solid $soft_color2;
+  background: $soft_color1;
+}
+
+ul.sidenav {
+  padding: 0px;
+
+  > li {
+    padding: 20px;
+  }
+
+  > li:hover {
+    background: $soft_color2;
+  }
+}
+
+.row.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+
+  > [class^="col-"],
+  > [class*=" col-"] {
+    padding-right: 0;
+    padding-left: 0;
+  }
 }
 
 .oauth-login-button {

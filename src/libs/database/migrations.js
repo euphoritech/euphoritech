@@ -66,6 +66,8 @@ async function createUsers(postgres) {
       username_email varchar(255) not null,
       password_hash varchar(255),
       password_iv varchar(255),
+      needs_password_reset boolean,
+      last_password_reset timestamp(6),
       first_name varchar(255),
       last_name varchar(255),
       created_at timestamp(6) without time zone NOT NULL DEFAULT now(),

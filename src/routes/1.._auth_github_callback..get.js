@@ -1,9 +1,14 @@
 import passport from 'passport'
 import Routes from '../libs/Routes'
 
-export default [
-  passport.authenticate("github", { failureRedirect: '/' }),
-  async function afterSuccessfulAuthGithub(req, res) {
-    Routes.checkAndRedirect(req, res, '/')
-  }
-]
+export default function AuthGithubCallback(req, res, next) {
+  passport.authenticate("github", function(err, user, info) {
+    if (err)
+      return next(err)
+
+    if (!user)
+      return res.redirect('/login')
+
+    return Routes.checkAndRedirect(req, res, '/')
+  })(req, res, next)
+}

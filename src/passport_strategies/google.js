@@ -1,6 +1,7 @@
 import PassportGoogle from 'passport-google-oauth20'
 import Users from '../libs/models/Users'
 import UserOauthIntegrations from '../libs/models/UserOauthIntegrations'
+import TeamsUsersRolesMap from '../libs/models/TeamsUsersRolesMap'
 import config from '../config'
 
 const GoogleStrategy = PassportGoogle.Strategy
@@ -18,6 +19,7 @@ export default function GooglePassportStrategy(postgresClient) {
       try {
         const users   = Users(postgresClient, req.session)
         const userInt = UserOauthIntegrations(postgresClient)
+        const teamMap = TeamsUsersRolesMap(postgresClient)
 
         const emailAddress = profile.emails[0].value
 
@@ -42,6 +44,10 @@ export default function GooglePassportStrategy(postgresClient) {
         const intRecord = await userInt.findOrCreateBy({ user_id: userRecord.id, type: 'google', unique_id: profile.id })
         userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
         await userInt.save()
+
+        const teamRoleMapRecords = await teamMap.getAllByUserId(userRecord.id)
+        if (teamRoleMapRecords.length === 0)
+          throw new Errors.NoTeamError('No team found for this user yet.')
 
         const didLogin = users.login(userRecord)
         return done(null, intInfo.unique_id)

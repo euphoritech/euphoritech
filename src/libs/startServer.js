@@ -91,6 +91,12 @@ export default async function startApp() {
     passport.serializeUser((user, done) => done(null, user))
     passport.deserializeUser((user, done) => done(null, user))
 
+    // Express error handling
+    app.use(function ExpressErrorHandler(err, req, res, next) {
+      log.error('Express error handling', err)
+      res.redirect(err.redirectRoute || '/')
+    })
+
     httpServer.listen(config.server.port, () => log.info(`listening on *: ${config.server.port}`))
     return httpServer
 

@@ -16,7 +16,7 @@
                 b-form-input(id="cpassword",v-model="data.confirm_password",type="password")
               div.text-center
                 b-button(type="submit",class="btn btn-default") {{ title }}
-              b-alert.margin-medium(variant="danger",:show="error") {{ error }}
+              b-alert.margin-medium(variant="warning",:show="error") {{ error }}
         a.oauth-login-button.google.d-flex.flex-row.align-items-center.justify-content-center(href="/auth/google")
           i.devicon-google-plain
           div Login with Google

@@ -1,9 +1,15 @@
 <template lang="pug">
-  b-container
+  b-container(:fluid="true")
     div(v-if="isLoading")
       loader
     b-row(v-if="!isLoading")
-      b-col Some infoooooo
+      b-col.main-left-nav(cols="3")
+        ul.list-unstyled.sidenav
+          li Dashboard
+          li Customers
+          li Development
+          li Support
+      b-col the body stuff
 </template>
 
 <script>
