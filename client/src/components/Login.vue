@@ -5,13 +5,14 @@
         h1 {{ title }}
         b-card.shadow-small
           div.card-text
-            b-form(@submit="validateForm($event)")
+            - //b-form(@submit="validateForm($event)")
+            b-form(action="/auth/local",method="post")
               input(type="hidden",id="create",name="create",:value="createValue")
               b-form-group(label="Username",label-for="username")
-                b-form-input(id="username",v-model="data.username")
+                b-form-input(id="username",name="username",v-model="data.username")
               hr.separate-vert-large(v-if="createValue")
               b-form-group(label="Password",label-for="password")
-                b-form-input(id="password",v-model="data.password",type="password")
+                b-form-input(id="password",name="password",v-model="data.password",type="password")
               b-form-group(v-if="createValue",label="Confirm Password",label-for="cpassword")
                 b-form-input(id="cpassword",v-model="data.confirm_password",type="password")
               div.text-center
@@ -71,18 +72,19 @@
       },
 
       async validateForm(e) {
-        e.preventDefault()
-        const error = this.getCreateSubmissionError(!!this.createValue)
-        if (error) {
-          setTimeout(() => this.error = null, 5000)
-          return this.error = error
-        }
-
-        const response = await AuthFactory.loginOrCreateAccount(this.data.username, this.data.password, this.createValue)
-        console.log('repsonse', response)
-        if (response.error)
-          return this.error = response.error
-        location.href = '/dashboard'
+        // e.preventDefault()
+        // const error = this.getCreateSubmissionError(!!this.createValue)
+        // if (error) {
+        //   setTimeout(() => this.error = null, 5000)
+        //   return this.error = error
+        // }
+        //
+        //
+        // const response = await AuthFactory.loginOrCreateAccount(this.data.username, this.data.password, this.createValue)
+        // console.log('repsonse', response)
+        // if (response.error)
+        //   return this.error = response.error
+        // location.href = '/dashboard'
       }
     },
 

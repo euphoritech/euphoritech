@@ -37,6 +37,7 @@ async function createTeams(postgres) {
     CREATE TABLE IF NOT EXISTS teams (
       id serial PRIMARY KEY,
       parent_team_id integer DEFAULT null REFERENCES teams,
+      external_id varchar(255) UNIQUE,
       is_global boolean,
       type varchar(255),
       name varchar(255),
@@ -65,11 +66,12 @@ async function createUsers(postgres) {
       name varchar(255),
       username_email varchar(255) not null,
       password_hash varchar(255),
-      password_iv varchar(255),
-      needs_password_reset boolean,
-      last_password_reset timestamp(6),
       first_name varchar(255),
       last_name varchar(255),
+      needs_password_reset boolean,
+      last_password_reset timestamp(6),
+      last_login timestamp(6),
+      num_logins integer,
       created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
       updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
     );

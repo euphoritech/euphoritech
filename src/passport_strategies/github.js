@@ -8,7 +8,7 @@ import config from '../config'
 
 const GithubStrategy = PassportGithub.Strategy
 
-export default function PassportGithubPassportStrategy(postgresClient) {
+export default function GithubPassportStrategy(postgresClient) {
   return {
     strategy: PassportGithub.Strategy,
     options: {
@@ -17,7 +17,7 @@ export default function PassportGithubPassportStrategy(postgresClient) {
       callbackURL:        config.github.loginCallbackUrl,
       passReqToCallback:  true
     },
-    handler: async function PassportGithubPassportHandler(req, accessToken, refreshToken, profile, done) {
+    handler: async function PassportGithubHandler(req, accessToken, refreshToken, profile, done) {
       try {
         const users   = Users(postgresClient, req.session)
         const userInt = UserOauthIntegrations(postgresClient)
@@ -43,19 +43,21 @@ export default function PassportGithubPassportStrategy(postgresClient) {
         const userRecord = await users.findOrCreateBy({ username_email: emailAddress })
         users.setRecord(Object.assign({}, intInfo, {
           first_name: userRecord.first_name || intInfo.first_name,
-          last_name: userRecord.last_name || intInfo.last_name
+          last_name: userRecord.last_name || intInfo.last_name,
+          last_login: new Date(),
+          num_logins: (userRecord.num_logins || 0) + 1
         }, { id: userRecord.id }))
         await users.save()
 
         const intRecord = await userInt.findOrCreateBy({ user_id: userRecord.id, type: 'github', unique_id: profile.id })
         userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
         await userInt.save()
+        const didLogin = users.login(userRecord)
 
         const teamRoleMapRecords = await teamMap.getAllByUserId(userRecord.id)
         if (teamRoleMapRecords.length === 0)
           throw new Errors.NoTeamError('No team found for this user yet.')
 
-        const didLogin = users.login(userRecord)
         return done(null, intInfo.unique_id)
 
       } catch(err) {

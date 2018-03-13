@@ -7,8 +7,10 @@
         b-nav-item Home
         b-nav-item Somewhere
       b-navbar-nav(class="ml-auto")
-        b-form-input(size="sm",class="mr-sm-2",placeholder="Search..")
+        b-form-input.mr-sm-2(size="sm",placeholder="Search..")
         b-nav-item(v-if="!$store.state.user",href="/login") Login
+        b-nav-item(v-if="$store.state.user",href="/settings")
+          i.fa.fa-cog
         b-nav-item(v-if="$store.state.user",href="/logout") Logout
 </template>
 

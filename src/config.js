@@ -45,6 +45,11 @@ export default {
     }
   },
 
+  auth: {
+    GLOBAL_ADMIN: process.env.GLOBAL_ADMIN,
+    GLOBAL_PASSWORD: process.env.GLOBAL_PASSWORD
+  },
+
   slack: {
     webhookUrl: process.env.SLACK_WEBHOOK_URL
   },
@@ -64,6 +69,21 @@ export default {
     appId: process.env.GOOGLE_APP_ID,
     appSecret: process.env.GOOGLE_APP_SECRET,
     loginCallbackUrl: `${hostName}/auth/google/callback`
+  },
+
+  mailer: {
+    transporterConfig: {
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        type: 'OAuth2',
+        user: 'noreply@euphoritech.com',
+        clientId: process.env.GOOGLE_APP_ID,
+        clientSecret: process.env.GOOGLE_APP_SECRET,
+        accessToken: process.env.GOOGLE_ACCESS_TOKEN
+      }
+    }
   },
 
   logger: {

@@ -10,7 +10,8 @@ export default function Users(postgres, session=null) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'name', 'username_email', 'password_hash', 'first_name', 'last_name'
+        'name', 'username_email', 'password_hash', 'first_name', 'last_name',
+        'needs_password_reset', 'last_password_reset', 'last_login', 'num_logins'
       ],
 
       async isUsernameAvailabile(usernameEmail) {
@@ -20,7 +21,10 @@ export default function Users(postgres, session=null) {
         return rows.length === 0
       },
 
-      async validateUserPassword(username, plainPassword) {
+      async validateUserPassword(username, plainPassword, hashedPasswordToCheck=null) {
+        if (hashedPasswordToCheck)
+          return await Encryption.comparePassword(plainPassword, hashedPasswordToCheck)
+
         const record = await this.findByColumn(username, 'username_email')
         if (record) {
           const pwHash = record.password_hash
