@@ -140,20 +140,19 @@ html, body {
   font-size: 0.5em;
 }
 
-.main-left-nav {
+.side-nav {
   border: 1px solid $soft_color2;
   background: $soft_color1;
-}
-
-ul.sidenav {
-  padding: 0px;
-
-  > li {
-    padding: 20px;
+  height: calc(100vh - 56px);
+  padding: 0;
+  
+  .active, :hover {
+    background: $soft_color2;
+    color: white
   }
 
-  > li:hover {
-    background: $soft_color2;
+  .active {
+    border: 1px solid $soft_color2;
   }
 }
 

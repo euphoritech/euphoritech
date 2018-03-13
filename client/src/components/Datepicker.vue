@@ -6,7 +6,7 @@
 
 <script>
   import moment from 'moment'
-  import Datepicker from 'vuejs-datepicker'
+  import DatePicker from 'vuejs-datepicker'
 
   export default {
     props: [ 'valueKey', 'label', 'placeholder', 'value' ],
@@ -27,7 +27,7 @@
         this.date = moment(this.value).toDate()
     },
     components: {
-      dp: Datepicker
+      dp: DatePicker
     }
   }
 </script>
