@@ -7,10 +7,10 @@
         b-nav-item(href="/") Home
       b-navbar-nav(class="ml-auto")
         b-form-input.mr-sm-2(size="sm",placeholder="Search..")
-        b-nav-item(v-if="!$store.state.user",href="/login") Login
-        b-nav-item(v-if="$store.state.user",href="/settings")
+        b-nav-item(v-if="!$store.state.auth.user",href="/login") Login
+        b-nav-item(v-if="$store.state.auth.user",href="/settings")
           i.fa.fa-cog
-        b-nav-item(v-if="$store.state.user",href="/logout") Logout
+        b-nav-item(v-if="$store.state.auth.user",href="/logout") Logout
 </template>
 
 <script>

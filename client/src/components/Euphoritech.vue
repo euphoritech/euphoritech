@@ -21,8 +21,12 @@
       this.$refs.toastr.defaultPosition = "toast-bottom-right"
     },
 
-    created() {
-      this.$store.dispatch('getLoggedInUser')
+    async created() {
+      await this.$store.dispatch('getLoggedInUser')
+      if (!this.$store.state.auth.user)
+        return this.$store.dispatch('redirectToLogin')
+
+      this.$store.commit('APP_NO_LONGER_LOADING')
     }
   }
 </script>
