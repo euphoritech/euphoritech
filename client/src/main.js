@@ -20,6 +20,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './css/main.scss'
 
 window.euphoritechFetch = fetchDefaults(fetch, { credentials: 'same-origin' })
+window.vueRouter = router
 
 // Initiate FastClick for mobile devices to remove the built-in 300ms
 // delay. Read more in https://github.com/ftlabs/fastclick

@@ -2,7 +2,7 @@
   div.container.margin-top-large
     div.row.d-flex.justify-content-center
       div.col-xs-12.col-sm-8.col-sm-offset-2.col-lg-6.col-lg-offset-6
-        b-alert(variant="danger",:show="errorMessage") {{ errorMessage }}
+        b-alert(variant="danger",:show="!!errorMessage") {{ errorMessage }}
     component(:is="subComponent")
 </template>
 

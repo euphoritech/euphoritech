@@ -1,3 +1,7 @@
 export default {
-  user: null
+  isLoading: true,
+
+  auth: {
+    user: null
+  }
 }

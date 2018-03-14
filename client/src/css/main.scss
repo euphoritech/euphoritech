@@ -143,9 +143,9 @@ html, body {
 .side-nav {
   border: 1px solid $soft_color2;
   background: $soft_color1;
-  height: calc(100vh - 56px);
+  height: calc(100vh);
   padding: 0;
-  
+
   .active, :hover {
     background: $soft_color2;
     color: white
