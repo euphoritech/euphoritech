@@ -1,8 +1,6 @@
 <template lang="pug">
   b-container(:fluid="true")
-    div(v-if="$store.state.isLoading")
-      loader
-    b-row(v-if="!$store.state.isLoading")
+    b-row
       side-bar
       component.padding-medium(:is="partialComponent")
 </template>
