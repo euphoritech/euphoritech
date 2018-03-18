@@ -7,16 +7,27 @@
         b-nav-item(href="/") Home
       b-navbar-nav(class="ml-auto")
         b-form-input.mr-sm-2(size="sm",placeholder="Search..")
-        b-nav-item(v-if="!$store.state.auth.user",href="/login") Login
-        b-nav-item(v-if="$store.state.auth.user",href="/settings")
+        b-nav-item(v-if="!isLoggedIn",href="/login") Login
+        b-nav-item(v-if="isLoggedIn",@click="toggleSettings")
           i.fa.fa-cog
-        b-nav-item(v-if="$store.state.auth.user",href="/logout") Logout
+        b-nav-item(v-if="isLoggedIn",href="/logout") Logout
 </template>
 
 <script>
   import moment from 'moment'
+  import AuthFactory from '../factories/ApiAuth'
 
   export default {
+    computed: {
+      isLoggedIn() {
+        return AuthFactory.isLoggedIn(this.$store.state)
+      }
+    },
 
+    methods: {
+      async toggleSettings() {
+        await this.$store.dispatch('toggleSettingsModal')
+      }
+    }
   }
 </script>

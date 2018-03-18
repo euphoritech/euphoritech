@@ -10,8 +10,9 @@ import router from './router'
 
 // external libraries and components
 import 'whatwg-fetch'
-import Toastr from 'vue-toastr'
 import Loader from './components/Loader'
+import Toastr from 'vue-toastr'
+import SettingsContainer from './components/settings/SettingsContainer'
 
 // css
 import 'vue-toastr/src/vue-toastr.less'
@@ -28,8 +29,9 @@ if ('addEventListener' in document)
   document.addEventListener('DOMContentLoaded', () => FastClick.attach(document.body), false)
 
 Vue.use(BootstrapVue)
-Vue.component('vue-toastr', Toastr)
 Vue.component('loader', Loader)
+Vue.component('vue-toastr', Toastr)
+Vue.component('settings', SettingsContainer)
 
 Vue.config.productionTip = false
 

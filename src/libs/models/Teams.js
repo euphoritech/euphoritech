@@ -12,7 +12,49 @@ export default function Teams(postgres) {
         'primary_contact_email', 'primary_contact_name'
       ],
 
-      async getTeamHierarchy(topMostTeamId=null) {
+      async isChildInParentsHierarchy(parentTeamId, childTeamId) {
+        const childHierarchy = await this.getParentTeams(childTeamId)
+        return childHierarchy.map(r => r.pid).includes(parentTeamId)
+      },
+
+      async getEntireHierarchy(topMostTeamId=null) {
+        const rows = this.hierarchyFromTop(topMostTeamId)
+        return buildTeamNestedObject(rows)
+      },
+
+      async getParentTeams(bottomMostTeamId) {
+        const rows = await this.hierarchyFromBottom(bottomMostTeamId)
+        return buildTeamNestedObject(rows)
+      },
+
+      async hierarchyFromBottom(bottomMostTeamId) {
+        // cid: child org id
+        // cname: child org name
+        // pid: parent org id
+        const { rows } = await postgres.query(`
+          WITH RECURSIVE chain(cid, cname, pid) AS (
+            select
+              o1.id as cid,
+              o1.name as cname,
+              o1.parent_team_id as pid
+            from teams as o1
+            where o1.id = $1
+
+              UNION
+
+            select
+              o2.id as cid,
+              o2.name as cname,
+              o2.parent_team_id as pid
+            from teams as o2, chain o1
+            where o2.id = o1.pid
+          )
+          select * from chain
+        `, [ bottomMostTeamId ])
+        return rows
+      },
+
+      async hierarchyFromTop(topMostTeamId=null) {
         let addToQuery = ``
         let params = []
         if (topMostTeamId) {
@@ -43,8 +85,7 @@ export default function Teams(postgres) {
           )
           select * from chain
         `, params)
-
-        return buildTeamNestedObject(rows)
+        return rows
       }
     }
   )

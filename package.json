@@ -45,6 +45,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-plumber": "^1.1.0",
     "ioredis": "^3.2.2",
+    "jsforce": "^1.8.1",
     "minimist": "^1.2.0",
     "moment": "^2.18.1",
     "newrelic": "^1.40.0",

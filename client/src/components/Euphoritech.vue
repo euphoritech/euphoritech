@@ -6,6 +6,7 @@
       nav-bar
       router-view
     vue-toastr(ref="toastr")
+    settings
 </template>
 
 <script>
@@ -25,8 +26,8 @@
     },
 
     async created() {
-      await this.$store.dispatch('getLoggedInUser')
-      if (!this.$store.state.auth.user && this.$route.path !== '/login')
+      await this.$store.dispatch('getSessionInfo')
+      if (!AuthFactory.isLoggedIn(this.$store.state) && this.$route.path !== '/login')
         this.$store.dispatch('redirectToLogin')
 
       this.$store.commit('APP_NO_LONGER_LOADING')

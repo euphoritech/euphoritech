@@ -9,6 +9,10 @@ const log = bunyan.createLogger(config.logger.options)
 
 export default async function Index(req, res) {
   try {
+    if (req.params[0].indexOf("favicon.ico") !== 0) {
+      req.session.returnTo = req.params[0]
+      req.session.save()
+    }
 
     res.render('index', {})
 

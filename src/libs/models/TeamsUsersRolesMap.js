@@ -1,4 +1,5 @@
 import DatabaseModel from './DatabaseModel'
+import Teams from './Teams'
 
 export default function TeamsUsersRolesMap(postgres) {
   const factoryToExtend = DatabaseModel(postgres, 'teams_users_roles_map')
@@ -30,6 +31,16 @@ export default function TeamsUsersRolesMap(postgres) {
           where user_id = $1 and team_id = $2
         `, [ userId, teamId ])
         return rows[0]
+      },
+
+      async userHasAccessToTeam(userId, teamId) {
+        const teams = Teams(postgres)
+        const mapRecords = await this.getAllByUserId(userId)
+        // if (mapRecords.length > 0) {
+        //   const hierarchy = await teams.getParentTeams(mapRecords[0].team_id)
+        //   const topTeamId = hierarchy[ hierarchy.length-1 ].cid
+        // }
+        return false
       }
     }
   )

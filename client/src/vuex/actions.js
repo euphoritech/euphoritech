@@ -1,9 +1,18 @@
 import AuthFactory from '../factories/ApiAuth'
+import SettingsFactory from '../factories/ApiSettings'
 
 export default {
-  async getLoggedInUser({ commit }) {
-    const info = await AuthFactory.getLoggedInUser()
-    commit('SET_LOGGED_IN_USER', info.session)
+  async getSessionInfo({ commit }) {
+    const [ user, settings ] = await Promise.all([
+      AuthFactory.getLoggedInUser(),
+      SettingsFactory.getStatus()
+    ])
+    commit('SET_SESSION_INFO', { user: user.session, settings: settings.status })
+  },
+
+  async toggleSettingsModal({ commit }) {
+    commit('TOGGLE_SETTINGS_MODAL')
+    await SettingsFactory.open()
   },
 
   redirectToLogin() {
