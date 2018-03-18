@@ -19,12 +19,16 @@ export default async function oauthTypeCallback(req, res) {
     if (result && result.error)
       return res.status(500).json({ error: result })
 
+    // Example `token`: {"token":{"access_token":"7095d09f1d8e020b881c93d25e472ca097749910","token_type":"bearer","scope":"","expires_at":null}}
     const token = oauthConf.oauth2.accessToken.create(result)
     log.debug(`${oauthType} OAuth token`, token)
 
-    // TODO: Store in database and redirect back to config page
-    // Example `token`: {"token":{"access_token":"7095d09f1d8e020b881c93d25e472ca097749910","token_type":"bearer","scope":"","expires_at":null}}
-    return res.json(token)
+    const intInfo   = { type: oauthType, access_token: token.token.access_token }
+    const intRecord = await userInt.findOrCreateBy({ user_id: req.session.user.id, type: oauthType, unique_id: profile.id })
+    userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
+    await userInt.save()
+
+    return res.redirect(req.session.returnTo || '/')
 
   } catch(error) {
     return res.status(500).json({ error })

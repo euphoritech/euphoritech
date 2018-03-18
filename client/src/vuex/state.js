@@ -3,5 +3,9 @@ export default {
 
   auth: {
     user: null
+  },
+
+  settings: {
+    isOpen: false
   }
 }

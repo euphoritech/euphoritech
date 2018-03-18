@@ -55,6 +55,21 @@ export default function Users(postgres, session=null) {
         return false
       },
 
+      getLoggedInUserId() {
+        if (this.isLoggedIn())
+          return session.user.id
+
+        return false
+      },
+
+      isLoggedIn() {
+        if (session && session.toString() === '[object Object]') {
+          if (Object.keys(session.user) > 0)
+            return true
+        }
+        return false
+      },
+
       login(userObject=this.record) {
         if (session) {
           session.user = session.user || {}

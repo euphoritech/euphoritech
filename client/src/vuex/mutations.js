@@ -3,8 +3,13 @@ export default {
     state.isLoading = false
   },
 
-  SET_LOGGED_IN_USER(state, userObj) {
-    state.auth.user = userObj
-    console.log('state.auth.user', state.auth.user)
+  SET_SESSION_INFO(state, { user, settings }) {
+    state.auth.user = Object.assign(state.auth.user || {}, user)
+    state.settings  = Object.assign(state.settings || {}, settings)
+    console.log('STATE', state)
+  },
+
+  TOGGLE_SETTINGS_MODAL(state) {
+    state.settings.isOpen = !state.settings.isOpen
   }
 }

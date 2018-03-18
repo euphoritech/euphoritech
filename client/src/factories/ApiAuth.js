@@ -15,5 +15,11 @@ export default {
   async getLoggedInUser() {
     const response = await euphoritechFetch(`/api/1.0/auth/session`)
     return response.json()
+  },
+
+  isLoggedIn(state) {
+    return (state.auth && state.auth.user && Object.keys(state.auth.user).length > 0)
+      return true
+    return false
   }
 }

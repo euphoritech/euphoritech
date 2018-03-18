@@ -1,8 +1,10 @@
 import bunyan from 'bunyan'
 import ApiVersions from '../libs/api/'
+import PostgresClient from '../libs/PostgresClient'
 import config from '../config'
 
 const log = bunyan.createLogger(config.logger.options)
+const postgres = new PostgresClient()
 
 export default async function ApiNamespaceCommand(req, res) {
   const version   = req.params.version
@@ -10,7 +12,7 @@ export default async function ApiNamespaceCommand(req, res) {
   const command   = req.params.command
 
   try {
-    await ApiVersions[version][namespace][command]({ req, res })
+    await ApiVersions[version][namespace][command]({ req, res, postgres })
   } catch(err) {
     log.error("Error with API request", err)
     res.sendStatus(404)

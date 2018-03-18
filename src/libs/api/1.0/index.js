@@ -1,5 +1,9 @@
 import Auth from './auth'
+import Settings from './settings'
+import Teams from './teams'
 
 export default {
-  auth: Auth
+  auth:     Auth,
+  settings: Settings,
+  teams:    Teams
 }
