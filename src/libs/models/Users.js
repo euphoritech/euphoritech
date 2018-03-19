@@ -64,7 +64,7 @@ export default function Users(postgres, session=null) {
 
       isLoggedIn() {
         if (session && session.toString() === '[object Object]') {
-          if (Object.keys(session.user) > 0)
+          if (Object.keys(session.user || {}).length > 0)
             return true
         }
         return false

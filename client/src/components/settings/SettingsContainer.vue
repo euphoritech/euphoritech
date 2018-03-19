@@ -1,7 +1,7 @@
 <template>
   <b-modal id="settings-modal" ref="settingsModal" v-model="$store.state.settings.isOpen" size="lg" centered title="Settings">
     <b-row class="settings-modal-content-wrapper">
-      <b-col class="settings-nav" cols="3">
+      <b-col class="settings-nav" cols="2">
         <b-navbar v-b-scrollspy:settings-content>
           <b-nav pills class="flex-column">
             <b-nav-item v-for="setting in settings" @click="goToSection(setting)" :href="'#' + getSettingId(setting)" :key="getSettingId(setting)">
