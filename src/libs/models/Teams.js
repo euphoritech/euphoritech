@@ -13,18 +13,18 @@ export default function Teams(postgres) {
       ],
 
       async isChildInParentsHierarchy(parentTeamId, childTeamId) {
-        const childHierarchy = await this.getParentTeams(childTeamId)
+        const childHierarchy = await this.hierarchyFromBottom(childTeamId)
         return childHierarchy.map(r => r.pid).includes(parentTeamId)
       },
 
       async getEntireHierarchy(topMostTeamId=null) {
-        const rows = this.hierarchyFromTop(topMostTeamId)
+        const rows = await this.hierarchyFromTop(topMostTeamId)
         return buildTeamNestedObject(rows)
       },
 
       async getParentTeams(bottomMostTeamId) {
         const rows = await this.hierarchyFromBottom(bottomMostTeamId)
-        return buildTeamNestedObject(rows)
+        return buildTeamNestedObject(rows.reverse())
       },
 
       async hierarchyFromBottom(bottomMostTeamId) {
@@ -102,18 +102,15 @@ export function buildTeamNestedObject(databaseResults) {
   // | 4     | Dept 2    | 2      |
   // | 5     | SubDept 2 | 4      |
   // +-------+-----------+--------+
-
-
-  // if (rows.length > 0) {
-  //   return rows.reduce((row, finalObj) => {
-  //     if (finalObj[row.pid]) {
-  //       if (row.cid)
-  //         finalObj[row.pid].children.push({ name: row.c_name, id: row.cid })
-  //       else
-  //         finalObj[row.pid]
-  //     }
-  //   }, {})
-  // }
-
-  return databaseResults
+  const addChildren = obj => {
+    const children = databaseResults.filter(r => r.pid == obj.id)
+    if (children.length > 0) {
+      obj.children = Object.assign({}, obj.children || {}, children.reduce((acc, c) => {
+        acc[c.cid] = addChildren({ id: c.cid, name: c.cname })
+        return acc
+      }, {}))
+    }
+    return obj
+  }
+  return databaseResults.reduce((acc, val) => (acc) ? addChildren(acc) : ({ id: val.cid, name: val.cname }), null)
 }

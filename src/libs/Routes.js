@@ -1,6 +1,7 @@
 import fs from 'fs'
 import util from 'util'
 import path from 'path'
+import Users from './models/Users'
 
 const readdir = util.promisify(fs.readdir)
 
@@ -32,5 +33,19 @@ export default {
       return res.redirect(redirectTo)
 
     res.redirect(defaultRedirectPath)
+  },
+
+  requireAuthExpressMiddleware() {
+    return function(req, res, next) {
+      if (Users(null, req.session).isLoggedIn())
+        return next()
+
+      // TODO: Support API key authentication here
+      const apiKeyProvided = req.headers['euphoritech-api-key']
+      if (true)
+        return next()
+
+      return res.status(401).json({ error: 'Invalid authentication information.' })
+    }
   }
 }

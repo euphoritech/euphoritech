@@ -36,10 +36,12 @@ export default function TeamsUsersRolesMap(postgres) {
       async userHasAccessToTeam(userId, teamId) {
         const teams = Teams(postgres)
         const mapRecords = await this.getAllByUserId(userId)
-        // if (mapRecords.length > 0) {
-        //   const hierarchy = await teams.getParentTeams(mapRecords[0].team_id)
-        //   const topTeamId = hierarchy[ hierarchy.length-1 ].cid
-        // }
+        if (mapRecords.length > 0) {
+          const targetTeamParents = await teams.hierarchyFromBottom(teamId)
+          return mapRecords.some(h => {
+            return (targetTeamParents.map(p => p.cid).includes(h.team_id) || targetTeamParents.map(p => p.pid).includes(h.team_id))
+          })
+        }
         return false
       }
     }
