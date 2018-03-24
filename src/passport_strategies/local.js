@@ -42,6 +42,7 @@ export default function LocalPassportStrategy(postgresClient) {
         if (teamRoleMapRecords.length === 0)
           throw new Errors.NoTeamError('No team found for this user yet.')
 
+        users.setSession({ teams_roles: teamRoleMapRecords })
         return done(null, username)
 
       } catch(err) {

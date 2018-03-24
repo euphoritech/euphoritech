@@ -1,3 +1,5 @@
+import { handleFetchResponse } from './ApiHelpers'
+
 export default {
   // async loginOrCreateAccount(username, password, shouldCreate=false) {
   //   const response = await euphoritechFetch(`/api/1.0/auth/login`, {
@@ -14,7 +16,7 @@ export default {
 
   async getLoggedInUser() {
     const response = await euphoritechFetch(`/api/1.0/auth/session`)
-    return response.json()
+    return await handleFetchResponse(response)
   },
 
   isLoggedIn(state) {

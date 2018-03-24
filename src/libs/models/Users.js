@@ -55,6 +55,13 @@ export default function Users(postgres, session=null) {
         return false
       },
 
+      getLoggedInUser() {
+        if (this.isLoggedIn())
+          return session.user
+
+        return false
+      },
+
       getLoggedInUserId() {
         if (this.isLoggedIn())
           return session.user.id

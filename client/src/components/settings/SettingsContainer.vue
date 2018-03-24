@@ -52,11 +52,11 @@
     created() {
       this.settings = [
         { header: 'Personal Info', id: "personal", component: Personal },
-        { header: 'Teams', id: 'teams', content: 'My infor' },
         { header: 'Customers', id: "customers", content: 'My infor' },
         { header: 'Development', id: "development", content: 'My infor' },
         { header: 'Support', id: "support", content: 'My infor' },
-        { header: 'Marketing', id: "marketing", content: 'My infor' }
+        { header: 'Marketing', id: "marketing", content: 'My infor' },
+        { header: 'Teams', id: 'teams', content: 'My infor' }
       ]
     },
 

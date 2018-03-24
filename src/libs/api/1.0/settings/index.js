@@ -2,7 +2,7 @@ export default {
   close({ req, res }) {
     req.session.settings = null
     req.session.save()
-    res.sendStatus(200)
+    res.status(200).json(null)
   },
 
   open({ req, res }) {
@@ -11,7 +11,7 @@ export default {
       section:  req.body.section
     }
     req.session.save()
-    res.sendStatus(200)
+    res.status(200).json(null)
   },
 
   status({ req, res }) {

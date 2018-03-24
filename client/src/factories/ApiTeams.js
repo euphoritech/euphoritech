@@ -1,6 +1,26 @@
+import { handleFetchResponse } from './ApiHelpers'
+
 export default {
-  async getTeamHierarchy(teamId) {
+  async getTeamHierarchy(teamId='') {
     const response = await euphoritechFetch(`/api/1.0/teams/getCurrentHierarchy?teamId=${teamId}`)
-    return response.json()
+    return await handleFetchResponse(response)
+  },
+
+  async newTeam({ teamId, teamName }) {
+    const response = await euphoritechFetch(`/api/1.0/teams/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ teamId, teamName })
+    })
+    return await handleFetchResponse(response)
+  },
+
+  async requestJoinTeam({ teamId }) {
+    const response = await euphoritechFetch(`/api/1.0/teams/requestJoinTeam`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ teamId })
+    })
+    return await handleFetchResponse(response)
   }
 }

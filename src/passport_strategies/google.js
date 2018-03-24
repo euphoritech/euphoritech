@@ -1,8 +1,5 @@
 import PassportGoogle from 'passport-google-oauth20'
-import Users from '../libs/models/Users'
-import UserOauthIntegrations from '../libs/models/UserOauthIntegrations'
-import TeamsUsersRolesMap from '../libs/models/TeamsUsersRolesMap'
-import Errors from '../libs/errors'
+import { passportOauthLoginHandler } from '../libs/Helpers'
 import config from '../config'
 
 const GoogleStrategy = PassportGoogle.Strategy
@@ -18,42 +15,21 @@ export default function GooglePassportStrategy(postgresClient) {
     },
     handler: async function GooglePassportHandler(req, accessToken, refreshToken, profile, done) {
       try {
-        const users   = Users(postgresClient, req.session)
-        const userInt = UserOauthIntegrations(postgresClient)
-        const teamMap = TeamsUsersRolesMap(postgresClient)
-
         const emailAddress = profile.emails[0].value
 
-        const intInfo = Object.assign({}, profile, {
-          type:           'google',
-          unique_id:      profile.id,
-          name:           `${profile.name.givenName} ${profile.name.familyName}`,
-          first_name:     profile.name.givenName,
-          last_name:      profile.name.familyName,
-          email:          emailAddress,
-          access_token:   accessToken,
-          refresh_token:  refreshToken
-        }, { id: undefined })
-
-        const userRecord = await users.findOrCreateBy({ username_email: emailAddress })
-        users.setRecord(Object.assign({}, intInfo, {
-          first_name: userRecord.first_name || intInfo.first_name,
-          last_name: userRecord.last_name || intInfo.last_name,
-          last_login: new Date(),
-          num_logins: (userRecord.num_logins || 0) + 1
-        }, { id: userRecord.id }))
-        await users.save()
-
-        const intRecord = await userInt.findOrCreateBy({ user_id: userRecord.id, type: 'google', unique_id: profile.id })
-        userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
-        await userInt.save()
-        const didLogin = users.login(userRecord)
-
-        const teamRoleMapRecords = await teamMap.getAllByUserId(userRecord.id)
-        if (teamRoleMapRecords.length === 0)
-          throw new Errors.NoTeamError('No team found for this user yet.')
-
-        return done(null, intInfo.unique_id)
+        await passportOauthLoginHandler({
+          req,
+          accessToken,
+          refreshToken,
+          profile,
+          postgresClient,
+          emailAddress,
+          done,
+          type:       'google',
+          name:       `${profile.name.givenName} ${profile.name.familyName}`,
+          firstName:  profile.name.givenName,
+          lastName:   profile.name.familyName
+        })
 
       } catch(err) {
         done(err)

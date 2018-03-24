@@ -5,6 +5,8 @@ export default {
     user: null
   },
 
+  session: {},
+
   settings: {
     isOpen: false
   }

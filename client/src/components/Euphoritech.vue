@@ -27,8 +27,11 @@
 
     async created() {
       await this.$store.dispatch('getSessionInfo')
-      if (!AuthFactory.isLoggedIn(this.$store.state) && this.$route.path !== '/login')
+      if (!AuthFactory.isLoggedIn(this.$store.state) && this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
         this.$store.dispatch('redirectToLogin')
+
+      if (AuthFactory.isLoggedIn(this.$store.state) && !this.$store.state.session.teams_roles)
+        this.$store.dispatch('redirectToNoTeamForm')
 
       this.$store.commit('APP_NO_LONGER_LOADING')
     }

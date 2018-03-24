@@ -43,6 +43,19 @@ export default function TeamsUsersRolesMap(postgres) {
           })
         }
         return false
+      },
+
+      roles() {
+        return {
+          superadmin:       { id: 0, desc: '' },
+          readonly:         { id: 1, desc: '' },
+          reporter:         { id: 2, desc: '' },
+          teamadmin:        { id: 3, desc: '' },
+          developer:        { id: 4, desc: '' },
+          sales:            { id: 5, desc: '' },
+          marketing:        { id: 6, desc: '' },
+          customersuccess:  { id: 7, desc: '' }
+        }
       }
     }
   )

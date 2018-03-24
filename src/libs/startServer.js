@@ -13,6 +13,7 @@ import passport from 'passport'
 import express from 'express'
 import socket_io from 'socket.io'
 import throng from 'throng'
+import i18n from 'i18n'
 import bunyan from 'bunyan'
 import PostgresClient from '../libs/PostgresClient'
 import Routes from '../libs/Routes'
@@ -50,6 +51,9 @@ export default async function startApp() {
     app.use(passport.initialize())
     app.use(passport.session())
     io.use((socket, next) => sessionMiddleware(socket.request, socket.request.res, next))
+
+    i18n.configure({ locales: [ 'en', 'de' ] })
+    app.use(i18n.init)
 
     // TODO create socket.io handler and event handlers
 

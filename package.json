@@ -44,6 +44,7 @@
     "gulp-babel": "latest",
     "gulp-concat": "^2.6.0",
     "gulp-plumber": "^1.1.0",
+    "i18n": "^0.8.3",
     "ioredis": "^3.2.2",
     "jsforce": "^1.8.1",
     "minimist": "^1.2.0",
