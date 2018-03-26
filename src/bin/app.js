@@ -3,9 +3,9 @@
  */
 
 import 'babel-polyfill'
-// import newrelic from 'newrelic'
+import newrelic from 'newrelic'
 import throng from 'throng'
-import startServer from '../libs/startServer'
+import startWebServer from '../libs/startWebServer'
 import config from '../config'
 
 // entry point to start server
@@ -15,5 +15,5 @@ throng({
   workers:  config.server.concurrency,
   lifetime: Infinity,
   grace:    8000,
-  start:    startServer
+  start:    startWebServer
 })

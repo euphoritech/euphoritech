@@ -1,6 +1,9 @@
+import NodeResque from 'node-resque'
 import Teams from '../../../models/Teams'
 import TeamsUsersRolesMap from '../../../models/TeamsUsersRolesMap'
+import TeamUserAccessRequest from '../../../models/TeamUserAccessRequest'
 import Users from '../../../models/Users'
+import config from '../../../../config'
 
 export default {
   async create({ req, res, postgres }) {
@@ -21,7 +24,7 @@ export default {
       name: teamName,
       primary_contact_user_id: userId
     })
-    const teamMapRecord = await teamMap.findOrCreateBy({ team_id: newRecord.id, user_id: userId, role: 'teamadmin' })
+    const teamMapRecord = await teamMap.findOrCreateBy({ team_id: newRecord.id, primary_contact_user_id: userId, role: 'teamadmin' })
 
     const teamRoleMapRecords = await teamMap.getAllByUserId(userId)
     users.setSession({ teams_roles: teamRoleMapRecords })
@@ -29,8 +32,28 @@ export default {
     return res.json(null)
   },
 
-  async requestJoinTeam({ req, res, postgres }) {
+  async requestJoinTeam({ req, res, postgres, redis }) {
+    const queue       = new NodeResque.Queue({ connection: { redis: redis.client }})
+    const teams       = Teams(postgres)
+    const users       = Users(postgres, req.session)
+    const teamAccess  = TeamUserAccessRequest(postgres)
+    const userId      = users.getLoggedInUserId()
+    const teamExtId   = req.body.teamId
 
+    const teamRecord = await teams.findBy({ external_id: teamExtId })
+    if (!teamRecord)
+      return res.status(404).json({ error: res.__(`We didn't find an existing team with the ID provided. Please make sure you typed it correctly and try again.`) })
+
+    const newAccessRecord = await teamAccess.findOrCreateBy({ requesting_user_id: userId, team_id: teamRecord.id })
+    teamAccess.setRecord({ requested_time: new Date(), status: 'pending' })
+    await teamAccess.save()
+    await queue.connect()
+    await queue.enqueue(config.resque.default_queue, 'sendTeamAccessRequest', [{
+      team_id: teamRecord.id,
+      user_id: userId
+    }])
+
+    return res.json(null)
   },
 
   async getCurrentHierarchy({ req, res, postgres }) {

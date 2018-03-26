@@ -32,6 +32,10 @@ export default {
     url: process.env.REDIS_URL || 'redis://localhost:6379'
   },
 
+  resque: {
+    default_queue: process.env.RESQUE_QUEUE || 'euphoritech_resque_default'
+  },
+
   postgres: {
     connection_string: process.env.DATABASE_URL || 'postgres://localhost:5432/euphoritech'
   },

@@ -1,6 +1,8 @@
 <template lang="pug">
   div.container.margin-top-large
-    div.row.d-flex.justify-content-center
+    div(v-if="localIsLoading")
+      loader
+    div.row.d-flex.justify-content-center(v-if="!localIsLoading")
       div.col-xs-12.col-sm-8.col-sm-offset-2.col-lg-6.col-lg-offset-3
         h1 Create or Join Team
         b-card.shadow-small
@@ -11,7 +13,11 @@
                 b-form-input(id="jteam",name="jteam",v-model="data.teamIdToJoin",placeholder="Team ID")
               div.text-center
                 b-button(variant="primary",type="submit",class="btn btn-default") Request Access
-              b-alert.margin-medium(variant="warning",:show="joinError") {{ joinError }}
+              b-alert.margin-medium(variant="warning",:show="!!joinError") {{ joinError }}
+              b-alert.margin-medium(variant="success",:show="joinSuccess").
+                Successfully requested access to team ID: {{ data.teamIdToJoin }}.
+                You will receive an e-mail once the request is acted on by the
+                team administrator.
             hr
             b-form(@submit="createNewTeam")
               h4 Create New Team
@@ -21,7 +27,7 @@
                 b-form-input(id="nteamname",name="nteamname",v-model="data.teamNameToCreate",placeholder="New Team Name")
               div.text-center
                 b-button(variant="success",type="submit",class="btn btn-default") Create New Team
-              b-alert.margin-medium(variant="warning",:show="newTeamError") {{ newTeamError }}
+              b-alert.margin-medium(variant="warning",:show="!!newTeamError") {{ newTeamError }}
 </template>
 
 <script>
@@ -30,12 +36,15 @@
   export default {
     data() {
       return {
+        localIsLoading: true,
+
         data: {
           teamIdToJoin: '',
           teamIdToCreate: '',
           teamNameToCreate: ''
         },
         joinError: null,
+        joinSuccess: false,
         newTeamError: null
       }
     },
@@ -54,19 +63,34 @@
         this.$store.dispatch('redirectToHome')
       },
 
-      joinExistingTeam(evt) {
-        if (!(this.data.teamIdToCreate && this.validTeamId(this.data.teamIdToCreate)))
+      async joinExistingTeam(evt) {
+        evt.preventDefault()
+
+        if (!(this.data.teamIdToJoin && this.validTeamId(this.data.teamIdToJoin)))
           return this.joinError = `Please enter a valid team ID to request access to join the team.`
 
-        console.log('valid join info')
+        try {
+          await ApiTeams.requestJoinTeam({ teamId: this.data.teamIdToJoin })
+          this.joinSuccess = true
+          setTimeout(() => this.$router.go(this.$router.currentRoute), 2500)
+        } catch(err) {
+          this.joinError = err.message
+        }
       },
 
       validTeamId(id='') {
-        if (/[a-z\d]{5,8}/.test(id.toLowerCase()))
+        if (/^[a-z\d]{5,8}$/.test(id.toLowerCase()))
           return true
 
         return false
       }
+    },
+
+    async created() {
+      // TODO: make backend call to see if there are any currently
+      // pending requests to join a team and show a message if so instead
+      // of the current form
+      this.localIsLoading = false
     }
   }
 </script>

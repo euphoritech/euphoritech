@@ -1,4 +1,4 @@
-var config = require("./config.js");
+var config = require("./config.js").default;
 
 'use strict'
 
@@ -12,7 +12,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name: [config.app.name],
+  app_name: [ config.app.name ],
   /**
    * Your New Relic license key.
    */

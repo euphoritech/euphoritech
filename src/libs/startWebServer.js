@@ -25,7 +25,7 @@ const io          = socket_io(httpServer)
 const pgClient    = new PostgresClient()
 const log         = bunyan.createLogger(config.logger.options)
 
-export default async function startApp() {
+export default async function startWebServer() {
   try {
     const routes = await Routes.get()
 

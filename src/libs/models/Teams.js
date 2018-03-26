@@ -9,7 +9,7 @@ export default function Teams(postgres) {
     {
       accessibleColumns: [
         'external_id', 'is_global', 'name', 'parent_team_id', 'type',
-        'primary_contact_email', 'primary_contact_name'
+        'primary_contact_user_id'
       ],
 
       async isChildInParentsHierarchy(parentTeamId, childTeamId) {

@@ -1,1 +1,2 @@
-web: node forever
+web: npm start
+worker: npm run resque

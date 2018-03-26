@@ -13,8 +13,10 @@
   "scripts": {
     "build": "gulp build",
     "dev": "nodemon --exec 'nf start'",
-    "start": "node forever",
+    "migrate": "node tasks/migrate",
     "postinstall": "gulp build",
+    "resque": "node bin/resque_worker",
+    "start": "node forever",
     "test": "mocha --compilers js:babel-core/register --require babel-polyfill --recursive './src/**/*.spec.js'"
   },
   "devDependencies": {
@@ -50,6 +52,7 @@
     "minimist": "^1.2.0",
     "moment": "^2.18.1",
     "newrelic": "^1.40.0",
+    "node-resque": "^5.2.0",
     "nodemailer": "^4.6.2",
     "npm": "^5.7.1",
     "passport": "^0.4.0",

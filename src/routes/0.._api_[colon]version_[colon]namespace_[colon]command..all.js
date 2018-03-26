@@ -1,11 +1,13 @@
 import bunyan from 'bunyan'
 import ApiVersions from '../libs/api/'
 import PostgresClient from '../libs/PostgresClient'
+import RedisHelper from '../libs/RedisHelper'
 import Routes from '../libs/Routes'
 import config from '../config'
 
 const log = bunyan.createLogger(config.logger.options)
-const postgres = new PostgresClient()
+const postgres  = new PostgresClient()
+const redis     = new RedisHelper()
 
 export default [
     Routes.requireAuthExpressMiddleware(),
@@ -15,7 +17,7 @@ export default [
     const command   = req.params.command
 
     try {
-      await ApiVersions[version][namespace][command]({ req, res, log, postgres })
+      await ApiVersions[version][namespace][command]({ req, res, log, postgres, redis })
     } catch(err) {
       log.error("Error with API request", err)
       res.sendStatus(404)
