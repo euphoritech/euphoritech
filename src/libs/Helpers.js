@@ -54,16 +54,18 @@ export async function passportOauthLoginHandler({
   }, { id: undefined })
 
   const userRecord = await users.findOrCreateBy({ username_email: emailAddress })
-  users.setRecord(Object.assign({}, intInfo, {
-    first_name: userRecord.first_name || intInfo.first_name,
-    last_name:  userRecord.last_name || intInfo.last_name,
-    last_login: new Date(),
-    num_logins: (userRecord.num_logins || 0) + 1
-  }, { id: userRecord.id }))
+  users.setRecord(
+    Object.assign({}, intInfo, {
+      first_name: userRecord.first_name || intInfo.first_name,
+      last_name:  userRecord.last_name || intInfo.last_name,
+      last_login: new Date(),
+      num_logins: (userRecord.num_logins || 0) + 1
+    }, { id: userRecord.id })
+  )
   await users.save()
 
   const intRecord = await userInt.findOrCreateBy({ user_id: userRecord.id, type: type, unique_id: profile.id })
-  userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
+  userInt.setRecord(Object.assign(intInfo, { id: intRecord.id, refresh_token: refreshToken || intRecord.refresh_token }))
   await userInt.save()
   const didLogin = users.login(userRecord)
 

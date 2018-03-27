@@ -22,6 +22,12 @@ export default async function runMigrations(postgresUrl) {
 
 export function migrations(postgres) {
   return [
+    async function createUuidExtension() {
+      await postgres.query(`
+        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      `)
+    },
+
     async function createUsers() {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -223,6 +229,7 @@ export function migrations(postgres) {
           requesting_user_id integer REFERENCES users,
           team_id integer REFERENCES teams,
           requested_time timestamp(6),
+          unique_id uuid NOT NULL DEFAULT uuid_generate_v4(),
           status varchar(255),
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
@@ -233,6 +240,7 @@ export function migrations(postgres) {
     async function createTeamUserAccessRequestIndexes() {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_user_access_request_requesting_user_id_idx on team_user_access_request (requesting_user_id)`)
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_user_access_request_team_id_idx on team_user_access_request (team_id)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_user_access_request_unique_id_idx on team_user_access_request (unique_id)`)
     },
 
     // async function createEventLocationAndTvListingsInEvents() {

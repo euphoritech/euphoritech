@@ -1,9 +1,11 @@
+import path from 'path'
 const appName   = process.env.APP_NAME || "euphoritech"
 const hostName  = process.env.HOSTNAME || "http://localhost:8000"
 
 export default {
   app: {
-    name: appName
+    name: appName,
+    rootDir: path.join(path.dirname(require.main.filename), '..')
   },
 
   server: {

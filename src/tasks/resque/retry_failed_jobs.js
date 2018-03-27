@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import minimist from 'minimist'
 import NodeResque from 'node-resque'
 import RedisHelper from '../../libs/RedisHelper'

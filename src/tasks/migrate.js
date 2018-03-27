@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import minimist from 'minimist'
 import bunyan from 'bunyan'
 import runMigrations from '../libs/database/migrations'

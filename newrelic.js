@@ -49,7 +49,7 @@ exports.config = {
      *
      * @env NEW_RELIC_ERROR_COLLECTOR_IGNORE_ERROR_CODES
      */
-    ignore_status_codes: [],
+    ignore_status_codes: [ 400 ],
     /**
      * Whether error events are collected.
      */

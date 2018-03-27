@@ -1,4 +1,5 @@
 import bunyan from 'bunyan'
+import Routes from '../libs/Routes'
 import oauthConfigs from '../conf/oauth'
 import config from '../config'
 
@@ -28,7 +29,7 @@ export default async function oauthTypeCallback(req, res) {
     userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
     await userInt.save()
 
-    return res.redirect(req.session.returnTo || '/')
+    return Routes.checkAndRedirect(req, res, '/')
 
   } catch(error) {
     return res.status(500).json({ error })

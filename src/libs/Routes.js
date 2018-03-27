@@ -30,7 +30,7 @@ export default {
 
   checkAndRedirect(req, res, defaultRedirectPath='/') {
     if (req.session && req.session.returnTo)
-      return res.redirect(redirectTo)
+      return res.redirect(req.session.returnTo)
 
     res.redirect(defaultRedirectPath)
   },

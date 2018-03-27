@@ -52,6 +52,7 @@
     methods: {
       async createNewTeam(evt) {
         evt.preventDefault()
+        this.newTeamError = null
 
         if (!(this.data.teamIdToCreate && this.validTeamId(this.data.teamIdToCreate)))
           return this.newTeamError = `Please enter a valid team ID of 5-8 alphanumeric characters to create a new team.`
@@ -59,12 +60,17 @@
         if (!this.data.teamNameToCreate)
           return this.newTeamError = `Please enter a name for the new team you want to create.`
 
-        await ApiTeams.newTeam({ teamId: this.data.teamIdToCreate, teamName: this.data.teamNameToCreate })
-        this.$store.dispatch('redirectToHome')
+        try {
+          await ApiTeams.newTeam({ teamId: this.data.teamIdToCreate, teamName: this.data.teamNameToCreate })
+          this.$store.dispatch('redirectToHome')
+        } catch(err) {
+          this.newTeamError = err.message
+        }
       },
 
       async joinExistingTeam(evt) {
         evt.preventDefault()
+        this.joinError = null
 
         if (!(this.data.teamIdToJoin && this.validTeamId(this.data.teamIdToJoin)))
           return this.joinError = `Please enter a valid team ID to request access to join the team.`

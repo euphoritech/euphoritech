@@ -1,0 +1,6 @@
+div= 'A user, ' + userEmail + ', is requesting access to team: ' + teamName + '. Please confirm or deny this request below:'
+br
+div
+  a(href=host + '/api/1.0/teams/access?type=confirm&uid=' + uuid) Confirm
+div
+  a(href=host + '/api/1.0/teams/access?type=deny&uid=' + uuid) Deny

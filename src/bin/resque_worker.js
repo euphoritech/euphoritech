@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import newrelic from 'newrelic'
 import minimist from 'minimist'
 import NodeResque from 'node-resque'

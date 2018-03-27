@@ -56,6 +56,39 @@ export default {
     return res.json(null)
   },
 
+  async access({ req, res, postgres, redis }) {
+    const queue         = new NodeResque.Queue({ connection: { redis: redis.client }})
+    const teamAccess    = TeamUserAccessRequest(postgres)
+    const teamUserMap   = TeamsUsersRolesMap(postgres)
+    console.log("QUERY", req.query)
+    const accessRecUuid = req.query.uid
+    const confType      = req.query.type
+    const userType      = req.query.userType
+    const teamAccRecord = await teamAccess.findBy({ unique_id: accessRecUuid })
+    await queue.connect()
+
+    if (!teamAccRecord)
+      return res.status(404).json({ error: "We can't find the request you are looking for. Please confirm you have the right ID and try again." })
+
+    switch(confType) {
+      case 'confirm':
+        teamAccess.setRecord(Object.assign(teamAccRecord, { status: 'confirmed' }))
+        await teamAccess.save()
+        await teamUserMap.findOrCreateBy({ team_id: teamAccRecord.team_id, user_id: teamAccRecord.requesting_user_id, role: userType || 'teamadmin' })
+        await queue.enqueue(config.resque.default_queue, 'sendTeamAccessConfirmation', [{ record_id: teamAccRecord.id }])
+        return res.redirect('/')
+
+      case 'deny':
+        teamAccess.setRecord(Object.assign(teamAccRecord, { status: 'denied' }))
+        await teamAccess.save()
+        await queue.enqueue(config.resque.default_queue, 'sendTeamAccessConfirmation', [{ record_id: teamAccRecord.id }])
+        return res.redirect('/')
+
+      default:
+        return res.status(404).json({ error: "We don't recognize what you're trying to do. Please try again." })
+    }
+  },
+
   async getCurrentHierarchy({ req, res, postgres }) {
     const teams   = Teams(postgres)
     const turm    = TeamsUsersRolesMap(postgres)
