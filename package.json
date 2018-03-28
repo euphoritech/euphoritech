@@ -17,7 +17,7 @@
     "postinstall": "gulp build",
     "resque": "node bin/resque_worker",
     "start": "node forever",
-    "test": "mocha --compilers js:babel-core/register --require babel-polyfill --recursive './src/**/*.spec.js'"
+    "test": "mocha --compilers js:babel-core/register --recursive './src/**/*.spec.js'"
   },
   "devDependencies": {
     "foreman": "^2.0.0",
@@ -64,7 +64,8 @@
     "request-promise-native": "^1.0.5",
     "require-from-string": "^2.0.1",
     "simple-oauth2": "^1.5.0",
-    "socket.io": "^1.7.4",
+    "socket.io": "^2.0.4",
+    "sticky-session": "^1.1.2",
     "throng": "^4.0.0"
   },
   "author": "Lance Whatley <whatl3y@gmail.com>",

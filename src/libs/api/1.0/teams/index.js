@@ -60,7 +60,6 @@ export default {
     const queue         = new NodeResque.Queue({ connection: { redis: redis.client }})
     const teamAccess    = TeamUserAccessRequest(postgres)
     const teamUserMap   = TeamsUsersRolesMap(postgres)
-    console.log("QUERY", req.query)
     const accessRecUuid = req.query.uid
     const confType      = req.query.type
     const userType      = req.query.userType
@@ -68,7 +67,7 @@ export default {
     await queue.connect()
 
     if (!teamAccRecord)
-      return res.status(404).json({ error: "We can't find the request you are looking for. Please confirm you have the right ID and try again." })
+      return res.status(404).json({ error: res.__("We can't find the request you are looking for. Please confirm you have the right ID and try again.") })
 
     switch(confType) {
       case 'confirm':
@@ -85,7 +84,7 @@ export default {
         return res.redirect('/')
 
       default:
-        return res.status(404).json({ error: "We don't recognize what you're trying to do. Please try again." })
+        return res.status(404).json({ error: res.__("We don't recognize what you're trying to do. Please try again.") })
     }
   },
 
@@ -103,6 +102,6 @@ export default {
       const hierarchyObject = await teams.getEntireHierarchy(teamId)
       return res.json({ hierarchy: hierarchyObject })
     }
-    res.status(401).json(null)
+    res.status(401).json({ error: res.__("You do not have access to this team.") })
   }
 }
