@@ -1,5 +1,6 @@
 {
 	"Hello World": "Hello World",
 	"Hello": "Hello",
-	"Please provide a valid team ID to get it's hierarchy.": "Please provide a valid team ID to get it's hierarchy."
+	"Please provide a valid team ID to get it's hierarchy.": "Please provide a valid team ID to get it's hierarchy.",
+	"We didn't find an existing team with the ID provided. Please make sure you typed it correctly and try again.": "We didn't find an existing team with the ID provided. Please make sure you typed it correctly and try again."
 }

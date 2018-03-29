@@ -1,7 +1,7 @@
 <template>
   <b-modal id="settings-modal" ref="settingsModal" v-model="$store.state.settings.isOpen" size="lg" centered title="Settings">
     <b-row class="settings-modal-content-wrapper">
-      <b-col class="settings-nav" cols="2">
+      <b-col class="settings-nav d-none d-md-block" cols="2">
         <b-navbar v-b-scrollspy:settings-content>
           <b-nav pills class="flex-column">
             <b-nav-item v-for="setting in settings" @click="goToSection(setting)" :href="'#' + getSettingId(setting)" :key="getSettingId(setting)">
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+  import Development from './Development'
   import Personal from './Personal'
   import SettingsFactory from '../../factories/ApiSettings'
 
@@ -53,7 +54,7 @@
       this.settings = [
         { header: 'Personal Info', id: "personal", component: Personal },
         { header: 'Customers', id: "customers", content: 'My infor' },
-        { header: 'Development', id: "development", content: 'My infor' },
+        { header: 'Development', id: "development", component: Development },
         { header: 'Support', id: "support", content: 'My infor' },
         { header: 'Marketing', id: "marketing", content: 'My infor' },
         { header: 'Teams', id: 'teams', content: 'My infor' }

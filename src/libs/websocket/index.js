@@ -2,7 +2,7 @@ import app from "./socketApp"
 import Global from "./Global"
 import GeoIP from "../GeoIP"
 
-export default function WebSocket({ io, namespacedIo, log, postgres, redis }) {
+export default function WebSocket({ io, log, postgres, redis }) {
   io.on('connection', async socket => {
     const req   = socket.request
     const user  = req.session.user
@@ -30,12 +30,12 @@ export default function WebSocket({ io, namespacedIo, log, postgres, redis }) {
       }
 
       const handlers = {
-        global: await Global({ app, socket, log })
+        global: await Global({ app, socket, log, io, postgres, redis })
       }
 
       Object.keys(handlers).forEach(category => {
         Object.keys(handlers[category]).forEach(evt => {
-          socket.on(evt, data => handlers[category][evt]({ io, data, postgres, redis }))
+          socket.on(evt, handlers[category][evt])
         })
       })
     }

@@ -22,5 +22,10 @@ export default {
       body: JSON.stringify({ teamId })
     })
     return await handleFetchResponse(response)
+  },
+
+  async getCurrentTeamIntegrations() {
+    const response = await euphoritechFetch(`/api/1.0/teams/getCurrentTeamIntegrations`)
+    return await handleFetchResponse(response)
   }
 }

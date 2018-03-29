@@ -18,12 +18,8 @@
               div.text-center
                 b-button(type="submit",class="btn btn-default") {{ title }}
               b-alert.margin-medium(variant="warning",:show="error") {{ error }}
-        a.oauth-login-button.google.d-flex.flex-row.align-items-center.justify-content-center(href="/auth/google")
-          i.devicon-google-plain
-          div Login with Google
-        a.oauth-login-button.github.d-flex.flex-row.align-items-center.justify-content-center(href="/auth/github")
-          i.devicon-github-plain
-          div Login with Github
+        oauth-button(type="google")
+        //- oauth-button(type="github")
         - //div.center-everything.separate-vert-large(v-if="createValue")
         - //  a(href="/login") Login to Existing Account
         - //div.center-everything.separate-vert-large(v-if="!createValue")
@@ -35,6 +31,7 @@
 </template>
 
 <script>
+  import OauthButton from './OauthButton'
   import AuthFactory from '../factories/ApiAuth'
   import StringHelpers from '../factories/StringHelpers'
 
@@ -96,6 +93,10 @@
       }
 
       this.error = StringHelpers.unserialize(location.search).error
+    },
+
+    components: {
+      OauthButton
     }
   }
 </script>

@@ -24,7 +24,17 @@
     },
 
     created() {
-      setImmediate(() => this.userInfo = Object.assign(this.userInfo, this.$store.state.auth.user))
+      let tries = 0
+      const userInfoInterval = setInterval(() => {
+        if (tries > 10) {
+          clearInterval(userInfoInterval)
+        } else if (this.$store.state.auth.user) {
+          this.userInfo = Object.assign(this.userInfo, this.$store.state.auth.user)
+          clearInterval(userInfoInterval)
+        } else {
+          tries++
+        }
+      }, 250)
     }
   }
 </script>

@@ -103,5 +103,9 @@ export default {
       return res.json({ hierarchy: hierarchyObject })
     }
     res.status(401).json({ error: res.__("You do not have access to this team.") })
+  },
+
+  async getCurrentTeamIntegrations({ req, res, postgres }) {
+    res.json({ integrations: true })
   }
 }

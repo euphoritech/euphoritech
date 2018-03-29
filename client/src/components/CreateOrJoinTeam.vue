@@ -73,7 +73,7 @@
         this.joinError = null
 
         if (!(this.data.teamIdToJoin && this.validTeamId(this.data.teamIdToJoin)))
-          return this.joinError = `Please enter a valid team ID to request access to join the team.`
+          return this.joinError = `Please enter a valid team ID (5-8 alphanumeric characters) to request access to join the team.`
 
         try {
           await ApiTeams.requestJoinTeam({ teamId: this.data.teamIdToJoin })

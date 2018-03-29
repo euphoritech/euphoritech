@@ -3,10 +3,12 @@ import ApiTeams from '../factories/ApiTeams'
 import SettingsFactory from '../factories/ApiSettings'
 
 export default {
-  async getSessionInfo({ commit }) {
+  async init({ commit }) {
     const responses = await Promise.all([
       AuthFactory.getLoggedInUser(),
+      AuthFactory.getLoggedInUsersIntegrations(),
       ApiTeams.getTeamHierarchy(),
+      ApiTeams.getCurrentTeamIntegrations(),
       SettingsFactory.getStatus()
     ].map(p => p.catch(e => e)))
 
@@ -15,14 +17,18 @@ export default {
       console.log("ERRORS", errors)
 
     const sessionInfo = responses[0]
-    const hierarchy = responses[1]
-    const settings = responses[0]
+    const usersInteg  = responses[1]
+    const hierarchy   = responses[2]
+    const teamInteg   = responses[3]
+    const settings    = responses[4]
 
     commit('SET_SESSION_INFO', {
-      user: sessionInfo.session.user,
-      session: sessionInfo.session,
-      team_hierarchy: hierarchy,
-      settings: settings.status
+      user:               sessionInfo.session.user,
+      user_integrations:  usersInteg.integrations,
+      team_integrations:  teamInteg.integrations,
+      session:            sessionInfo.session,
+      team_hierarchy:     hierarchy,
+      settings:           settings.status
     })
   },
 

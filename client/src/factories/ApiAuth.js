@@ -19,5 +19,10 @@ export default {
     return (state.auth && state.auth.user && Object.keys(state.auth.user).length > 0)
       return true
     return false
+  },
+
+  async getLoggedInUsersIntegrations() {
+    const response = await euphoritechFetch(`/api/1.0/auth/getIntegrations`)
+    return await handleFetchResponse(response)
   }
 }

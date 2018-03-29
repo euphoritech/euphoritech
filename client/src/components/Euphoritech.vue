@@ -26,11 +26,11 @@
     },
 
     async created() {
-      euphoritechSocket.on('connect', () => euphoritechSocket.emit('subscribe', data => console.log("SUBSCIBRED", data)))
+      euphoritechSocket.on('connect', () => euphoritechSocket.emit('subscribe', { yo: 'bro' }))
       euphoritechSocket.on('subscribeConfirm', data => console.log("subscribeConfirm", data))
       euphoritechSocket.on('disconnect', () => console.log("SOCKETDISCONNECTED"))
 
-      await this.$store.dispatch('getSessionInfo')
+      await this.$store.dispatch('init')
       if (!AuthFactory.isLoggedIn(this.$store.state) && this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
         this.$store.dispatch('redirectToLogin')
 

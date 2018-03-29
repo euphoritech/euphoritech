@@ -32,6 +32,7 @@ module.exports = {
       ['/auth/']: 'http://localhost:8000',
       ['/file']: 'http://localhost:8000',
       ['/logout']: 'http://localhost:8000',
+      ['/oauth']: 'http://localhost:8000',
       ['/public']: 'http://localhost:8000',
       ['/socket.io/']: 'http://localhost:8000'
     },

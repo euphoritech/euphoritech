@@ -1,9 +1,13 @@
 import bunyan from 'bunyan'
+import PostgresClient from '../libs/PostgresClient'
 import Routes from '../libs/Routes'
+import Users from '../libs/models/Users'
+import UserOauthIntegrations from '../libs/models/UserOauthIntegrations'
 import oauthConfigs from '../conf/oauth'
 import config from '../config'
 
 const log = bunyan.createLogger(config.logger.options)
+const postgres  = new PostgresClient()
 
 export default async function oauthTypeCallback(req, res) {
   try {
@@ -11,6 +15,12 @@ export default async function oauthTypeCallback(req, res) {
     const oauthConf   = oauthConfigs[oauthType]
     const callbackErr = req.query.error
     const code        = req.query.code
+
+    const users   = Users(postgres, req.session)
+    const userInt = UserOauthIntegrations(postgres)
+
+    if (!users.isLoggedIn())
+      return res.redirect('/')
 
     if (callbackErr)
       return res.status(500).json({ error: req.query })
@@ -25,13 +35,14 @@ export default async function oauthTypeCallback(req, res) {
     log.debug(`${oauthType} OAuth token`, token)
 
     const intInfo   = { type: oauthType, access_token: token.token.access_token }
-    const intRecord = await userInt.findOrCreateBy({ user_id: req.session.user.id, type: oauthType, unique_id: profile.id })
+    const intRecord = await userInt.findOrCreateBy({ user_id: users.getLoggedInUserId(), type: oauthType })
     userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
     await userInt.save()
 
     return Routes.checkAndRedirect(req, res, '/')
 
   } catch(error) {
+    log.error("Error with oauth callback", error)
     return res.status(500).json({ error })
   }
 }

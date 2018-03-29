@@ -3,11 +3,20 @@ export default {
     state.isLoading = false
   },
 
-  SET_SESSION_INFO(state, { user, session, team_hierarchy, settings }) {
-    state.auth.user       = Object.assign(state.auth.user || {}, user)
-    state.session         = Object.assign(state.session || {}, session)
-    state.settings        = Object.assign(state.settings || {}, settings)
-    state.team_hierarchy  = Object.assign(state.team_hierarchy || {}, team_hierarchy)
+  SET_SESSION_INFO(state, {
+    user,
+    user_integrations,
+    team_integrations,
+    session,
+    team_hierarchy,
+    settings
+  }) {
+    state.auth.user               = Object.assign(state.auth.user || {}, user)
+    state.auth.user_integrations  = Object.assign(state.user_integrations || {}, user_integrations)
+    state.auth.team_integrations  = Object.assign(state.team_integrations || {}, team_integrations)
+    state.session                 = Object.assign(state.session || {}, session)
+    state.settings                = Object.assign(state.settings || {}, settings)
+    state.team_hierarchy          = Object.assign(state.team_hierarchy || {}, team_hierarchy)
     console.log('STATE', state)
   },
 

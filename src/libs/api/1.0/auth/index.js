@@ -1,3 +1,6 @@
+import Users from '../../../models/Users'
+import UserOauthIntegrations from '../../../models/UserOauthIntegrations'
+
 export default {
   session({ req, res }) {
     res.json({ session: req.session })
@@ -7,5 +10,16 @@ export default {
     req.session.returnTo = req.body.target
     req.session.save()
     res.json(null)
+  },
+
+  async getIntegrations({ req, res, postgres }) {
+    const users   = Users(postgres, req.session)
+    const integ   = UserOauthIntegrations(postgres)
+    const records = await integ.getAllByUserId(users.getLoggedInUserId())
+    const recordObj = records.reduce((obj, record) => {
+      obj[record.type] = record
+      return obj
+    }, {})
+    res.json({ integrations: recordObj })
   }
 }

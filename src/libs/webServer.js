@@ -22,6 +22,7 @@ const app         = express()
 const httpServer  = http.Server(app)
 const io          = socketIo(httpServer, { pingInterval: 4000, pingTimeout: 10000 })
 const pgClient    = new PostgresClient()
+const redis       = new RedisHelper()
 const log         = bunyan.createLogger(config.logger.options)
 
 export default function webServer() {
@@ -98,7 +99,7 @@ export default function webServer() {
         passport.serializeUser((user, done) => done(null, user))
         passport.deserializeUser((user, done) => done(null, user))
 
-        WebSocket({ postgres: pgClient, redis: RedisHelper, io, log })
+        WebSocket({ postgres: pgClient, redis, io, log })
 
         // Express error handling
         app.use(function ExpressErrorHandler(err, req, res, next) {
