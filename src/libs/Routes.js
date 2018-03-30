@@ -42,7 +42,7 @@ export default {
 
       // TODO: Support API key authentication here
       const apiKeyProvided = req.headers['euphoritech-api-key']
-      if (true)
+      if (false)
         return next()
 
       return res.status(401).json({ error: 'Invalid authentication information.' })

@@ -3,6 +3,10 @@ export default {
     state.isLoading = false
   },
 
+  CHECK_LOGGED_IN(state, isLoggedIn) {
+    state.isLoggedIn = isLoggedIn
+  },
+
   SET_SESSION_INFO(state, {
     user,
     user_integrations,

@@ -12,6 +12,27 @@ export default function Teams(postgres) {
         'primary_contact_user_id'
       ],
 
+      async getTopMostTeamId(teamIdsAry) {
+        const hierarchies = await Promise.all(
+          teamIdsAry.map(async teamId => {
+            return {
+              team_id: teamId,
+              hierarchy: await this.hierarchyFromBottom(teamId)
+            }
+          })
+        )
+
+        return hierarchies.reduce((highestTeamInfo, teamInfo) => {
+          if (!highestTeamInfo)
+            return teamInfo
+
+          // TODO: what do we do if two teams have the same hierarchy length???
+          // the "highest" team is going to have the least hierarchy
+          // since there will be fewer teams above it.
+          return (highestTeamInfo.hierarchy.length < teamInfo.hierarchy.length) ? highestTeamInfo : teamInfo
+        }, null).team_id
+      },
+
       async isChildInParentsHierarchy(parentTeamId, childTeamId) {
         const childHierarchy = await this.hierarchyFromBottom(childTeamId)
         return childHierarchy.map(r => r.pid).includes(parentTeamId)

@@ -20,7 +20,7 @@
   export default {
     computed: {
       isLoggedIn() {
-        return AuthFactory.isLoggedIn(this.$store.state)
+        return AuthFactory.isLoggedInLocal(this.$store.state)
       }
     },
 

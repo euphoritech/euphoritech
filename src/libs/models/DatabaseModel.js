@@ -18,6 +18,20 @@ export default function DatabaseModel(postgres, table) {
       return rows
     },
 
+    // Uses AND logic between columns
+    // Ex. keyValuePairs = { col1: 'val1', col2: 'col2', ... }
+    async getAllBy(keyValuePairs) {
+      const columnAry     = Object.keys(keyValuePairs)
+      const paramsAry     = []
+      const filters       = columnAry.map((col, ind) => {
+        paramsAry.push(keyValuePairs[col])
+        return `${col} = $${ind + 1}`
+      })
+      const filterString  = filters.join(' AND ')
+      const { rows }      = await postgres.query(`select * from ${table} where ${filterString}`, paramsAry)
+      return rows
+    },
+
     async findByColumn(value, column='id') {
       const { rows } = await postgres.query(`select * from ${table} where ${column} = $1`, [ value ])
       if (rows.length > 0)

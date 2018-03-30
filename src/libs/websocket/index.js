@@ -7,6 +7,16 @@ export default function WebSocket({ io, log, postgres, redis }) {
     const req   = socket.request
     const user  = req.session.user
 
+    const handlers = {
+      global: await Global({ app, socket, log, io, postgres, redis })
+    }
+
+    Object.keys(handlers).forEach(category => {
+      Object.keys(handlers[category]).forEach(evt => {
+        socket.on(evt, handlers[category][evt])
+      })
+    })
+
     if (user && user.id) {
       let realClientIpAddress = (req.headers['x-forwarded-for'] || req.ip || socket.handshake.address || "").split(',')
       realClientIpAddress = realClientIpAddress[realClientIpAddress.length - 1]
@@ -28,16 +38,6 @@ export default function WebSocket({ io, log, postgres, redis }) {
           countryCde: geoData.country_code
         }
       }
-
-      const handlers = {
-        global: await Global({ app, socket, log, io, postgres, redis })
-      }
-
-      Object.keys(handlers).forEach(category => {
-        Object.keys(handlers[category]).forEach(evt => {
-          socket.on(evt, handlers[category][evt])
-        })
-      })
     }
   })
 }

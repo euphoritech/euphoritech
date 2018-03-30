@@ -3,7 +3,11 @@ import ApiTeams from '../factories/ApiTeams'
 import SettingsFactory from '../factories/ApiSettings'
 
 export default {
-  async init({ commit }) {
+  async init({ commit, state }) {
+    const isLoggedIn = await AuthFactory.isLoggedInLocal(state)
+    if (!isLoggedIn)
+      return false
+
     const responses = await Promise.all([
       AuthFactory.getLoggedInUser(),
       AuthFactory.getLoggedInUsersIntegrations(),

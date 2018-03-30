@@ -1,5 +1,6 @@
 export default {
   isLoading: true,
+  isLoggedIn: false,
 
   auth: {
     user: {

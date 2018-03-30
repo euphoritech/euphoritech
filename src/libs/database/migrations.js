@@ -3,8 +3,7 @@ import PostgresClient from '../../libs/PostgresClient'
 import config from '../../config'
 
 const log = bunyan.createLogger(config.logger.options)
-const lancesEmailAddress  = 'lance@euphoritech.com'
-const calsEmailAddress    = 'cal@euphoritech.com'
+const seedEmailAddress  = process.env.SEED_EMAIL_ADDRESS || 'lance@euphoritech.com'
 
 export default async function runMigrations(postgresUrl) {
   try {
@@ -52,9 +51,9 @@ export function migrations(postgres) {
     },
 
     async function seedUsers() {
-      const { rows } = await postgres.query(`select * from users where username_email in ('${lancesEmailAddress}', '${calsEmailAddress}')`)
+      const { rows } = await postgres.query(`select * from users where username_email = '${seedEmailAddress}'`)
       if (rows.length === 0) {
-        await postgres.query(`INSERT INTO users (username_email) VALUES ('${lancesEmailAddress}'), ('${calsEmailAddress}')`)
+        await postgres.query(`INSERT INTO users (username_email) VALUES ('${seedEmailAddress}')`)
       }
     },
 
@@ -82,8 +81,8 @@ export function migrations(postgres) {
     async function seedGlobalTeam() {
       const { rows } = await postgres.query('select * from teams where is_global is true')
       if (rows.length === 0) {
-        const lancesUserRecord = (await postgres.query(`select * from users where username_email = '${lancesEmailAddress}'`)).rows[0]
-        await postgres.query(`INSERT INTO teams (id, external_id, is_global, name, primary_contact_user_id) VALUES (1, 'global', true, 'Global', ${lancesUserRecord.id})`)
+        const seedUserRecord = (await postgres.query(`select * from users where username_email = '${seedEmailAddress}'`)).rows[0]
+        await postgres.query(`INSERT INTO teams (id, external_id, is_global, name, primary_contact_user_id) VALUES (1, 'global', true, 'Global', ${seedUserRecord.id})`)
         await postgres.query(`ALTER SEQUENCE teams_id_seq RESTART WITH 2`)
       }
     },

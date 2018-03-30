@@ -26,18 +26,30 @@
     },
 
     async created() {
-      euphoritechSocket.on('connect', () => euphoritechSocket.emit('subscribe', { yo: 'bro' }))
-      euphoritechSocket.on('subscribeConfirm', data => console.log("subscribeConfirm", data))
+      euphoritechSocket.on('connect', () => euphoritechSocket.emit('subscribe'))
       euphoritechSocket.on('disconnect', () => console.log("SOCKETDISCONNECTED"))
 
-      await this.$store.dispatch('init')
-      if (!AuthFactory.isLoggedIn(this.$store.state) && this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
-        this.$store.dispatch('redirectToLogin')
+      // Begin app initialization after we determine the logged in state of
+      // the user
+      euphoritechSocket.on('isLoggedIn', async isLoggedIn => {
+        this.$store.commit('CHECK_LOGGED_IN', isLoggedIn)
 
-      if (AuthFactory.isLoggedIn(this.$store.state) && !this.$store.state.session.teams_roles)
-        this.$store.dispatch('redirectToNoTeamForm')
+        if (!AuthFactory.isLoggedInLocal(this.$store.state)) {
+          if (this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
+            this.$store.dispatch('redirectToLogin')
 
-      this.$store.commit('APP_NO_LONGER_LOADING')
+          return this.$store.commit('APP_NO_LONGER_LOADING')
+        }
+
+        console.log("YAYAYAYA LOGGED IN")
+
+        await this.$store.dispatch('init')
+
+        if (AuthFactory.isLoggedInLocal(this.$store.state) && !this.$store.state.session.teams_roles)
+          this.$store.dispatch('redirectToNoTeamForm')
+
+        this.$store.commit('APP_NO_LONGER_LOADING')
+      })
     }
   }
 </script>

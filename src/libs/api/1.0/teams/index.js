@@ -1,5 +1,6 @@
 import NodeResque from 'node-resque'
 import Teams from '../../../models/Teams'
+import TeamIntegrations from '../../../models/TeamIntegrations'
 import TeamsUsersRolesMap from '../../../models/TeamsUsersRolesMap'
 import TeamUserAccessRequest from '../../../models/TeamUserAccessRequest'
 import Users from '../../../models/Users'
@@ -106,6 +107,11 @@ export default {
   },
 
   async getCurrentTeamIntegrations({ req, res, postgres }) {
+    const teamInt = TeamIntegrations(postgres)
+    const users   = Users(postgres, req.session)
+    const userId  = users.getLoggedInUserId()
+
+    
     res.json({ integrations: true })
   }
 }

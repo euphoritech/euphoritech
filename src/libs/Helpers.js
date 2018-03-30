@@ -1,7 +1,7 @@
 import Errors from './errors'
 import Users from './models/Users'
 import UserOauthIntegrations from './models/UserOauthIntegrations'
-import TeamsUsersRolesMap from './models/TeamsUsersRolesMap'
+import LoginHandler from './LoginHandler'
 
 export function flatten(ary) {
   const nestedFlattened = ary.map(v => {
@@ -37,7 +37,7 @@ export async function passportOauthLoginHandler({
 }) {
   const users   = Users(postgresClient, req.session)
   const userInt = UserOauthIntegrations(postgresClient)
-  const teamMap = TeamsUsersRolesMap(postgresClient)
+  const login   = LoginHandler(postgresClient, req.session)
 
   if (!emailAddress)
     throw new Errors.NoEmailAddress('No email address found for this user.')
@@ -67,12 +67,7 @@ export async function passportOauthLoginHandler({
   const intRecord = await userInt.findOrCreateBy({ user_id: userRecord.id, type: type, unique_id: profile.id })
   userInt.setRecord(Object.assign(intInfo, { id: intRecord.id, refresh_token: refreshToken || intRecord.refresh_token }))
   await userInt.save()
-  const didLogin = users.login(userRecord)
 
-  const teamRoleMapRecords = await teamMap.getAllByUserId(userRecord.id)
-  if (teamRoleMapRecords.length === 0)
-    throw new Errors.NoTeamError('No team found for this user yet.')
-
-  users.setSession({ teams_roles: teamRoleMapRecords })
+  await login.standardLogin(userRecord)
   return done(null, intInfo.unique_id)
 }

@@ -107,7 +107,7 @@ export default function webServer() {
           res.redirect(err.redirectRoute || '/')
         })
 
-        // Assume we'll listen in the primary app file
+        // Assume we'll listen in the primary app file via clustering module
         // httpServer.listen(config.server.port, () => log.info(`listening on *: ${config.server.port}`))
 
       } catch(err) {

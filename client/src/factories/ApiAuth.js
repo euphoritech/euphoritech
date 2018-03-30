@@ -15,8 +15,8 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  isLoggedIn(state) {
-    return (state.auth && state.auth.user && Object.keys(state.auth.user).length > 0)
+  isLoggedInLocal(state) {
+    return (state.isLoggedIn)
       return true
     return false
   },

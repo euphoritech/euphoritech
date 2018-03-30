@@ -1,7 +1,7 @@
 import PassportLocal from "passport-local"
 import Users from '../libs/models/Users'
-import TeamsUsersRolesMap from '../libs/models/TeamsUsersRolesMap'
 import Errors from '../libs/errors'
+import LoginHandler from '../libs/LoginHandler'
 import config from '../config'
 
 const LocalStrategy = PassportLocal.Strategy
@@ -14,8 +14,8 @@ export default function LocalPassportStrategy(postgresClient) {
     },
     handler: async function PassportLocalHandler(req, username, password, done) {
       try {
-        const users   = Users(postgresClient, req.session)
-        const teamMap = TeamsUsersRolesMap(postgresClient)
+        const users = Users(postgresClient, req.session)
+        const login = LoginHandler(postgresClient, req.session)
 
         if (username && username == config.auth.GLOBAL_ADMIN)
           return done(null, (users.validateUserPassword(username, password, config.auth.GLOBAL_PASSWORD) ? username : false))
@@ -36,13 +36,8 @@ export default function LocalPassportStrategy(postgresClient) {
           num_logins: (userRecord.num_logins || 0) + 1
         }, { id: userRecord.id }))
         await users.save()
-        const didLogin = users.login(userRecord)
-
-        const teamRoleMapRecords = await teamMap.getAllByUserId(userRecord.id)
-        if (teamRoleMapRecords.length === 0)
-          throw new Errors.NoTeamError('No team found for this user yet.')
-
-        users.setSession({ teams_roles: teamRoleMapRecords })
+        
+        await login.standardLogin(userRecord)
         return done(null, username)
 
       } catch(err) {
