@@ -24,6 +24,7 @@
 </template>
 
 <script>
+  import Customers from './Customers'
   import Development from './Development'
   import Personal from './Personal'
   import SettingsFactory from '../../factories/ApiSettings'
@@ -53,7 +54,7 @@
     created() {
       this.settings = [
         { header: 'Personal Info', id: "personal", component: Personal },
-        { header: 'Customers', id: "customers", content: 'My infor' },
+        { header: 'Customers', id: "customers", component: Customers },
         { header: 'Development', id: "development", component: Development },
         { header: 'Support', id: "support", content: 'My infor' },
         { header: 'Marketing', id: "marketing", content: 'My infor' },

@@ -10,9 +10,9 @@ const oauthConf = {
   },
 
   client_id:      config.salesforce.appId,
-  client_secret:  config.salesforce.appSecret
+  client_secret:  config.salesforce.appSecret,
 
-  // scopes: []
+  scopes: [].join(',')
 }
 
 const sfdcConf = buildConfig('salesforce', oauthConf, config.server.host)

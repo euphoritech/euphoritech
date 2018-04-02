@@ -41,8 +41,6 @@
           return this.$store.commit('APP_NO_LONGER_LOADING')
         }
 
-        console.log("YAYAYAYA LOGGED IN")
-
         await this.$store.dispatch('init')
 
         if (AuthFactory.isLoggedInLocal(this.$store.state) && !this.$store.state.session.teams_roles)

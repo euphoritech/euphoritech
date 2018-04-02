@@ -13,7 +13,7 @@ const oauthConf = {
   client_secret:  config.github.appSecret,
 
   // https://developer.github.com/apps/building-oauth-apps/scopes-for-oauth-apps/
-  scopes: [ 'repo', 'read:org', 'user' ].join(', '),
+  scopes: [ 'repo', 'read:org', 'user' ].join(','),
 }
 
 const githubConf = buildConfig('github', oauthConf, config.server.host)

@@ -12,6 +12,12 @@ export default {
     res.json(null)
   },
 
+  hasIntegration({ req, res }) {
+    const intTypeToCheck  = req.query.type
+    const currentIntegr   = req.session.user_integrations
+    res.json(!!currentIntegr[intTypeToCheck])
+  },
+
   async getIntegrations({ req, res, postgres }) {
     const users   = Users(postgres, req.session)
     const integ   = UserOauthIntegrations(postgres)

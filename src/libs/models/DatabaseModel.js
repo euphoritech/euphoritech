@@ -42,14 +42,7 @@ export default function DatabaseModel(postgres, table) {
     // Uses AND logic between columns
     // Ex. keyValuePairs = { col1: 'val1', col2: 'col2', ... }
     async findBy(keyValuePairs) {
-      const columnAry     = Object.keys(keyValuePairs)
-      const paramsAry     = []
-      const filters       = columnAry.map((col, ind) => {
-        paramsAry.push(keyValuePairs[col])
-        return `${col} = $${ind + 1}`
-      })
-      const filterString  = filters.join(' AND ')
-      const { rows }      = await postgres.query(`select * from ${table} where ${filterString}`, paramsAry)
+      const rows = await this.getAllBy(keyValuePairs)
       if (rows.length > 0)
         return rows[0]
       return null

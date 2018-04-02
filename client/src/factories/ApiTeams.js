@@ -27,5 +27,10 @@ export default {
   async getCurrentTeamIntegrations() {
     const response = await euphoritechFetch(`/api/1.0/teams/getCurrentTeamIntegrations`)
     return await handleFetchResponse(response)
+  },
+
+  async hasIntegration(type) {
+    const response = await euphoritechFetch(`/api/1.0/teams/hasIntegration?type=${type}`)
+    return await handleFetchResponse(response)
   }
 }

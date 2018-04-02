@@ -28,6 +28,13 @@
             link:         '/auth/google',
             mainClass:    'google',
             text:         'Google'
+          },
+
+          salesforce: {
+            deviconClass: [ 'fa', 'fa-cloud' ],
+            link:         '/oauth/salesforce',
+            mainClass:    'salesforce',
+            text:         'Salesforce'
           }
         }
       }

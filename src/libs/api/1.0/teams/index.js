@@ -7,6 +7,12 @@ import Users from '../../../models/Users'
 import config from '../../../../config'
 
 export default {
+  hasIntegration({ req, res }) {
+    const intTypeToCheck  = req.query.type
+    const currentIntegr   = req.session.current_team_integrations
+    res.json(!!currentIntegr[intTypeToCheck])
+  },
+
   async create({ req, res, postgres }) {
     const teams     = Teams(postgres)
     const teamMap   = TeamsUsersRolesMap(postgres)
@@ -107,11 +113,13 @@ export default {
   },
 
   async getCurrentTeamIntegrations({ req, res, postgres }) {
-    const teamInt = TeamIntegrations(postgres)
-    const users   = Users(postgres, req.session)
-    const userId  = users.getLoggedInUserId()
+    const teamIntegrations        = TeamIntegrations(postgres)
+    const currentLoggedInTeamId   = req.session.current_team.id
+    const currentLoggedInTeamInt  = (await teamIntegrations.getAllBy({ team_id: currentLoggedInTeamId })).reduce((obj, record) => {
+      obj[record.type] = record
+      return obj
+    }, {})
 
-    
-    res.json({ integrations: true })
+    res.json({ integrations: currentLoggedInTeamInt })
   }
 }
