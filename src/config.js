@@ -5,7 +5,11 @@ const hostName  = process.env.HOSTNAME || "http://localhost:8000"
 export default {
   app: {
     name: appName,
-    rootDir: path.join(path.dirname(require.main.filename), '..')
+    rootDir: (() => {
+      try {
+        return path.join(path.dirname(require.main.filename), '..')
+      } catch(e) {}
+    })()
   },
 
   server: {
@@ -75,6 +79,11 @@ export default {
     appId: process.env.GOOGLE_APP_ID,
     appSecret: process.env.GOOGLE_APP_SECRET,
     loginCallbackUrl: `${hostName}/auth/google/callback`
+  },
+
+  zendesk: {
+    appId: process.env.ZENDESK_APP_ID,
+    appSecret: process.env.ZENDESK_APP_SECRET
   },
 
   mailer: {

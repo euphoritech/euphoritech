@@ -25,6 +25,17 @@ export default function TeamsUsersRolesMap(postgres) {
         return rows
       },
 
+      async getAllByTeamId(teamId, page=1, pageSize=10) {
+        const { rows } = await postgres.query(`
+          select u.*, m.role from teams_users_roles_map as m
+          inner join users as u on u.id = m.user_id
+          where team_id = $1
+          limit ${pageSize}
+          offset ${(page-1) * pageSize}
+        `, [ teamId ])
+        return rows
+      },
+
       async getByUserIdAndTeamId(userId, teamId) {
         const { rows } = await postgres.query(`
           select * from teams_users_roles_map

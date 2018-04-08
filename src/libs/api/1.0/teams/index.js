@@ -1,5 +1,6 @@
 import NodeResque from 'node-resque'
 import Teams from '../../../models/Teams'
+import TeamEntityTypes from '../../../models/TeamEntityTypes'
 import TeamIntegrations from '../../../models/TeamIntegrations'
 import TeamsUsersRolesMap from '../../../models/TeamsUsersRolesMap'
 import TeamUserAccessRequest from '../../../models/TeamUserAccessRequest'
@@ -121,5 +122,23 @@ export default {
     }, {})
 
     res.json({ integrations: currentLoggedInTeamInt })
+  },
+
+  async entityTypes({ req, res, postgres }) {
+    const teamId    = req.session.current_team.id
+    const typesInst = TeamEntityTypes(postgres)
+    const types     = await typesInst.getAllBy({ team_id: teamId })
+
+    res.json({ types })
+  },
+
+  async users({ req, res, postgres }) {
+    const page      = req.query.page || 1
+    const pageSize  = req.query.pageSize || 10
+    const turm      = TeamsUsersRolesMap(postgres)
+    const teamId    = req.session.current_team.id
+    const users     = await turm.getAllByTeamId(teamId, page, pageSize)
+
+    res.json({ users })
   }
 }

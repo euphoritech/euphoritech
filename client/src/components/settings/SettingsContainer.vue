@@ -24,9 +24,10 @@
 </template>
 
 <script>
-  import Customers from './Customers'
-  import Development from './Development'
+  import Integrations from './Integrations'
   import Personal from './Personal'
+  import RecordTypes from './RecordTypes'
+  import TeamUsers from './TeamUsers'
   import SettingsFactory from '../../factories/ApiSettings'
 
   export default {
@@ -47,18 +48,13 @@
       }
     },
 
-    components: {
-      Personal
-    },
-
     created() {
       this.settings = [
-        { header: 'Personal Info', id: "personal", component: Personal },
-        { header: 'Customers', id: "customers", component: Customers },
-        { header: 'Development', id: "development", component: Development },
-        { header: 'Support', id: "support", content: 'My infor' },
-        { header: 'Marketing', id: "marketing", content: 'My infor' },
-        { header: 'Teams', id: 'teams', content: 'My infor' }
+        { header: 'Personalize', id: "personal", component: Personal },
+        { header: 'Integrations', id: "integrations", component: Integrations },
+        { header: 'Record Types', id: 'entities', component: RecordTypes },
+        { header: 'Teams', id: 'teams', content: 'My infor' },
+        { header: 'Team Users', id: "users", component: TeamUsers }
       ]
     },
 

@@ -22,6 +22,10 @@ export function createNestedArrays(ary, length=10) {
   return nestedArys
 }
 
+export function sleep(timeoutMs=1000) {
+  return new Promise(resolve => setTimeout(resolve, timeoutMs))
+}
+
 export async function passportOauthLoginHandler({
   req,
   accessToken,

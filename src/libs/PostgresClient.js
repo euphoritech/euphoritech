@@ -33,39 +33,12 @@ export default class PostgresClient {
 
   async query(...args) {
     let query = args[0]
-    let values = null
-    let callback = NOOP
-    try {
-      switch (args.length) {
-        case 2:
-          switch (typeof args[1]) {
-            case 'function':
-              callback = args[1]
-              break
-            default:
-              values = args[1] || []
-          }
-          break
-        case 3:
-          values = args[1]
-          callback = args[2]
-          break
-      }
+    let values = args[1]
 
-      let queryResults
-      if (values) {
-        queryResults = await this.pool.query(query, values)
-      } else {
-        queryResults = await this.pool.query(query)
-      }
+    if (values)
+      return await this.pool.query(query, values)
 
-      callback(null, queryResults)
-      return queryResults
-
-    } catch (err) {
-      callback(err)
-      throw err
-    }
+    return await this.pool.query(query)
   }
 
   queryStream(query, ...args) {

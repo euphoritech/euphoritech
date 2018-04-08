@@ -32,5 +32,15 @@ export default {
   async hasIntegration(type) {
     const response = await euphoritechFetch(`/api/1.0/teams/hasIntegration?type=${type}`)
     return await handleFetchResponse(response)
-  }
+  },
+
+  async getUsersInLoggedInTeam(page=1, pageSize=10) {
+    const response = await euphoritechFetch(`/api/1.0/teams/users?page=${page}&pageSize=${pageSize}`)
+    return await handleFetchResponse(response)
+  },
+
+  async getTeamEntityTypes() {
+    const response = await euphoritechFetch(`/api/1.0/teams/entityTypes`)
+    return await handleFetchResponse(response)
+  },
 }

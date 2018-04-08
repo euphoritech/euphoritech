@@ -1,7 +1,7 @@
 import requireFromString from 'require-from-string'
-import config from '../../config'
 import Aws from '../Aws'
 import DatabaseModel from './DatabaseModel'
+import config from '../../config'
 
 const s3 = Aws().S3
 

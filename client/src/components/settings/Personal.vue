@@ -1,9 +1,18 @@
 <template lang="pug">
   b-row
     b-col
-      b-form(@submit="submitPersonal")
-        b-form-group(label="Email Address:",label-for="personal-email")
-          b-form-input(id="personal-email",name="personal-email",v-model="userInfo.username_email")
+      b-row
+        b-col(cols="12",md="2",lg="1")
+          strong Email:
+        b-col(cols="12",md="10",lg="11")
+          div {{ userInfo.username_email }}
+        b-col(cols="12",md="2",lg="1")
+          strong Name:
+        b-col(cols="12",md="10",lg="11")
+          div {{ userInfo.name }}
+      - //b-form(@submit="submitPersonal")
+      - //  b-form-group(label="Email Address:",label-for="personal-email")
+      - //    b-form-input(id="personal-email",name="personal-email",v-model="userInfo.username_email")
 </template>
 
 <script>
@@ -34,7 +43,7 @@
         } else {
           tries++
         }
-      }, 250)
+      }, 500)
     }
   }
 </script>
