@@ -1,5 +1,7 @@
 import NodeResque from 'node-resque'
+import SessionHandler from '../../../SessionHandler'
 import Teams from '../../../models/Teams'
+import TeamApiKeys from '../../../models/TeamApiKeys'
 import TeamEntityTypes from '../../../models/TeamEntityTypes'
 import TeamIntegrations from '../../../models/TeamIntegrations'
 import TeamsUsersRolesMap from '../../../models/TeamsUsersRolesMap'
@@ -12,6 +14,18 @@ export default {
     const intTypeToCheck  = req.query.type
     const currentIntegr   = req.session.current_team_integrations
     res.json(!!currentIntegr[intTypeToCheck])
+  },
+
+  async getApiKeys({ req, res, postgres }) {
+    const keysInst  = TeamApiKeys(postgres)
+    const session   = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+
+    if (!currentTeamId)
+      return res.json({ keys: [] })
+
+    const keys = await keysInst.getAllBy({ team_id: currentTeamId })
+    return res.json({ keys })
   },
 
   async create({ req, res, postgres }) {
@@ -97,11 +111,13 @@ export default {
   },
 
   async getCurrentHierarchy({ req, res, postgres }) {
-    const teams   = Teams(postgres)
-    const turm    = TeamsUsersRolesMap(postgres)
-    const users   = Users(postgres, req.session)
-    const teamId  = req.query.teamId || ((req.session.teams_roles) ? req.session.teams_roles['0'].team_id : null)
-    const userId  = users.getLoggedInUserId()
+    const teams         = Teams(postgres)
+    const turm          = TeamsUsersRolesMap(postgres)
+    const users         = Users(postgres, req.session)
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const teamId        = req.query.teamId || currentTeamId
+    const userId        = users.getLoggedInUserId()
 
     if (!teamId)
       return res.status(400).json({ error: res.__("Please provide a valid team ID to get it's hierarchy.") })
@@ -115,7 +131,8 @@ export default {
 
   async getCurrentTeamIntegrations({ req, res, postgres }) {
     const teamIntegrations        = TeamIntegrations(postgres)
-    const currentLoggedInTeamId   = req.session.current_team.id
+    const session                 = SessionHandler(req.session)
+    const currentLoggedInTeamId   = session.getCurrentLoggedInTeam()
     const currentLoggedInTeamInt  = (await teamIntegrations.getAllBy({ team_id: currentLoggedInTeamId })).reduce((obj, record) => {
       obj[record.type] = record
       return obj
@@ -125,7 +142,12 @@ export default {
   },
 
   async entityTypes({ req, res, postgres }) {
-    const teamId    = req.session.current_team.id
+    const session   = SessionHandler(req.session)
+    const teamId    = session.getCurrentLoggedInTeam()
+
+    if (!teamId)
+      return res.json({ types: [] })
+
     const typesInst = TeamEntityTypes(postgres)
     const types     = await typesInst.getAllBy({ team_id: teamId })
 
@@ -136,8 +158,13 @@ export default {
     const page      = req.query.page || 1
     const pageSize  = req.query.pageSize || 10
     const turm      = TeamsUsersRolesMap(postgres)
-    const teamId    = req.session.current_team.id
-    const users     = await turm.getAllByTeamId(teamId, page, pageSize)
+    const session   = SessionHandler(req.session)
+    const teamId    = session.getCurrentLoggedInTeam()
+
+    if (!teamId)
+      return res.json({ users: [] })
+
+    const users = await turm.getAllByTeamId(teamId, page, pageSize)
 
     res.json({ users })
   }

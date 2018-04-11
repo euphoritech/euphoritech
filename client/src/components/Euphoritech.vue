@@ -6,6 +6,7 @@
       nav-bar
       router-view
     vue-toastr(ref="toastr")
+    create-entity
     settings
 </template>
 

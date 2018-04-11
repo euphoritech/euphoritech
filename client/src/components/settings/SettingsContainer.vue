@@ -24,6 +24,7 @@
 </template>
 
 <script>
+  import ApiKeys from './ApiKeys'
   import Integrations from './Integrations'
   import Personal from './Personal'
   import RecordTypes from './RecordTypes'
@@ -50,6 +51,7 @@
 
     created() {
       this.settings = [
+        { header: 'API Keys', id: "api", component: ApiKeys },
         { header: 'Personalize', id: "personal", component: Personal },
         { header: 'Integrations', id: "integrations", component: Integrations },
         { header: 'Record Types', id: 'entities', component: RecordTypes },

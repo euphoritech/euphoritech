@@ -27,6 +27,8 @@ export default function LoginHandler(postgres, session) {
         return obj
       }, {})
 
+      // TODO: support passing in team ID to determine the logged in team
+      // of the user
       const currentLoggedInTeamId   = await teams.getTopMostTeamId(teamRoleMapRecords.map(r => r.team_id))
       const currentLoggedInTeam     = await teams.findBy({ id: currentLoggedInTeamId })
       const currentTypes            = await teamTypes.getAllBy({ team_id: currentLoggedInTeamId })

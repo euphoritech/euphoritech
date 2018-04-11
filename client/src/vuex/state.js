@@ -1,6 +1,7 @@
 export default {
   isLoading: true,
   isLoggedIn: false,
+  showEntityModal: false,
 
   auth: {
     user: {

@@ -8,7 +8,7 @@ export default function WebSocket({ io, log, postgres, redis }) {
     const user  = req.session.user
 
     const handlers = {
-      global: await Global({ app, socket, log, io, postgres, redis })
+      global: Global({ app, socket, log, io, postgres, redis })
     }
 
     Object.keys(handlers).forEach(category => {

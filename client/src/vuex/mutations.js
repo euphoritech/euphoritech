@@ -24,6 +24,10 @@ export default {
     console.log('STATE', state)
   },
 
+  TOGGLE_CREATE_ENTITY_MODAL(state) {
+    state.showEntityModal = !state.showEntityModal
+  },
+
   TOGGLE_SETTINGS_MODAL(state) {
     state.settings.isOpen = !state.settings.isOpen
   }

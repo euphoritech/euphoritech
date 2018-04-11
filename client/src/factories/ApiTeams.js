@@ -43,4 +43,9 @@ export default {
     const response = await euphoritechFetch(`/api/1.0/teams/entityTypes`)
     return await handleFetchResponse(response)
   },
+
+  async getApiKeys() {
+    const response = await euphoritechFetch(`/api/1.0/teams/getApiKeys`)
+    return await handleFetchResponse(response)
+  }
 }

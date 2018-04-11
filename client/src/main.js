@@ -13,6 +13,7 @@ import router from './router'
 import 'whatwg-fetch'
 import Loader from './components/Loader'
 import Toastr from 'vue-toastr'
+import CreateEntityModal from './components/entities/CreateEntityModal'
 import SettingsContainer from './components/settings/SettingsContainer'
 
 // css
@@ -34,6 +35,7 @@ Vue.use(BootstrapVue)
 Vue.component('loader', Loader)
 Vue.component('vue-toastr', Toastr)
 Vue.component('settings', SettingsContainer)
+Vue.component('create-entity', CreateEntityModal)
 
 Vue.config.productionTip = false
 

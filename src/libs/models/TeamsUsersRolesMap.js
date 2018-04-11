@@ -44,7 +44,10 @@ export default function TeamsUsersRolesMap(postgres) {
         return rows[0]
       },
 
-      async userHasAccessToTeam(userId, teamId) {
+      async userHasAccessToTeam(userId, teamId=null) {
+        if (!teamId)
+          return false
+
         const teams = Teams(postgres)
         const mapRecords = await this.getAllByUserId(userId)
         if (mapRecords.length > 0) {

@@ -6,10 +6,14 @@
       b-navbar-nav
         b-nav-item(href="/") Home
       b-navbar-nav(class="ml-auto")
-        b-form-input.mr-sm-2(size="sm",placeholder="Search..")
+        //- b-form-input.mr-sm-2(size="sm",placeholder="Search..")
         b-nav-item(v-if="!isLoggedIn",href="/login") Login
-        b-nav-item(v-if="isLoggedIn",@click="toggleSettings")
+        b-nav-item(id="create-entity-modal",v-if="isLoggedIn",@click="showCreateEntityModal")
+          i.fa.fa-plus-square
+        b-tooltip(target="create-entity-modal",title="Create a new record to link to.")
+        b-nav-item(id="show-settings",v-if="isLoggedIn",@click="toggleSettings")
           i.fa.fa-cog
+        b-tooltip(target="show-settings",title="Access & update your settings.")
         b-nav-item(v-if="isLoggedIn",href="/logout") Logout
 </template>
 
@@ -25,6 +29,11 @@
     },
 
     methods: {
+      async showCreateEntityModal() {
+        console.log('gothere')
+        this.$store.commit('TOGGLE_CREATE_ENTITY_MODAL')
+      },
+
       async toggleSettings() {
         await this.$store.dispatch('toggleSettingsModal')
       }
