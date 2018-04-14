@@ -10,12 +10,6 @@ import Users from '../../../models/Users'
 import config from '../../../../config'
 
 export default {
-  hasIntegration({ req, res }) {
-    const intTypeToCheck  = req.query.type
-    const currentIntegr   = req.session.current_team_integrations
-    res.json(!!currentIntegr[intTypeToCheck])
-  },
-
   async getApiKeys({ req, res, postgres }) {
     const keysInst  = TeamApiKeys(postgres)
     const session   = SessionHandler(req.session)
@@ -127,6 +121,14 @@ export default {
       return res.json({ hierarchy: hierarchyObject })
     }
     res.status(401).json({ error: res.__("You do not have access to this team.") })
+  },
+
+  async hasIntegration({ req, res, postgres }) {
+    const intTypeToCheck = req.query.type
+    let currentIntegr
+    await this.getCurrentTeamIntegrations({ req, res: { json: ({ integrations }) => currentIntegr = integrations }, postgres })
+
+    res.json(!!currentIntegr[intTypeToCheck])
   },
 
   async getCurrentTeamIntegrations({ req, res, postgres }) {

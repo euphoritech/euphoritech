@@ -32,6 +32,10 @@
   import SettingsFactory from '../../factories/ApiSettings'
 
   export default {
+    props: {
+      loggedIn: { type: Boolean, default: false }
+    },
+
     data() {
       return {
         settings: []
@@ -49,15 +53,19 @@
       }
     },
 
-    created() {
-      this.settings = [
-        { header: 'API Keys', id: "api", component: ApiKeys },
-        { header: 'Personalize', id: "personal", component: Personal },
-        { header: 'Integrations', id: "integrations", component: Integrations },
-        { header: 'Record Types', id: 'entities', component: RecordTypes },
-        { header: 'Teams', id: 'teams', content: 'My infor' },
-        { header: 'Team Users', id: "users", component: TeamUsers }
-      ]
+    watch: {
+      loggedIn(newVal, oldVal) {
+        if (!!newVal) {
+          this.settings = [
+            { header: 'API Keys', id: "api", component: ApiKeys },
+            { header: 'Personalize', id: "personal", component: Personal },
+            { header: 'Integrations', id: "integrations", component: Integrations },
+            { header: 'Record Types', id: 'entities', component: RecordTypes },
+            { header: 'Teams', id: 'teams', content: 'My infor' },
+            { header: 'Team Users', id: "users", component: TeamUsers }
+          ]
+        }
+      }
     },
 
     mounted() {

@@ -24,5 +24,12 @@ export default {
   async getLoggedInUsersIntegrations() {
     const response = await euphoritechFetch(`/api/1.0/auth/getIntegrations`)
     return await handleFetchResponse(response)
+  },
+
+  isValidTeamId(id='') {
+    if (/^[a-z\d]{5,8}$/.test(id.toLowerCase()))
+      return true
+
+    return false
   }
 }

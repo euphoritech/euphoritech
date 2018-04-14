@@ -11,7 +11,7 @@ export default new VueRouter({
   mode: 'history',
   routes: [
     { path: '/autherror/:error', component: AuthError, props: true },
-    // { path: '/createaccount', component: Login },
+    { path: '/createaccount', component: Login },
     { path: '/login', component: Login },
     { path: '/dashboard/:partial', component: DashboardContainer, props: true },
     { path: '/', component: DashboardContainer },

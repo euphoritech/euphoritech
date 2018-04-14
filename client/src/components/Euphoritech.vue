@@ -7,7 +7,7 @@
       router-view
     vue-toastr(ref="toastr")
     create-entity
-    settings
+    settings(:logged-in="isLoggedIn")
 </template>
 
 <script>
@@ -16,6 +16,12 @@
 
   export default {
     name: 'euphoritech',
+
+    data() {
+      return {
+        isLoggedIn: false
+      }
+    },
 
     components: {
       NavBar
@@ -33,10 +39,11 @@
       // Begin app initialization after we determine the logged in state of
       // the user
       euphoritechSocket.on('isLoggedIn', async isLoggedIn => {
+        this.isLoggedIn = isLoggedIn
         this.$store.commit('CHECK_LOGGED_IN', isLoggedIn)
 
         if (!AuthFactory.isLoggedInLocal(this.$store.state)) {
-          if (this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
+          if (this.$route.path !== '/createaccount' && this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
             this.$store.dispatch('redirectToLogin')
 
           return this.$store.commit('APP_NO_LONGER_LOADING')

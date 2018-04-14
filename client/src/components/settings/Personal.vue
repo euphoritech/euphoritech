@@ -2,13 +2,13 @@
   b-row
     b-col
       b-row
-        b-col(cols="12",md="2",lg="1")
-          strong Email:
-        b-col(cols="12",md="10",lg="11")
+        b-col(cols="12",md="2",lg="2")
+          strong Username:
+        b-col(cols="12",md="10",lg="10")
           div {{ userInfo.username_email }}
-        b-col(cols="12",md="2",lg="1")
+        b-col(cols="12",md="2",lg="2")
           strong Name:
-        b-col(cols="12",md="10",lg="11")
+        b-col(cols="12",md="10",lg="10")
           div {{ userInfo.name }}
       - //b-form(@submit="submitPersonal")
       - //  b-form-group(label="Email Address:",label-for="personal-email")

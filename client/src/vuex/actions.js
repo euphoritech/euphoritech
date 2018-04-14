@@ -4,7 +4,7 @@ import SettingsFactory from '../factories/ApiSettings'
 
 export default {
   async init({ commit, state }) {
-    const isLoggedIn = await AuthFactory.isLoggedInLocal(state)
+    const isLoggedIn = AuthFactory.isLoggedInLocal(state)
     if (!isLoggedIn)
       return false
 

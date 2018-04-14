@@ -30,7 +30,6 @@
 
     methods: {
       async showCreateEntityModal() {
-        console.log('gothere')
         this.$store.commit('TOGGLE_CREATE_ENTITY_MODAL')
       },
 

@@ -32,6 +32,7 @@
 
 <script>
   import ApiTeams from '../factories/ApiTeams'
+  import ApiAuth from '../factories/ApiAuth'
 
   export default {
     data() {
@@ -50,11 +51,13 @@
     },
 
     methods: {
+      isValidTeamId: ApiAuth.isValidTeamId,
+
       async createNewTeam(evt) {
         evt.preventDefault()
         this.newTeamError = null
 
-        if (!(this.data.teamIdToCreate && this.validTeamId(this.data.teamIdToCreate)))
+        if (!(this.data.teamIdToCreate && this.isValidTeamId(this.data.teamIdToCreate)))
           return this.newTeamError = `Please enter a valid team ID of 5-8 alphanumeric characters to create a new team.`
 
         if (!this.data.teamNameToCreate)
@@ -72,7 +75,7 @@
         evt.preventDefault()
         this.joinError = null
 
-        if (!(this.data.teamIdToJoin && this.validTeamId(this.data.teamIdToJoin)))
+        if (!(this.data.teamIdToJoin && this.isValidTeamId(this.data.teamIdToJoin)))
           return this.joinError = `Please enter a valid team ID (5-8 alphanumeric characters) to request access to join the team.`
 
         try {
@@ -82,13 +85,6 @@
         } catch(err) {
           this.joinError = err.message
         }
-      },
-
-      validTeamId(id='') {
-        if (/^[a-z\d]{5,8}$/.test(id.toLowerCase()))
-          return true
-
-        return false
       }
     },
 
