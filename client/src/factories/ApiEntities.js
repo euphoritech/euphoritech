@@ -1,6 +1,11 @@
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
+  async getTypes() {
+    const response = await euphoritechFetch(`/api/1.0/entities/getTypes`)
+    return await handleFetchResponse(response)
+  },
+
   async getLinkedEntities(entityId) {
     const response = await euphoritechFetch(`/api/1.0/entities/getLinks?id=${entityId}`)
     return await handleFetchResponse(response)

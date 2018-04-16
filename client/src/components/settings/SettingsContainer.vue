@@ -57,8 +57,8 @@
       loggedIn(newVal, oldVal) {
         if (!!newVal) {
           this.settings = [
-            { header: 'API Keys', id: "api", component: ApiKeys },
-            { header: 'Personalize', id: "personal", component: Personal },
+            // { header: 'API Keys', id: "api", component: ApiKeys },
+            { header: 'Personal', id: "personal", component: Personal },
             { header: 'Integrations', id: "integrations", component: Integrations },
             { header: 'Record Types', id: 'entities', component: RecordTypes },
             { header: 'Teams', id: 'teams', content: 'My infor' },

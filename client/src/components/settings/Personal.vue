@@ -10,12 +10,22 @@
           strong Name:
         b-col(cols="12",md="10",lg="10")
           div {{ userInfo.name }}
+        b-col(cols="12",md="2",lg="2")
+          strong Last Login:
+        b-col(cols="12",md="10",lg="10")
+          div {{ getFormattedDate(userInfo.last_login, 'MMMM Do, YYYY h:mm a') }}
+        b-col(cols="12",md="2",lg="2")
+          strong Num Logins:
+        b-col(cols="12",md="10",lg="10")
+          div {{ userInfo.num_logins }}
       - //b-form(@submit="submitPersonal")
       - //  b-form-group(label="Email Address:",label-for="personal-email")
       - //    b-form-input(id="personal-email",name="personal-email",v-model="userInfo.username_email")
 </template>
 
 <script>
+  import TimeHelpers from '../../factories/TimeHelpers'
+
   export default {
     data() {
       return {
@@ -26,6 +36,8 @@
     },
 
     methods: {
+      getFormattedDate: TimeHelpers.getFormattedDate,
+
       submitPersonal(evt) {
         evt.preventDefault()
         console.log('got here...')

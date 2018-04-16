@@ -11,6 +11,7 @@ import router from './router'
 // external libraries and components
 import 'whatwg-fetch'
 import Loader from './components/Loader'
+import Datepicker from './components/Datepicker'
 import Toastr from 'vue-toastr'
 import CreateEntityModal from './components/entities/CreateEntityModal'
 import SettingsContainer from './components/settings/SettingsContainer'
@@ -31,6 +32,7 @@ if ('addEventListener' in document)
 
 Vue.use(BootstrapVue)
 Vue.component('loader', Loader)
+Vue.component('datepicker', Datepicker)
 Vue.component('vue-toastr', Toastr)
 Vue.component('settings', SettingsContainer)
 Vue.component('create-entity', CreateEntityModal)

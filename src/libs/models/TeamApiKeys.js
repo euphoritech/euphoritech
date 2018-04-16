@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import DatabaseModel from './DatabaseModel'
 
 export default function TeamApiKeys(postgres) {
@@ -8,7 +9,13 @@ export default function TeamApiKeys(postgres) {
     {
       accessibleColumns: [
         'team_id', 'api_key', 'status'
-      ]
+      ],
+
+      createKey(userId, teamId) {
+        const shaSum = crypto.createHash('sha1')
+        shaSum.update(`${userId}|${teamId}|${Date.now()}`)
+        return shaSum.digest('hex')
+      }
     }
   )
 }

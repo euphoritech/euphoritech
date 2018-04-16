@@ -87,6 +87,7 @@ export function migrations(postgres) {
         const seedUserRecord = (await postgres.query(`select * from users where username_email = '${seedEmailAddress}'`)).rows[0]
         await postgres.query(`INSERT INTO teams (id, external_id, is_global, name, primary_contact_user_id) VALUES (1, 'global', true, 'Global', ${seedUserRecord.id})`)
         await postgres.query(`ALTER SEQUENCE teams_id_seq RESTART WITH 2`)
+        await postgres.query(`INSERT INTO teams_users_roles_map (team_id, user_id, role) VALUES (1, ${seedUserRecord.id}, 'superadmin')`)
       }
     },
 
@@ -185,56 +186,12 @@ export function migrations(postgres) {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS extensions_triggers_table_map_id_idx on extensions_triggers (map_table, map_id)`)
     },
 
-    async function createTeamEntities() {
-      await postgres.query(`
-        CREATE TABLE IF NOT EXISTS team_entities (
-          id serial PRIMARY KEY,
-          team_id integer REFERENCES teams,
-          source varchar(255),
-          entity_type varchar(255),
-          uid varchar(255),
-          external_link varchar(255),
-          due_date timestamp(6),
-          mod1 varchar(255),
-          mod2 varchar(255),
-          mod3 varchar(255),
-          mod4 varchar(255),
-          mod5 varchar(255),
-          created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
-          updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
-        );
-      `)
-    },
-
-    async function createTeamEntitiesIndexes() {
-      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_idx on team_entities (team_id)`)
-      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_source_idx on team_entities (team_id, source)`)
-    },
-
-    async function createTeamEntityLinks() {
-      await postgres.query(`
-        CREATE TABLE IF NOT EXISTS team_entity_links (
-          id serial PRIMARY KEY,
-          entity1_id integer REFERENCES team_entities,
-          entity2_id integer REFERENCES team_entities,
-          created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
-          updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
-        );
-      `)
-    },
-
-    async function createTeamEntityLinksIndexes() {
-      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_links_entity1_id_idx on team_entity_links (entity1_id)`)
-      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_links_entity2_id_idx on team_entity_links (entity2_id)`)
-    },
-
     async function createTeamEntityTypes() {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_entity_types (
           id serial PRIMARY KEY,
           team_id integer REFERENCES teams,
-          internal_type varchar(255),
-          external_type varchar(255),
+          name varchar(255),
           description text,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
@@ -256,6 +213,50 @@ export function migrations(postgres) {
         if (types.length === 0)
           await entities.insertSeedTypes(globalTeam.id)
       }
+    },
+
+    async function createTeamEntities() {
+      await postgres.query(`
+        CREATE TABLE IF NOT EXISTS team_entities (
+          id serial PRIMARY KEY,
+          team_id integer REFERENCES teams,
+          source varchar(255),
+          entity_type_id integer REFERENCES team_entity_types,
+          uid varchar(255),
+          external_link varchar(255),
+          due_date timestamp(6),
+          mod1 varchar(255),
+          mod2 varchar(255),
+          mod3 varchar(255),
+          mod4 varchar(255),
+          mod5 varchar(255),
+          created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
+          updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
+        );
+      `)
+    },
+
+    async function createTeamEntitiesIndexes() {
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_idx on team_entities (team_id)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_source_idx on team_entities (team_id, source)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_entity_type_id_idx on team_entities (team_id, entity_type_id)`)
+    },
+
+    async function createTeamEntityLinks() {
+      await postgres.query(`
+        CREATE TABLE IF NOT EXISTS team_entity_links (
+          id serial PRIMARY KEY,
+          entity1_id integer REFERENCES team_entities,
+          entity2_id integer REFERENCES team_entities,
+          created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
+          updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
+        );
+      `)
+    },
+
+    async function createTeamEntityLinksIndexes() {
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_links_entity1_id_idx on team_entity_links (entity1_id)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_links_entity2_id_idx on team_entity_links (entity2_id)`)
     },
 
     async function createTeamUserAccessRequest() {

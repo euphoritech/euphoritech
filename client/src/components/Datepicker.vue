@@ -17,7 +17,7 @@
     },
     methods: {
       dateChanged(date) {
-        const sanitizedDate = moment.utc(date || this.date).startOf('day')
+        const sanitizedDate = moment.utc(date || this.date).startOf('day').toDate()
         this.$emit('input', sanitizedDate)
         this.$emit('changedWithKey', sanitizedDate, this.valueKey)
       }
