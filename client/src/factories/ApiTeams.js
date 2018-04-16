@@ -1,6 +1,16 @@
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
+  async checkTeamAvailability(teamId) {
+    const response = await euphoritechFetch(`/api/1.0/teams/teamAvailable?teamId=${teamId}`)
+    return await handleFetchResponse(response)
+  },
+
+  async checkTeamExists(teamId) {
+    const response = await euphoritechFetch(`/api/1.0/teams/teamExists?teamId=${teamId}`)
+    return await handleFetchResponse(response)
+  },
+
   async getTeamHierarchy(teamId='') {
     const response = await euphoritechFetch(`/api/1.0/teams/getCurrentHierarchy?teamId=${teamId}`)
     return await handleFetchResponse(response)

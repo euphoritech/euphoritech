@@ -1,8 +1,10 @@
 import config from '../../config'
 import DatabaseModel from './DatabaseModel'
+import TeamEntities from './TeamEntities'
 
 export default function Teams(postgres) {
   const factoryToExtend = DatabaseModel(postgres, 'teams')
+  const entities = TeamEntities(postgres)
 
   return Object.assign(
     factoryToExtend,
@@ -11,6 +13,18 @@ export default function Teams(postgres) {
         'external_id', 'is_global', 'name', 'parent_team_id', 'type',
         'primary_contact_user_id'
       ],
+
+      async create({ parentTeamId, teamExtId, teamName, userId }) {
+        parentTeamId = parentTeamId || 1
+        const newTeamRecord = await this.findOrCreateBy({
+          parent_team_id: parentTeamId,
+          external_id: teamExtId,
+          name: teamName,
+          primary_contact_user_id: userId
+        })
+        await entities.insertSeedTypes(newTeamRecord.id)
+        return newTeamRecord
+      },
 
       async getTopMostTeamId(teamIdsAry) {
         const hierarchies = await Promise.all(

@@ -10,6 +10,20 @@ import Users from '../../../models/Users'
 import config from '../../../../config'
 
 export default {
+  async teamAvailable({ req, res, postgres }) {
+    const teams   = Teams(postgres)
+    const teamId  = req.query.teamId
+
+    const teamRecord = await teams.findBy({ external_id: teamId })
+    res.json(!teamRecord)
+  },
+
+  async teamExists({ req, res, postgres }) {
+    let teamIsAvailable
+    await this.teamAvailable({ req, res: { json: available => teamIsAvailable = available }, postgres })
+    res.json(!teamIsAvailable)
+  },
+
   async getApiKeys({ req, res, postgres }) {
     const keysInst  = TeamApiKeys(postgres)
     const session   = SessionHandler(req.session)
@@ -34,13 +48,8 @@ export default {
     if (teamAlreadyExists)
       return res.status(400).json({ error: res.__(`There is already a team with ID: ${teamExtId}`) })
 
-    const newRecord = await teams.findOrCreateBy({
-      parent_team_id: 1,
-      external_id: teamExtId,
-      name: teamName,
-      primary_contact_user_id: userId
-    })
-    const teamMapRecord = await teamMap.findOrCreateBy({ team_id: newRecord.id, primary_contact_user_id: userId, role: 'teamadmin' })
+    const newTeamRecord = await teams.create({ teamExtId, teamName, userId })
+    const teamMapRecord = await teamMap.findOrCreateBy({ team_id: newTeamRecord.id, primary_contact_user_id: userId, role: 'teamadmin' })
 
     const teamRoleMapRecords = await teamMap.getAllByUserId(userId)
     users.setSession({ teams_roles: teamRoleMapRecords })

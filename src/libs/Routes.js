@@ -37,15 +37,27 @@ export default {
 
   requireAuthExpressMiddleware() {
     return function(req, res, next) {
+      const currentPath = req.path
+      if (routesNotNeedingAuth().includes(currentPath))
+        return next()
+
       if (Users(null, req.session).isLoggedIn())
         return next()
 
       // TODO: Support API key authentication here
-      const apiKeyProvided = req.headers['euphoritech-api-key']
+      const apiKeyProvided = req.headers['x-api-key']
       if (false)
         return next()
 
       return res.status(401).json({ error: 'Invalid authentication information.' })
     }
   }
+}
+
+function routesNotNeedingAuth() {
+  return [
+    '/api/1.0/auth/usernameAvailable',
+    '/api/1.0/teams/teamAvailable',
+    '/api/1.0/teams/teamExists'
+  ]
 }

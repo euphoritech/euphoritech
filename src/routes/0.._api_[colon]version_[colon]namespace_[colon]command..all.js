@@ -20,7 +20,7 @@ export default [
       await ApiVersions[version][namespace][command]({ req, res, log, postgres, redis })
     } catch(err) {
       log.error("Error with API request", err)
-      res.sendStatus(404)
+      res.sendStatus(500)
     }
   }
 ]

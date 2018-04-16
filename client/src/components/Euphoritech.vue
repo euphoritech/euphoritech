@@ -13,6 +13,7 @@
 <script>
   import NavBar from './NavBar'
   import AuthFactory from '../factories/ApiAuth'
+  import euphoritechSocket from '../factories/EuphoritechSocket'
 
   export default {
     name: 'euphoritech',

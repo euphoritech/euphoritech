@@ -15,6 +15,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async checkUsernameAvailability(username) {
+    const response = await euphoritechFetch(`/api/1.0/auth/usernameAvailable?username=${encodeURIComponent(username)}`)
+    return await handleFetchResponse(response)
+  },
+
   isLoggedInLocal(state) {
     return (state.isLoggedIn)
       return true
@@ -26,10 +31,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  isValidTeamId(id='') {
-    if (/^[a-z\d]{5,8}$/.test(id.toLowerCase()))
-      return true
+  isValidEmail(text='') {
+    return /^.+@.+\.([a-zA-Z\d]{2,5})$/.test(text)
+  },
 
-    return false
+  isValidTeamId(id='') {
+    return /^[a-z\d]{5,8}$/.test((id || '').toLowerCase())
   }
 }

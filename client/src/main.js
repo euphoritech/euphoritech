@@ -4,7 +4,6 @@ import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import fetchDefaults from 'fetch-defaults'
 import * as FastClick from 'fastclick'
-import socketIoClient from 'socket.io-client'
 import store from './vuex/store'
 import Euphoritech from './components/Euphoritech'
 import router from './router'
@@ -22,9 +21,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './css/main.scss'
 
-window.euphoritechFetch   = fetchDefaults(fetch, { credentials: 'same-origin' })
-window.euphoritechSocket  = window.euphoritechSocket || socketIoClient('http://localhost:8000')
-window.vueRouter          = router
+window.euphoritechFetch = fetchDefaults(fetch, { credentials: 'same-origin' })
+window.vueRouter        = router
 
 // Initiate FastClick for mobile devices to remove the built-in 300ms
 // delay. Read more in https://github.com/ftlabs/fastclick

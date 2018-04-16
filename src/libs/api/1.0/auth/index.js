@@ -6,6 +6,14 @@ export default {
     res.json({ session: req.session })
   },
 
+  async usernameAvailable({ req, res, postgres }) {
+    const users     = Users(postgres)
+    const username  = req.query.username
+
+    const userRecord = await users.findBy({ username_email: username })
+    res.json(!userRecord)
+  },
+
   setRedirect({ req, res }) {
     req.session.returnTo = req.body.target
     req.session.save()

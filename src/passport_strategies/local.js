@@ -20,8 +20,7 @@ export default function LocalPassportStrategy(postgresClient) {
         if (username && username == config.auth.GLOBAL_ADMIN)
           return done(null, (users.validateUserPassword(username, password, config.auth.GLOBAL_PASSWORD) ? username : false))
 
-        let userRecord = await users.findBy({ username_email: username })
-
+        const userRecord = await users.findBy({ username_email: username })
         if (!userRecord)
           throw new Errors.NoUserRecord(`We didn't find a user record with the provided e-mail address yet.`)
 
@@ -36,7 +35,7 @@ export default function LocalPassportStrategy(postgresClient) {
           num_logins: (userRecord.num_logins || 0) + 1
         }, { id: userRecord.id }))
         await users.save()
-        
+
         await login.standardLogin(userRecord)
         return done(null, username)
 

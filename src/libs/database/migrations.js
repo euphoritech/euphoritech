@@ -78,6 +78,7 @@ export function migrations(postgres) {
     async function createTeamsIndexes() {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS teams_user_id_idx on teams (primary_contact_user_id)`)
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS teams_parent_team_id_idx on teams (parent_team_id)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS teams_external_id_idx on teams (external_id)`)
     },
 
     async function seedGlobalTeam() {
