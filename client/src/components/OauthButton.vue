@@ -47,3 +47,39 @@
     }
   }
 </script>
+
+<style lang="scss">
+  .oauth-login-button {
+    padding: 10px;
+    margin: 10px 0px;
+    border: 1px solid;
+    border-radius: 3px;
+    width: 100%;
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    > i {
+      margin-right: 5px;
+    }
+
+    &.github {
+      background: #24292e;
+      border-color: #ccc;
+      color: #fff;
+    }
+
+    &.google {
+      background: #d14836;
+      border-color: #f00;
+      color: #fff;
+    }
+
+    &.salesforce {
+      background: #3290c5;
+      border-color: #215ca0;
+      color: #fff;
+    }
+  }
+</style>

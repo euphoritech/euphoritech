@@ -7,9 +7,31 @@ export default function TeamEntities(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'team_id', 'source', 'entity_type', 'uid', 'external_link',
-        'due_date', 'mod1', 'mod2', 'mod3', 'mod4', 'mod5'
+        'team_id', 'name', 'description', 'source', 'entity_type_id',
+        'uid', 'external_link', 'due_date', 'mod1', 'mod2', 'mod3', 'mod4', 'mod5'
       ],
+
+      async findByTypeId(typeId, { page, pageSize, searchFilter, orderBy } = {}) {
+        page = page || 1
+        pageSize = pageSize || 30
+        searchFilter = searchFilter || null
+        orderBy = orderBy || 'lower(e.name)'
+
+        let additionalSearchFilter = ''
+        if (searchFilter)
+          additionalSearchFilter = `and e.name ilike '%${searchFilter}%'`
+
+        const { rows } = await postgres.query(`
+          select e.*
+          from team_entity_types as t
+          inner join team_entities as e on e.entity_type_id = t.id
+          where t.id = $1 ${additionalSearchFilter}
+          order by $2
+          limit $3
+          offset $4
+        `, [ typeId, orderBy, pageSize, (page-1) * pageSize ])
+        return rows
+      },
 
       seedTypes: [
         { name: 'Customer', description: 'Your customers or clients.' },
@@ -18,7 +40,7 @@ export default function TeamEntities(postgres) {
         { name: 'Development Pull Request', description: 'A version control pull request.' },
         { name: 'QA Note', description: 'A bug or feature request or other requested code change.' },
         { name: 'Release Note', description: 'Documentation about a code update or release to describe new or changed functionality.' },
-        { name: 'Support Ticket', description: 'Tickets submitted by your customers as support requests.' }
+        { name: 'Support Ticket', description: 'Tickets submitted by yourcustomers as support requests.' }
       ],
 
       async insertSeedTypes(teamId) {

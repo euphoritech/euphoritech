@@ -1,44 +1,57 @@
 <template lang="pug">
   b-container(:fluid="true")
     b-row
-      side-bar
-      component.padding-medium(:is="partialComponent")
+      side-bar(:active-type-id="this.type_id")
+      b-col
+        b-row
+          b-col(v-if="isLoadingLocal")
+            loader
+          component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",v-if="!isLoadingLocal")
 </template>
 
 <script>
-  import Customers from './Customers'
-  import Development from './Development'
+  import EntityRecords from './EntityRecords'
   import Home from './Home'
-  import Support from './Support'
   import SideBar from './SideBar'
+  import ApiEntities from '../../factories/ApiEntities'
 
   export default {
-    props: [ 'partial' ],
+    props: {
+      type_id: { type: [ Number, String ] }
+    },
 
     data() {
       return {
-        partialComponent: null
+        isLoadingLocal: true,
+        partialComponent: null,
+        entityRecords: []
+      }
+    },
+
+    computed: {
+      currentComponentProps() {
+        switch (this.partialComponent) {
+          case 'entity-records':
+            return { records: this.entityRecords, type_id: this.type_id }
+        }
       }
     },
 
     components: {
-      Customers,
-      Development,
+      EntityRecords,
       Home,
-      Support,
       SideBar
     },
 
-    created() {
-      const partialRouteMap = {
-        dashboard:    'home',
-        home:         'home',
-        customers:    'customers',
-        development:  'development',
-        support:      'support'
+    async created() {
+      if (this.type_id) {
+        this.entityRecords = (await ApiEntities.getEntityListByType({ type_id: this.type_id })).records
+        this.partialComponent = 'entity-records'
+        return this.isLoadingLocal = false
       }
 
-      this.partialComponent = partialRouteMap[this.partial] || 'home'
+      this.partialComponent = 'home'
+      this.isLoadingLocal = false
     }
   }
 </script>

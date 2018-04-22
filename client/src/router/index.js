@@ -13,7 +13,8 @@ export default new VueRouter({
     { path: '/autherror/:error', component: AuthError, props: true },
     { path: '/createaccount', component: Login },
     { path: '/login', component: Login },
-    { path: '/dashboard/:partial', component: DashboardContainer, props: true },
+    { path: '/dashboard/type/:type_id', component: DashboardContainer, props: true },
+    { path: '/dashboard*', component: DashboardContainer },
     { path: '/', component: DashboardContainer },
     { path: '*', component: NoPageFound }
   ]

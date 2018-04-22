@@ -221,6 +221,8 @@ export function migrations(postgres) {
           id serial PRIMARY KEY,
           team_id integer REFERENCES teams,
           source varchar(255),
+          name varchar(255),
+          description text,
           entity_type_id integer REFERENCES team_entity_types,
           uid varchar(255),
           external_link varchar(255),

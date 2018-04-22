@@ -47,7 +47,6 @@
   import OauthButton from './OauthButton'
   import ApiAuth from '../factories/ApiAuth'
   import ApiTeams from '../factories/ApiTeams'
-  import euphoritechSocket from '../factories/EuphoritechSocket'
   import StringHelpers from '../factories/StringHelpers'
 
   export default {

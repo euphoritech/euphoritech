@@ -6,13 +6,13 @@
       nav-bar
       router-view
     vue-toastr(ref="toastr")
-    create-entity
+    create-entity(:logged-in="isLoggedIn")
     settings(:logged-in="isLoggedIn")
 </template>
 
 <script>
   import NavBar from './NavBar'
-  import AuthFactory from '../factories/ApiAuth'
+  import ApiAuth from '../factories/ApiAuth'
   import euphoritechSocket from '../factories/EuphoritechSocket'
 
   export default {
@@ -43,7 +43,7 @@
         this.isLoggedIn = isLoggedIn
         this.$store.commit('CHECK_LOGGED_IN', isLoggedIn)
 
-        if (!AuthFactory.isLoggedInLocal(this.$store.state)) {
+        if (!this.$store.state.isLoggedIn) {
           if (this.$route.path !== '/createaccount' && this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
             this.$store.dispatch('redirectToLogin')
 
@@ -52,7 +52,7 @@
 
         await this.$store.dispatch('init')
 
-        if (AuthFactory.isLoggedInLocal(this.$store.state) && !this.$store.state.session.teams_roles)
+        if (this.$store.state.isLoggedIn && !this.$store.state.session.teams_roles)
           this.$store.dispatch('redirectToNoTeamForm')
 
         this.$store.commit('APP_NO_LONGER_LOADING')

@@ -3,8 +3,8 @@
     b-navbar-toggle(target="nav_collapse")
     b-navbar-brand(href="/") euphoritech
     b-collapse(:is-nav="true",id="nav_collapse")
-      b-navbar-nav
-        b-nav-item(href="/") Home
+      //- b-navbar-nav
+      //-   b-nav-item(href="/") Home
       b-navbar-nav(class="ml-auto")
         //- b-form-input.mr-sm-2(size="sm",placeholder="Search..")
         b-nav-item(v-if="!isLoggedIn",href="/login") Login
@@ -19,12 +19,12 @@
 
 <script>
   import moment from 'moment'
-  import AuthFactory from '../factories/ApiAuth'
+  import ApiAuth from '../factories/ApiAuth'
 
   export default {
     computed: {
       isLoggedIn() {
-        return AuthFactory.isLoggedInLocal(this.$store.state)
+        return this.$store.state.isLoggedIn
       }
     },
 

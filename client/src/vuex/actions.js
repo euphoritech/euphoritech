@@ -1,16 +1,16 @@
-import AuthFactory from '../factories/ApiAuth'
+import ApiAuth from '../factories/ApiAuth'
 import ApiTeams from '../factories/ApiTeams'
 import SettingsFactory from '../factories/ApiSettings'
 
 export default {
   async init({ commit, state }) {
-    const isLoggedIn = AuthFactory.isLoggedInLocal(state)
+    const isLoggedIn = state.isLoggedIn
     if (!isLoggedIn)
       return false
 
     const responses = await Promise.all([
-      AuthFactory.getLoggedInUser(),
-      AuthFactory.getLoggedInUsersIntegrations(),
+      ApiAuth.getLoggedInUser(),
+      ApiAuth.getLoggedInUsersIntegrations(),
       ApiTeams.getTeamHierarchy(),
       ApiTeams.getCurrentTeamIntegrations(),
       SettingsFactory.getStatus()

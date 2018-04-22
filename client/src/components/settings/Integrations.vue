@@ -7,7 +7,7 @@
         b-tabs(:card="true")
           b-tab(title="Main")
             div Manage your integration settings here.
-          b-tab(v-if="true",title="Github")
+          b-tab(v-if="hasGithub",title="Github")
             div.
               You can integrate your Github PRs &amp; issues to link to your
               customer accounts, QA tickets, etc.
@@ -24,6 +24,7 @@
 <script>
   import OauthButton from '../OauthButton'
   import ApiEnv from '../../factories/ApiEnv'
+  import ApiIntegrations from '../../factories/ApiIntegrations'
 
   export default {
     data() {
@@ -35,15 +36,22 @@
       }
     },
 
+    methods: {
+      // getCurrentTeamIntegrations() {
+      //   // TODO get current team OAuth integrations and determine if they match
+      //   // the current logged in user's integrations.
+      // }
+    },
+
     async created() {
       const [ hasGithub, hasSfdc, hasZendesk ] = await Promise.all([
         ApiEnv.hasIntegration('github'),
         ApiEnv.hasIntegration('salesforce'),
         ApiEnv.hasIntegration('zendesk')
       ])
-      this.hasGithub = hasGithub
-      this.hasSfdc = hasSfdc
-      this.hasZendesk = hasZendesk
+      this.hasGithub      = hasGithub
+      this.hasSfdc        = hasSfdc
+      this.hasZendesk     = hasZendesk
       this.isLoadingLocal = false
     },
 

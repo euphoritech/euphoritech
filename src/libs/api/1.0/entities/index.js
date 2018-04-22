@@ -20,16 +20,40 @@ export default {
   },
 
   async getByType({ req, res, postgres }) {
-    const entityType = req.query.type
-    const pageNumber = req.query.page || 1
-    const numPerPage = req.query.perPage || 10
+    const entities      = TeamEntities(postgres)
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const entityTypeId  = req.query.type_id
+    const pageNumber    = req.query.page
+    const numPerPage    = req.query.perPage
 
-    res.json(true)
+    const records = await entities.findByTypeId(parseInt(entityTypeId), { page: pageNumber, pageSize: numPerPage })
+    res.json({ records })
   },
 
   async create({ req, res, postgres }) {
-    const entityRecord = req.body.entity
+    const entities      = TeamEntities(postgres)
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const entityRecord  = req.body.entity
 
-    res.json(true)
+    entities.setRecord({
+      team_id:        currentTeamId,
+      name:           entityRecord.name,
+      description:    entityRecord.description,
+      source:         entityRecord.source,
+      entity_type_id: entityRecord.entityTypeId,
+      uid:            entityRecord.uid,
+      external_link:  entityRecord.external_link,
+      due_date:       entityRecord.dueDate,
+      mod1:           entityRecord.mod1,
+      mod2:           entityRecord.mod2,
+      mod3:           entityRecord.mod3,
+      mod4:           entityRecord.mod4,
+      mod5:           entityRecord.mod5,
+    })
+    const newEntityId = await entities.save()
+
+    res.json({ id: newEntityId })
   }
 }

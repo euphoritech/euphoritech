@@ -11,7 +11,9 @@ import router from './router'
 // external libraries and components
 import 'whatwg-fetch'
 import Loader from './components/Loader'
+import LoaderInline from './components/LoaderInline'
 import Datepicker from './components/Datepicker'
+import ToggleSwitch from './components/ToggleSwitch'
 import Toastr from 'vue-toastr'
 import CreateEntityModal from './components/entities/CreateEntityModal'
 import SettingsContainer from './components/settings/SettingsContainer'
@@ -31,8 +33,10 @@ if ('addEventListener' in document)
   document.addEventListener('DOMContentLoaded', () => FastClick.attach(document.body), false)
 
 Vue.use(BootstrapVue)
-Vue.component('loader', Loader)
+Vue.component('Loader', Loader)
+Vue.component('LoaderInline', LoaderInline)
 Vue.component('datepicker', Datepicker)
+Vue.component('toggle-switch', ToggleSwitch)
 Vue.component('vue-toastr', Toastr)
 Vue.component('settings', SettingsContainer)
 Vue.component('create-entity', CreateEntityModal)

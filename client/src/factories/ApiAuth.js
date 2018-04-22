@@ -20,12 +20,6 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  isLoggedInLocal(state) {
-    return (state.isLoggedIn)
-      return true
-    return false
-  },
-
   async getLoggedInUsersIntegrations() {
     const response = await euphoritechFetch(`/api/1.0/auth/getIntegrations`)
     return await handleFetchResponse(response)

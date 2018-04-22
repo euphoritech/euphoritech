@@ -11,8 +11,8 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  async getEntityListByType({ type, page, perPage }) {
-    const response = await euphoritechFetch(`/api/1.0/entities/getByType?type=${type}&page=${page}&perPage=${perPage}`)
+  async getEntityListByType({ type_id, page, perPage }) {
+    const response = await euphoritechFetch(`/api/1.0/entities/getByType?type_id=${type_id}&page=${page || ''}&perPage=${perPage || ''}`)
     return await handleFetchResponse(response)
   },
 
@@ -20,7 +20,7 @@ export default {
     const response = await euphoritechFetch(`/api/1.0/entities/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(entity)
+      body: JSON.stringify({ entity })
     })
     return await handleFetchResponse(response)
   }

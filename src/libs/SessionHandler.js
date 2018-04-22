@@ -5,6 +5,13 @@ export default function SessionHandler(session) {
         return session.current_team.id
 
       return null
+    },
+
+    getLoggedInUserId() {
+      if (session && session.user)
+        return session.user.id
+
+      return null
     }
   }
 }
