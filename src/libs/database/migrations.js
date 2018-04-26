@@ -41,6 +41,7 @@ export function migrations(postgres) {
           needs_password_reset boolean,
           last_password_reset timestamp(6),
           last_login timestamp(6),
+          last_session_refresh timestamp(6),
           num_logins integer,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()

@@ -33,6 +33,7 @@
 <script>
   import ApiEntities from '../../factories/ApiEntities'
   import SnackbarFactory from '../../factories/SnackbarFactory'
+  import EuphoritechSocket from '../../factories/EuphoritechSocket'
 
   export default {
     props: {
@@ -71,6 +72,14 @@
 
       resetData() {
         this.entityData = Object.assign({}, this.initData)
+      },
+
+      socketHandlers() {
+        // EuphoritechSocket.on('clientReceivePullRequests', function clientReceivePullRequests({ results }) {
+        //   console.log("GOT PRS", results)
+        // })
+        //
+        // EuphoritechSocket.emit('serverFetchPullRequests')
       }
     },
 
@@ -83,6 +92,8 @@
 
           this.entityData.entityTypeId = this.entityTypes[0].value
           this.initData = this.initData || Object.assign({}, this.entityData, { entityTypeId: this.entityData.entityTypeId })
+
+          this.socketHandlers()
         }
       }
     }

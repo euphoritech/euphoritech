@@ -12,7 +12,7 @@ export default {
 
   nopassword: `
     You have not set a password yet. Please login using the method you used
-    previously (i.e. Google or GitHub) and set a new password.
+    previously (i.e. Google) and set a new password.
   `,
 
   noteam: {

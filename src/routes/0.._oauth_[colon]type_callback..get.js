@@ -1,12 +1,14 @@
 import bunyan from 'bunyan'
 import PostgresClient from '../libs/PostgresClient'
+import RedisHelper from '../libs/RedisHelper'
 import Routes from '../libs/Routes'
 import Users from '../libs/models/Users'
 import UserOauthIntegrations from '../libs/models/UserOauthIntegrations'
 import oauthConfigs from '../conf/oauth'
 import config from '../config'
 
-const log = bunyan.createLogger(config.logger.options)
+const log       = bunyan.createLogger(config.logger.options)
+const redis     = new RedisHelper()
 const postgres  = new PostgresClient()
 
 export default async function oauthTypeCallback(req, res) {
@@ -16,8 +18,12 @@ export default async function oauthTypeCallback(req, res) {
     const callbackErr = req.query.error
     const code        = req.query.code
 
+    const session = SessionHandler(req.session, { redis })
     const users   = Users(postgres, req.session)
     const userInt = UserOauthIntegrations(postgres)
+
+    const userId        = users.getLoggedInUserId()
+    const currentTeamId = session.getCurrentLoggedInTeam()
 
     if (!users.isLoggedIn())
       return res.redirect('/')
@@ -35,9 +41,10 @@ export default async function oauthTypeCallback(req, res) {
     log.debug(`${oauthType} OAuth token`, token)
 
     const intInfo   = { type: oauthType, access_token: token.token.access_token }
-    const intRecord = await userInt.findOrCreateBy({ user_id: users.getLoggedInUserId(), type: oauthType })
+    const intRecord = await userInt.findOrCreateBy({ user_id: userId, type: oauthType })
     userInt.setRecord(Object.assign(intInfo, { id: intRecord.id }))
     await userInt.save()
+    await session.resetTeamSessionRefresh(currentTeamId)
 
     return Routes.checkAndRedirect(req, res, '/')
 

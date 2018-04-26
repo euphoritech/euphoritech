@@ -4,7 +4,7 @@
       div.text-large
         span There are no records of type: {{ type.name }}.&nbsp;
         a(href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
-        span  to create one.
+        span  to add one.
     table.table(v-if="records.length > 0")
       thead
         tr

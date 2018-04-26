@@ -55,11 +55,13 @@ export default function webServer() {
         app.use(passport.session())
         io.use((socket, next) => sessionMiddleware(socket.request, socket.request.res, next))
 
+        app.use(function passIoToReq(req, res, next) {
+          req.euphoritechIo = io
+          next()
+        })
+
         i18n.configure({ locales: [ 'en', 'de' ], directory: path.join(config.app.rootDir, 'i18n', 'locales') })
         app.use(i18n.init)
-
-        // TODO create socket.io handler and event handlers
-
 
         //static files
         app.use('/public', express.static(path.join(__dirname, '..', '/public')))

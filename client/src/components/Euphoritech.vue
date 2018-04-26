@@ -40,7 +40,6 @@
       // Begin app initialization after we determine the logged in state of
       // the user
       euphoritechSocket.on('isLoggedIn', async isLoggedIn => {
-        this.isLoggedIn = isLoggedIn
         this.$store.commit('CHECK_LOGGED_IN', isLoggedIn)
 
         if (!this.$store.state.isLoggedIn) {
@@ -56,6 +55,7 @@
           this.$store.dispatch('redirectToNoTeamForm')
 
         this.$store.commit('APP_NO_LONGER_LOADING')
+        this.isLoggedIn = isLoggedIn
       })
     }
   }

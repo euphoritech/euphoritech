@@ -16,24 +16,26 @@ export default class RedisHelper {
     }
   }
 
-  //http://redis.io/commands/INFO
-  //memory information about redis instance
-  info(param) {
-    return new Promise((resolve, reject) => {
-      this.client.info(param, (err, results) => {
-        if (err) return reject(err)
-        resolve(results)
-      })
-    })
+  async get(key) {
+    return await this.client.get(key)
   }
 
-  numberOfKeys() {
-    return new Promise((resolve, reject) => {
-      this.client.dbsize((err, results) => {
-        if (err) return reject(err)
-        resolve(results)
-      })
-    })
+  async set(key, value) {
+    return await this.client.set(key, value)
+  }
+
+  async del(key) {
+    return await this.client.del(key)
+  }
+
+  //http://redis.io/commands/INFO
+  //memory information about redis instance
+  async info(param) {
+    return await this.client.info(param)
+  }
+
+  async numberOfKeys() {
+    return this.client.dbsize()
   }
 
   scan(cursor, options=null) {

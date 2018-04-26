@@ -63,6 +63,7 @@ export async function passportOauthLoginHandler({
       first_name: userRecord.first_name || intInfo.first_name,
       last_name:  userRecord.last_name || intInfo.last_name,
       last_login: new Date(),
+      last_session_refresh: new Date(),
       num_logins: (userRecord.num_logins || 0) + 1
     }, { id: userRecord.id })
   )

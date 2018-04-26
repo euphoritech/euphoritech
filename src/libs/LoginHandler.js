@@ -48,7 +48,7 @@ export default function LoginHandler(postgres, session) {
         currentLoggedInTeam     = await teams.findBy({ id: currentLoggedInTeamId })
         currentTypes            = await teamTypes.getAllBy({ team_id: currentLoggedInTeamId })
         currentLoggedInTeamInt  = (await teamInt.getAllBy({ team_id: currentLoggedInTeamId })).reduce((obj, record) => {
-          obj[record.type] = record
+          obj[record.integration_type] = record
           return obj
         }, {})
       }

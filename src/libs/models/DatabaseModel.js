@@ -39,6 +39,10 @@ export default function DatabaseModel(postgres, table) {
       return null
     },
 
+    async find(id) {
+      return await this.findBy({ id })
+    },
+
     // Uses AND logic between columns
     // Ex. keyValuePairs = { col1: 'val1', col2: 'col2', ... }
     async findBy(keyValuePairs) {

@@ -145,7 +145,7 @@ export default {
     const session                 = SessionHandler(req.session)
     const currentLoggedInTeamId   = session.getCurrentLoggedInTeam()
     const currentLoggedInTeamInt  = (await teamIntegrations.getAllBy({ team_id: currentLoggedInTeamId })).reduce((obj, record) => {
-      obj[record.type] = record
+      obj[record.integration_type] = record
       return obj
     }, {})
 

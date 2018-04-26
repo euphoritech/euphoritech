@@ -40,7 +40,7 @@ export default function TeamEntities(postgres) {
         { name: 'Development Pull Request', description: 'A version control pull request.' },
         { name: 'QA Note', description: 'A bug or feature request or other requested code change.' },
         { name: 'Release Note', description: 'Documentation about a code update or release to describe new or changed functionality.' },
-        { name: 'Support Ticket', description: 'Tickets submitted by yourcustomers as support requests.' }
+        { name: 'Support Ticket', description: 'Tickets submitted by your customers as support requests.' }
       ],
 
       async insertSeedTypes(teamId) {

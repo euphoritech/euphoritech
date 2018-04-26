@@ -1,10 +1,16 @@
 import bunyan from 'bunyan'
+import moment from 'moment'
 import GeoIp from '../libs/GeoIp'
 import Slack from '../libs/Slack'
-// import RedisHelper from '../libs/RedisHelper'
+import RedisHelper from '../libs/RedisHelper'
+import PostgresClient from '../libs/PostgresClient'
+import LoginHandler from '../libs/LoginHandler'
+import SessionHandler from '../libs/SessionHandler'
+import Users from '../libs/models/Users'
 import config from '../config'
 
-// const redisClient = new RedisHelper()
+const redisClient = new RedisHelper()
+const postgres    = new PostgresClient()
 const log = bunyan.createLogger(config.logger.options)
 
 export default async function Index(req, res) {
@@ -15,6 +21,20 @@ export default async function Index(req, res) {
     }
 
     res.render('index', {})
+
+    const loginHandler    = LoginHandler(postgres, req.session)
+    const sessionHandler  = SessionHandler(req.session, { redis: redisClient })
+    const users           = Users(postgres, req.session)
+    const currentTeamId   = sessionHandler.getCurrentLoggedInTeam()
+    const currentUser     = sessionHandler.getLoggedInUserId(true)
+    if (currentTeamId) {
+      if (await sessionHandler.checkIfShouldRefreshSession(currentTeamId)) {
+        users.setRecord(currentUser, { last_session_refresh: new Date() })
+        await users.save()
+        await loginHandler.standardLogin(users.record)
+        await sessionHandler.resetTeamSessionRefresh(currentTeamId)
+      }
+    }
 
     // Only try to send to Slack if the webhook URL for the channel is configured
     if (config.slack.webhookUrl) {

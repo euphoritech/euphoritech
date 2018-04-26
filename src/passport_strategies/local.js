@@ -32,6 +32,7 @@ export default function LocalPassportStrategy(postgresClient) {
 
         users.setRecord(Object.assign({}, {
           last_login: new Date(),
+          last_session_refresh: new Date(),
           num_logins: (userRecord.num_logins || 0) + 1
         }, { id: userRecord.id }))
         await users.save()

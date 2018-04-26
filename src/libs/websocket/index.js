@@ -1,4 +1,5 @@
 import app from "./socketApp"
+import Github from "./Github"
 import Global from "./Global"
 import GeoIP from "../GeoIP"
 
@@ -8,6 +9,7 @@ export default function WebSocket({ io, log, postgres, redis }) {
     const user  = req.session.user
 
     const handlers = {
+      github: Github({ app, socket, log, io, postgres, redis }),
       global: Global({ app, socket, log, io, postgres, redis })
     }
 
