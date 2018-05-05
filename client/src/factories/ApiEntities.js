@@ -1,8 +1,20 @@
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
-  async getTypes() {
-    const response = await euphoritechFetch(`/api/1.0/entities/getTypes`)
+  async getTypes(onlyActive=true) {
+    if (onlyActive === null || typeof onlyActive === 'undefined')
+      onlyActive = ''
+
+    const response = await euphoritechFetch(`/api/1.0/entities/getTypes?onlyActive=${onlyActive}`)
+    return await handleFetchResponse(response)
+  },
+
+  async updateType(updatedTypeRecord) {
+    const response = await euphoritechFetch(`/api/1.0/entities/updateType`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ record: updatedTypeRecord })
+    })
     return await handleFetchResponse(response)
   },
 

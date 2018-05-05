@@ -1,15 +1,16 @@
 <template lang="pug">
-  b-col(cols="3",md="2")
-    b-row
-      b-col.no-gutter
-        b-list-group
-          b-list-group-item(:class="isActiveClass(null, true)",href="/dashboard/home") Home
-        div.side-nav-title
-          strong
-            u Record Types
-    b-row
-      b-col.side-nav
-        b-list-group-item(:class="isActiveClass(type.id)",:href="'/dashboard/type/' + type.id",v-for="type in typesSorted",:key="type.id") {{ type.name }}
+  b-col(cols="3")
+    div.max-300
+      b-row
+        b-col.no-gutter
+          b-list-group
+            b-list-group-item(:class="isActiveClass(null, true)",href="/dashboard/home") Home
+          div.side-nav-title
+            strong
+              u Record Types
+      b-row
+        b-col.side-nav
+          b-list-group-item(:class="isActiveClass(type.id)",:href="'/dashboard/type/' + type.id",v-for="type in typesSorted",:key="type.id") {{ type.name }}
 </template>
 
 <script>

@@ -32,7 +32,7 @@ export default async function Index(req, res) {
         users.setRecord(currentUser, { last_session_refresh: new Date() })
         await users.save()
         await loginHandler.standardLogin(users.record)
-        await sessionHandler.resetTeamSessionRefresh(currentTeamId)
+        // await sessionHandler.resetTeamSessionRefresh(currentTeamId)
       }
     }
 

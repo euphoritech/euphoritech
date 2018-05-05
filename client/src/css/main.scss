@@ -3,7 +3,8 @@
 // #2e529a
 // #c6d5f3
 
-$body_color: #2e529a;
+$body_color: #007bff;
+// $body_color: #2e529a;
 $soft_color1: #f8f8f8;
 $soft_color2: #c0c0c0;
 $dark_color: #343a40;
@@ -68,6 +69,10 @@ html, body {
 
 .margin-left-small {
   margin-left: 5px;
+}
+
+.margin-left-medium {
+  margin-left: 15px;
 }
 
 .margin-right-small {
@@ -166,6 +171,10 @@ html, body {
     padding-right: 0;
     padding-left: 0;
   }
+}
+
+.max-300 {
+  max-width: 300px;
 }
 
 @media (min-width: 992px) {

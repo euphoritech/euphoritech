@@ -25,7 +25,6 @@
     "nodemon": "^1.17.1"
   },
   "dependencies": {
-    "@octokit/rest": "^14.0.9",
     "@slack/client": "^3.13.0",
     "aws-sdk": "^2.107.0",
     "babel-core": "^6.26.0",
@@ -40,6 +39,7 @@
     "express-formidable": "^0.1.2",
     "express-session": "^1.15.6",
     "forever-monitor": "^1.7.1",
+    "github-api": "^3.0.0",
     "gulp": "latest",
     "gulp-babel": "latest",
     "gulp-concat": "^2.6.0",

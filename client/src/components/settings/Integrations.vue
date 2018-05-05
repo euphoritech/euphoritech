@@ -12,11 +12,20 @@
               div Your team hasn't integrated with Github yet.
             div(v-if="team.hasGithub")
               div Your team has integrated with Github!
+              div.default-github-org.margin-top-medium
+                div(v-if="github.org")
+                  small The organization that you can pull down PRs and Issues from:
+                  h3 {{ github.org }}
+                    i.remove-org-icon.margin-left-small.fa.fa-times(@click="selectGithubOrg({ login: null })")
+                  b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Update Organization
+                div(v-if="!github.org")
+                  b-form-checkbox(@change="selectGithubOrg({ login: true })") Use your personal GitHub account as the team's organization
+                  typeahead-input(:params="{ src: '/api/1.0/integrations/githubSearchForOrgs', keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
             hr
             div(v-if="!user.hasGithub")
               div.
                 After you authenticate with Github, you can use PRs &amp; issues to link to
-                your customer accounts, QA tickets, etc.
+                your customers, QA tickets, etc.
               b-row
                 b-col(cols="12",offset="0",md="8",offset-md="2",lg="4",offset-lg="4")
                   oauth-button(type="github",href="/oauth/github")
@@ -25,7 +34,7 @@
                 Would you like to use your Github authentication information for
                 your team to search your repositories for PRs and issues that they'd
                 like to link to other records?
-              b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary") Click Here to Use Your Auth Info
+              b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info
           b-tab(v-if="env.hasSfdc",title="Salesforce")
             div You can pull your customers from Salesforce here.
             b-row
@@ -60,14 +69,31 @@
           hasGithub: false,
           hasSfdc: false,
           hasZendesk: false
+        },
+
+        github: {
+          org: null
         }
       }
     },
 
     methods: {
-      async useUserIntegration(type) {
-        const response = await ApiIntegrations.saveTeamIntegration({ type })
-        SnackbarFactory(this).open(`Successfully added your ${type} integration to the team!`)
+      async selectGithubOrg(repoInfo) {
+        if (repoInfo.login === true) {
+          const res = await ApiIntegrations.githubGetUserProfile()
+          return this.github.org = res.profile.login
+        }
+        this.github.org = repoInfo.login
+      },
+
+      async useUserIntegration(type, onlyUpdateOrg=true) {
+        const toast = SnackbarFactory(this)
+        const org   = this.github.org
+        if (!org)
+          return toast.open("Please make sure you add an organization or user to fetch records from.", 'error')
+
+        const response = await ApiIntegrations.saveTeamIntegration({ type, org, onlyUpdateOrg })
+        toast.open(`Successfully added your ${type} integration to the team!`)
       }
     },
 
@@ -83,6 +109,10 @@
       this.team.hasGithub = !!this.$store.state.auth.team_integrations.github
       this.user.hasGithub = !!this.$store.state.auth.user_integrations.github
 
+      this.github.org = (this.$store.state.auth.team_integrations && this.$store.state.auth.team_integrations.github)
+        ? this.$store.state.auth.team_integrations.github.mod1
+        : null
+
       this.isLoadingLocal = false
     },
 
@@ -91,3 +121,10 @@
     }
   }
 </script>
+
+<style scoped>
+  .remove-org-icon {
+    color: red;
+    cursor: pointer;
+  }
+</style>

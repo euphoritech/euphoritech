@@ -141,6 +141,11 @@ export function migrations(postgres) {
           team_id integer REFERENCES teams,
           user_oauth_int_id integer REFERENCES user_oauth_integrations,
           integration_type varchar(255),
+          mod1 varchar(255),
+          mod2 varchar(255),
+          mod3 varchar(255),
+          mod4 varchar(255),
+          mod5 varchar(255),
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );
@@ -193,6 +198,7 @@ export function migrations(postgres) {
           id serial PRIMARY KEY,
           team_id integer REFERENCES teams,
           name varchar(255),
+          is_active boolean default true,
           description text,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
@@ -202,6 +208,7 @@ export function migrations(postgres) {
 
     async function createTeamEntityTypesIndexes() {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_types_team_id_idx on team_entity_types (team_id)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_types_team_id_is_active_idx on team_entity_types (team_id, is_active)`)
     },
 
     async function seedGlobalEntityTypes() {

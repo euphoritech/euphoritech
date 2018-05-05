@@ -3,10 +3,11 @@
     b-row
       side-bar(:active-type-id="this.type_id")
       b-col
-        b-row
-          b-col(v-if="isLoadingLocal")
-            loader
-          component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",v-if="!isLoadingLocal")
+        b-container(style="margin-left:inherit")
+          b-row
+            b-col(v-if="isLoadingLocal")
+              loader
+            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",v-if="!isLoadingLocal")
 </template>
 
 <script>

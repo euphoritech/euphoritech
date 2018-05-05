@@ -46,7 +46,7 @@ export default function LoginHandler(postgres, session) {
       } else {
         currentLoggedInTeamId   = (teamIdToLoginTo) ? teamIdToLoginTo : await teams.getTopMostTeamId(teamRoleMapRecords.map(r => r.team_id))
         currentLoggedInTeam     = await teams.findBy({ id: currentLoggedInTeamId })
-        currentTypes            = await teamTypes.getAllBy({ team_id: currentLoggedInTeamId })
+        currentTypes            = await teamTypes.getAllBy({ team_id: currentLoggedInTeamId, is_active: true })
         currentLoggedInTeamInt  = (await teamInt.getAllBy({ team_id: currentLoggedInTeamId })).reduce((obj, record) => {
           obj[record.integration_type] = record
           return obj

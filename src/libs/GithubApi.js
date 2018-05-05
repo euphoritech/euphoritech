@@ -1,62 +1,88 @@
-import octokitRest from '@octokit/rest'
+import GitHub from 'github-api'
 
-export default function GithubApi(oauthToken, owner=null, repo=null) {
-  const client = octokitRest()
-  if (oauthToken)
-    client.authenticate({ type: 'oauth', token: oauthToken })
+export default function GithubApi(oauthToken, userOrOrganization=null) {
+  let client    = new GitHub({ token: oauthToken })
+  let userOrOrg = userOrOrganization
+  let user      = null
+  let org       = null
+  let repo      = null
 
   return {
     client,
 
-    auth(token=oauthToken) {
-      return this.client.authenticate({ type: 'oauth', token })
+    async getUser() {
+      return user = await client.getUser()
     },
 
-    async emails() {
-      return await this.client.users.getEmails()
+    async getOrganization(org=userOrOrg) {
+      return org = await client.getOrganization(org)
     },
 
-    async listOrgRepos(org) {
-      return await this.client.repos.getForOrg({ org })
+    async getRepo(repo, userOrOrg=userOrOrg) {
+      return repo = await client.getRepo(userOrOrg, repo)
     },
 
-    // https://octokit.github.io/rest.js/#api-Issues-getForRepo
-    async listIssuesForRepo(obj={}, adhocOwner=null, adhocRepo=null) {
-      const owner = adhocOwner || owner
-      const repo  = adhocRepo || repo
-      return await this.client.issues.getForRepo(Object.assign({ owner, repo }, obj))
+    org: {
+      org,
+
+      async getRepos(org=org) {
+        return await org.getRepos()
+      }
     },
 
-    // https://octokit.github.io/rest.js/#api-Issues-getForUser
-    async listIssuesForUser(obj={}) {
-      return await this.client.issues.getForUser(obj)
+    repo: {
+      repo,
+
+      // http://github-tools.github.io/github/docs/3.1.0/Repository.html#getDetails
+      async getDetails() {
+        return await repo.getDetails()
+      },
+
+      // http://github-tools.github.io/github/docs/3.1.0/Repository.html#getPullRequest
+      async getPullRequest(id) {
+        return await repo.getPullRequest(id)
+      },
+
+      // http://github-tools.github.io/github/docs/3.1.0/Repository.html#listPullRequests
+      async listPullRequests(options={ state: 'all' }) {
+        return await repo.listPullRequests(options)
+      },
+
+      // http://github-tools.github.io/github/docs/3.1.0/Issue.html#listIssues
+      async listIssues(repo, options={ state: 'open' }, userOrOrganization=userOrOrg) {
+        const issueInst = await client.getIssues(userOrOrganization, repo)
+        return await issueInst.listIssues(options)
+      },
+
+      // http://github-tools.github.io/github/docs/3.1.0/Search.html#forIssues
+      async searchIssues(queryString, repo, userOrOrganization=userOrOrg) {
+        const q       = `${queryString} repo:${userOrOrganization}/${repo}`
+        const search  = await client.search({})
+        return await search.forIssues({ q, sort: 'created', order: 'desc' })
+      },
+
+      async getIssue(id, repo, userOrOrganization=userOrOrg) {
+        const issueInst = await client.getIssues(userOrOrganization, repo)
+        return await issueInst.getIssue(id)
+      }
     },
 
-    async issue(number, adhocOwner=null, adhocRepo=null) {
-      const owner = adhocOwner || owner
-      const repo  = adhocRepo || repo
-      return await this.client.issues.get({ owner, repo, number })
-    },
+    user: {
+      user,
 
-    // https://octokit.github.io/rest.js/#api-PullRequests-getAll
-    async listPullRequestsForRepo(obj={}, adhocOwner=null, adhocRepo=null) {
-      const owner = adhocOwner || owner
-      const repo  = adhocRepo || repo
-      return await this.client.pullRequests.getAll(Object.assign({ owner, repo }, obj))
-    },
+      // http://github-tools.github.io/github/docs/3.1.0/User.html#getEmails
+      async getEmails() {
+        return await user.getEmails()
+      },
 
-    // https://octokit.github.io/rest.js/#api-PullRequests-get
-    async pullRequest(number, adhocOwner=null, adhocRepo=null) {
-      const owner = adhocOwner || owner
-      const repo  = adhocRepo || repo
-      return await this.client.pullRequests.get({ owner, repo, number })
-    },
+      async getProfile() {
+        return await user.getProfile()
+      },
 
-    // https://octokit.github.io/rest.js/#api-PullRequests-getComments
-    async pullRequestComments(number, obj={}, adhocOwner=null, adhocRepo=null) {
-      const owner = adhocOwner || owner
-      const repo  = adhocRepo || repo
-      return await this.client.pullRequests.getComments(Object.assign({ owner, repo, number }, obj))
+      // http://github-tools.github.io/github/docs/3.0.0/User.html#listOrgs
+      async listOrgs() {
+        return await user.listOrgs()
+      }
     }
   }
 }

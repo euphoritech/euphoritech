@@ -4,23 +4,35 @@
       <b-col class="d-none d-md-block" cols="12">
         <b-form @submit="createRecord">
           <b-form-group label="Record Type">
-            <b-form-select v-model="entityData.entityTypeId" :options="entityTypes" placeholder="Select a record type to create." />
+            <b-form-select v-model="entityData.entityTypeId" size="lg" :options="entityTypes" placeholder="Select a record type to create." />
           </b-form-group>
           <hr class="separate-vert-large" />
-          <b-form-group label="Name">
-            <b-form-input v-model="entityData.name" />
-          </b-form-group>
-          <b-form-group label="Due/Delivery Date">
-            <datepicker v-model="entityData.dueDate"></datepicker>
-          </b-form-group>
-          <b-form-group id="entity-uid" label="Unique ID (optional)">
-            <b-form-input v-model="entityData.uid" />
-          </b-form-group>
-          <b-tooltip target="entity-uid" title="If you'd like to assign this a unique identifier of some sort, enter that here."></b-tooltip>
-          <b-form-group label="Description">
-            <b-form-textarea v-model="entityData.description" rows="3"></b-form-textarea>
-          </b-form-group>
-          <div class="text-center">
+          <b-card>
+            <b-tabs :card="true">
+              <b-tab title="Manual">
+                <b-form-group label="Name">
+                  <b-form-input v-model="entityData.name" />
+                </b-form-group>
+                <b-form-group label="Due/Delivery Date">
+                  <datepicker v-model="entityData.dueDate"></datepicker>
+                </b-form-group>
+                <b-form-group id="entity-uid" label="Unique ID (optional)">
+                  <b-form-input v-model="entityData.uid" />
+                </b-form-group>
+                <b-tooltip target="entity-uid" title="If you'd like to assign this a unique identifier of some sort, enter that here."></b-tooltip>
+                <b-form-group label="Description">
+                  <b-form-textarea v-model="entityData.description" rows="3"></b-form-textarea>
+                </b-form-group>
+              </b-tab>
+              <b-tab v-if="hasGithub" title="GitHub">
+                <component is="Github"></component>
+              </b-tab>
+              <b-tab v-if="hasSfdc" title="Salesforce">
+                this is SFDC!
+              </b-tab>
+            </b-tabs>
+          </b-card>
+          <div class="margin-top-medium text-center">
             <b-button type="submit" size="lg" variant="primary">Create Record</b-button>
           </div>
         </b-form>
@@ -31,6 +43,7 @@
 </template>
 
 <script>
+  import Github from './Github'
   import ApiEntities from '../../factories/ApiEntities'
   import SnackbarFactory from '../../factories/SnackbarFactory'
   import EuphoritechSocket from '../../factories/EuphoritechSocket'
@@ -43,6 +56,8 @@
     data() {
       return {
         entityTypes: [],
+        hasGithub: false,
+        hasSfdc: false,
         initData: null,
         entityData: {
           source: 'manual',
@@ -73,14 +88,6 @@
       resetData() {
         this.entityData = Object.assign({}, this.initData)
       },
-
-      socketHandlers() {
-        // EuphoritechSocket.on('clientReceivePullRequests', function clientReceivePullRequests({ results }) {
-        //   console.log("GOT PRS", results)
-        // })
-        //
-        // EuphoritechSocket.emit('serverFetchPullRequests')
-      }
     },
 
     watch: {
@@ -93,9 +100,14 @@
           this.entityData.entityTypeId = this.entityTypes[0].value
           this.initData = this.initData || Object.assign({}, this.entityData, { entityTypeId: this.entityData.entityTypeId })
 
-          this.socketHandlers()
+          this.hasGithub = !!this.$store.state.auth.team_integrations.github
+          this.hasSfdc = !!this.$store.state.auth.team_integrations.salesforce
         }
       }
-    }
+    },
+
+    components: {
+      Github
+    },
   }
 </script>

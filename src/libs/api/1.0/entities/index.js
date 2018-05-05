@@ -5,12 +5,33 @@ import TeamEntityTypes from '../../../models/TeamEntityTypes'
 
 export default {
   async getTypes({ req, res, postgres }) {
+    const onlyActive    = req.query.onlyActive || true
     const typesInst     = TeamEntityTypes(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
-    const types         = await typesInst.getAllBy({ team_id: currentTeamId })
 
+    let keys = { team_id: currentTeamId }
+    if (typeof onlyActive === 'boolean')
+      keys.is_active = onlyActive
+
+    const types = await typesInst.getAllBy(keys)
     res.json({ types })
+  },
+
+  async updateType({ req, res, postgres, redis }) {
+    const typeRecord    = req.body.record
+    const typesInst     = TeamEntityTypes(postgres)
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+
+    const dbRecord = await typesInst.findBy({ team_id: currentTeamId, id: typeRecord.id })
+    if (!dbRecord)
+      return res.status(401).json({ error: res.__(`We didn't find the record type you are looking for.`) })
+
+    typesInst.setRecord(Object.assign(dbRecord, typeRecord))
+    await typesInst.save()
+    await session.resetTeamSessionRefresh(currentTeamId)
+    res.json(true)
   },
 
   async getLinks({ req, res, postgres }) {
