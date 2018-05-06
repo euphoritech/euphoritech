@@ -21,22 +21,26 @@ export default {
   },
 
   async githubSearchRepos({ req, res, postgres }) {
-    const search  = req.query.search
-    console.log("SEARCHTEXT", search)
-    const session = SessionHandler(req.session)
-    const userId  = session.getLoggedInUserId()
-    const teamInt = session.getLoggedInTeamIntegrations()
-    const userInt = session.getLoggedInUserIntegrations()
+    const searchText  = req.query.search
+    const session     = SessionHandler(req.session)
+    const userId      = session.getLoggedInUserId()
+    const teamInt     = session.getLoggedInTeamIntegrations()
+    const userInt     = session.getLoggedInUserIntegrations()
 
     const teamGithubInt = teamInt['github']
-
     if (teamGithubInt) {
       const userOauth = UserOauthIntegrations(postgres)
       const userIntegrationRecord = await userOauth.find(teamGithubInt.user_oauth_int_id)
       const api = GithubApi(userIntegrationRecord.access_token)
-      // const prs = await api.listPullRequestsForRepo({ state: 'all', page }, 'useriq-com', 'useriq-app')
-      const prs = await api.listOrgRepos('useriq-com')
-      res.json({ results: prs.data })
+
+      if (teamGithubInt.mod2 === 'org')
+        await api.getOrganization(teamGithubInt.mod1)
+      if (teamGithubInt.mod2 === 'user')
+        await api.getUser()
+
+      const repos = await api[teamGithubInt.mod2 || 'org'].listRepos()
+      const filteredRepos = repos.data.filter(r => (new RegExp(`.*${searchText}.*`, 'i')).test(r.name))
+      res.json({ results: filteredRepos })
     } else {
       res.status(400).json({ error: res.__(`No GitHub team integration found for your user ID`) })
     }
@@ -50,7 +54,6 @@ export default {
     const searchText  = req.query.search
 
     const teamGithubInt = teamInt['github']
-
     if (!!teamGithubInt) {
       const userOauth = UserOauthIntegrations(postgres)
       const userIntegrationRecord = await userOauth.find(teamGithubInt.user_oauth_int_id)
@@ -67,6 +70,29 @@ export default {
     }
   },
 
+  async githubFindItemInRepo({ req, res, postgres}) {
+    const session     = SessionHandler(req.session)
+    const userId      = session.getLoggedInUserId()
+    const teamInt     = session.getLoggedInTeamIntegrations()
+    const repo        = req.query.repo
+    const number      = req.query.num
+
+    const teamGithubInt = teamInt['github']
+    if (!!teamGithubInt) {
+      const userOauth = UserOauthIntegrations(postgres)
+      const userIntegrationRecord = await userOauth.find(teamGithubInt.user_oauth_int_id)
+      const api = GithubApi(userIntegrationRecord.access_token)
+      const itemInfo = await api.repo.getIssueOrPullRequest(number, repo, teamGithubInt.mod1)
+
+      if (!itemInfo)
+        return res.status(404).json({ error: res.__("No item with the ID provided.") })
+
+      return res.json({ result: itemInfo.data })
+    } else {
+      res.status(400).json({ error: res.__(`No GitHub team integration found for your user ID`) })
+    }
+  },
+
   async saveTeamIntegration({ req, res, postgres, redis }) {
     const sessionHandler  = SessionHandler(req.session, { redis })
     const integrations    = TeamIntegrations(postgres)
@@ -76,13 +102,14 @@ export default {
     const teamInteg       = sessionHandler.getLoggedInTeamIntegrations()
     const intType         = req.body.type
     const defaultOrg      = req.body.org
+    const orgType         = req.body.orgType
     const onlyUpdateOrg   = req.body.onlyUpdateOrg
 
     const integration = (onlyUpdateOrg) ? teamInteg[intType] : userInteg[intType]
 
     if (integration) {
       await integrations.findOrCreateBy({ team_id: currentTeamId, integration_type: intType })
-      integrations.setRecord({ user_oauth_int_id: integration.id, mod1: defaultOrg })
+      integrations.setRecord({ user_oauth_int_id: integration.id, mod1: defaultOrg, mod2: orgType })
       const newId = await integrations.save()
       await sessionHandler.resetTeamSessionRefresh(currentTeamId)
 

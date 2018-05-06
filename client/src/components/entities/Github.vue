@@ -1,20 +1,59 @@
 <template lang="pug">
   div
-    div this is a github integration
-    typeahead-input(:params="{ src: '/api/1.0/auth/session', keysFromResponse: 'session.current_team_types' }",@onHit="selectGithubRepo")
+    div(v-if="!selectedRepo")
+      div Find a repository to search in:
+      typeahead-input(:params="{ src: '/api/1.0/integrations/githubSearchRepos', keysFromResponse: 'results', showProp: 'name' }",@onHit="selectGithubRepo")
+    div(v-if="selectedRepo")
+      div
+        div Enter an issue or PR number in repo:
+        div
+          strong {{ selectedRepo }}
+          i.margin-left-small.fa.fa-times(style="color: red; cursor: pointer;",@click="selectedRepo = null")
+        b-form-input(v-model="itemNumber",@keyup.native="getIssueOrPr")
 </template>
 
 <script>
   import ApiIntegrations from '../../factories/ApiIntegrations'
+  import SnackbarFactory from '../../factories/SnackbarFactory'
 
   export default {
+    data() {
+      return {
+        itemNumber: null,
+        selectedRepo: null
+      }
+    },
+
     methods: {
       async githubSearchRepos(searchText) {
         const results = await ApiIntegrations.githubSearchRepos(searchText)
       },
 
       selectGithubRepo(repo) {
-        console.log("REPO", repo)
+        this.selectedRepo = repo.name
+      },
+
+      async getIssueOrPr(evt) {
+        const toast = SnackbarFactory(this)
+
+        if (evt.keyCode === 13) {
+          if (this.itemNumber) {
+            const result = (await ApiIntegrations.githubFindItemInRepo({ repo: this.selectedRepo, num: this.itemNumber })).result
+            this.$emit("setEntityData", {
+              source: 'github',
+              name: result.title,
+              description: result.body,
+              uid: result.number,
+              mod1: this.selectedRepo,
+              mod2: result.html_url,
+              mod3: result.url,
+              mod4: result.user.login,
+              mod5: result.closed_at
+            })
+          } else {
+            toast.open("Please enter a valid issue or PR ID to find.", 'error')
+          }
+        }
       }
     }
   }

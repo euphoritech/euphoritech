@@ -5,5 +5,6 @@
 	"We didn't find an existing team with the ID provided. Please make sure you typed it correctly and try again.": "We didn't find an existing team with the ID provided. Please make sure you typed it correctly and try again.",
 	"You do not have access to this team.": "You do not have access to this team.",
 	"There was a problem trying to create your account. Please try again.": "There was a problem trying to create your account. Please try again.",
-	"Your passwords do not match.": "Your passwords do not match."
+	"Your passwords do not match.": "Your passwords do not match.",
+	"We could not find your integration. Make sure you've authenticated and try again.": "We could not find your integration. Make sure you've authenticated and try again."
 }

@@ -2,7 +2,7 @@
   <b-modal id="create-entity-modal" ref="createEntityModal" v-model="$store.state.showEntityModal" size="lg" centered title="Create Record">
     <b-row>
       <b-col class="d-none d-md-block" cols="12">
-        <b-form @submit="createRecord">
+        <b-form @submit="createRecord" onkeypress="return event.keyCode !== 13">
           <b-form-group label="Record Type">
             <b-form-select v-model="entityData.entityTypeId" size="lg" :options="entityTypes" placeholder="Select a record type to create." />
           </b-form-group>
@@ -25,7 +25,13 @@
                 </b-form-group>
               </b-tab>
               <b-tab v-if="hasGithub" title="GitHub">
-                <component is="Github"></component>
+                <component v-show="entityData.source !== 'github'" is="Github" @setEntityData="setEntityData"></component>
+                <b-row class="margin-bottom-medium" v-show="entityData.source === 'github'" v-for="(label, key) in github.dataLabelMap" :key="key">
+                  <b-col cols="3">
+                    <strong>{{ label }}</strong>
+                  </b-col>
+                  <b-col cols="9">{{ entityData[key] || 'Nothing here...' }}</b-col>
+                </b-row>
               </b-tab>
               <b-tab v-if="hasSfdc" title="Salesforce">
                 this is SFDC!
@@ -33,7 +39,7 @@
             </b-tabs>
           </b-card>
           <div class="margin-top-medium text-center">
-            <b-button type="submit" size="lg" variant="primary">Create Record</b-button>
+            <b-button type="submit" size="lg" variant="primary" :disabled="!validEntityInfo">Create Record</b-button>
           </div>
         </b-form>
       </b-col>
@@ -65,8 +71,33 @@
           dueDate: null,
           name: null,
           description: null,
-          uid: null
+          uid: null,
+          mod1: null,
+          mod2: null,
+          mod3: null,
+          mod4: null,
+          mod5: null
+        },
+
+        github: {
+          dataLabelMap: {
+            uid: 'Unique ID',
+            name: 'Title',
+            description: 'Description',
+            dueDate: 'Due Date',
+            mod1: 'Repository',
+            mod2: 'HTML Link',
+            mod3: 'API Link',
+            mod4: 'User Created',
+            mod5: 'Closed At'
+          }
         }
+      }
+    },
+
+    computed: {
+      validEntityInfo() {
+        return this.entityData.source && this.entityData.entityTypeId && this.entityData.name
       }
     },
 
@@ -81,6 +112,11 @@
         SnackbarFactory(this).open(`Successfully created a new ${this.getSelectedType()}!`)
       },
 
+      setEntityData(info) {
+        this.entityData = Object.assign(this.entityData, info)
+        console.log("DATA", this.entityData)
+      },
+
       getSelectedType() {
         return this.entityTypes.find(f => f.value === this.entityData.entityTypeId).text
       },
@@ -93,7 +129,7 @@
     watch: {
       async loggedIn(newVal, oldVal) {
         if (!!newVal) {
-          this.entityTypes = (await ApiEntities.getTypes()).types
+          this.entityTypes = (await ApiEntities.getTypes()).types.filter(t => !!t.is_active)
           .map(t => ({ value: t.id, text: t.name }))
           .sort((t1, t2) => (t1.text.toLowerCase() < t2.text.toLowerCase()) ? -1 : 1)
 

@@ -5,6 +5,7 @@
     <template v-else>
       <i class="fa fa-search" v-show="isEmpty"></i>
       <i class="fa fa-times" v-show="isDirty" @click="reset"></i>
+      <i class="fa fa-spinner fa-spin" v-show="loading"></i>
     </template>
 
     <!-- the input field -->

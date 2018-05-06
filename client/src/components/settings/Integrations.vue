@@ -13,6 +13,8 @@
             div(v-if="team.hasGithub")
               div Your team has integrated with Github!
               div.default-github-org.margin-top-medium
+                b-form-group(label="Is this a GitHub organization?")
+                  b-form-radio-group(v-model="github.orgType",:options="typeOptions")
                 div(v-if="github.org")
                   small The organization that you can pull down PRs and Issues from:
                   h3 {{ github.org }}
@@ -52,6 +54,7 @@
     data() {
       return {
         isLoadingLocal: true,
+        typeOptions: [{ text: 'Yes', value: 'org' }, { text: 'No', value: 'user' }],
 
         env: {
           hasGithub: false,
@@ -72,7 +75,8 @@
         },
 
         github: {
-          org: null
+          org: null,
+          orgType: 'org'
         }
       }
     },
@@ -81,18 +85,22 @@
       async selectGithubOrg(repoInfo) {
         if (repoInfo.login === true) {
           const res = await ApiIntegrations.githubGetUserProfile()
-          return this.github.org = res.profile.login
+          return this.github = {
+            org: res.profile.login,
+            orgType: 'user'
+          }
         }
         this.github.org = repoInfo.login
       },
 
       async useUserIntegration(type, onlyUpdateOrg=true) {
-        const toast = SnackbarFactory(this)
-        const org   = this.github.org
-        if (!org)
-          return toast.open("Please make sure you add an organization or user to fetch records from.", 'error')
+        const toast   = SnackbarFactory(this)
+        const org     = this.github.org
+        const orgType = this.github.orgType
+        // if (!org)
+        //   return toast.open("Please make sure you add an organization or user to fetch records from.", 'error')
 
-        const response = await ApiIntegrations.saveTeamIntegration({ type, org, onlyUpdateOrg })
+        const response = await ApiIntegrations.saveTeamIntegration({ type, org, orgType, onlyUpdateOrg })
         toast.open(`Successfully added your ${type} integration to the team!`)
       }
     },
@@ -109,9 +117,9 @@
       this.team.hasGithub = !!this.$store.state.auth.team_integrations.github
       this.user.hasGithub = !!this.$store.state.auth.user_integrations.github
 
-      this.github.org = (this.$store.state.auth.team_integrations && this.$store.state.auth.team_integrations.github)
-        ? this.$store.state.auth.team_integrations.github.mod1
-        : null
+      this.github = (this.$store.state.auth.team_integrations && this.$store.state.auth.team_integrations.github)
+        ? { org: this.$store.state.auth.team_integrations.github.mod1, orgType:  this.$store.state.auth.team_integrations.github.mod2 }
+        : this.github
 
       this.isLoadingLocal = false
     },

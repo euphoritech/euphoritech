@@ -11,6 +11,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async githubFindItemInRepo({ repo, num }) {
+    const response = await euphoritechFetch(`/api/1.0/integrations/githubFindItemInRepo?repo=${repo}&num=${num}`)
+    return await handleFetchResponse(response)
+  },
+
   async saveTeamIntegration(obj) {
     const response = await euphoritechFetch(`/api/1.0/integrations/saveTeamIntegration`, {
       method: 'POST',
