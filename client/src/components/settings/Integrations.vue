@@ -19,7 +19,7 @@
                   small The organization that you can pull down PRs and Issues from:
                   h3 {{ github.org }}
                     i.remove-org-icon.margin-left-small.fa.fa-times(@click="selectGithubOrg({ login: null })")
-                  b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Update Organization
+                  b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Save Organization
                 div(v-if="!github.org")
                   b-form-checkbox(@change="selectGithubOrg({ login: true })") Use your personal GitHub account as the team's organization
                   typeahead-input(:params="{ src: '/api/1.0/integrations/githubSearchForOrgs', keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
@@ -34,11 +34,11 @@
             div(v-if="user.hasGithub")
               div.
                 Would you like to use your Github authentication information for
-                your team to search your repositories for PRs and issues that they'd
-                like to link to other records?
-              b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info
+                your team to search your repositories for PRs and issues that you and your
+                team would like to link to other records?
+              b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info and Save
           b-tab(v-if="env.hasSfdc",title="Salesforce")
-            div You can pull your customers from Salesforce here.
+            div You can pull records from your Salesforce instance here, such as your customer or user information.
             b-row
               b-col(cols="12",offset="0",md="8",offset-md="2",lg="4",offset-lg="4")
                 oauth-button(type="salesforce",href="/oauth/salesforce")

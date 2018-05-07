@@ -51,9 +51,12 @@ export default {
     const newTeamRecord = await teams.create({ teamExtId, teamName, userId })
     const teamMapRecord = await teamMap.findOrCreateBy({ team_id: newTeamRecord.id, primary_contact_user_id: userId, role: 'teamadmin' })
 
-    const teamRoleMapRecords = await teamMap.getAllByUserId(userId)
-    users.setSession({ teams_roles: teamRoleMapRecords })
+    const [ teamRoleMapRecords, _ ] = await Promise.all([
+      teamMap.getAllByUserId(userId),
+      sessionHandler.resetTeamSessionRefresh(newTeamRecord.id)
+    ])
 
+    users.setSession({ teams_roles: teamRoleMapRecords })
     return res.json(null)
   },
 

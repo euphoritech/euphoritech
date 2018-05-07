@@ -1,7 +1,7 @@
 <template lang="pug">
   a.oauth-login-button.d-flex.flex-row.align-items-center.justify-content-center(:class="map.mainClass",:href="map.link")
     i(:class="map.deviconClass")
-    div Login with {{ map.text }}
+    div Authenticate with {{ map.text }}
 </template>
 
 <script>

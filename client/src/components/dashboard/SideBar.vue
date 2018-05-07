@@ -21,9 +21,11 @@
 
     computed: {
       typesSorted() {
-        return this.$store.state.session.current_team_types.sort((t1, t2) => {
-          return (t1.name.toLowerCase() > t2.name.toLowerCase()) ? 1 : -1
-        })
+        return this.$store.state.session.current_team_types
+          .filter(t => !!t.is_active)
+          .sort((t1, t2) => {
+            return (t1.name.toLowerCase() > t2.name.toLowerCase()) ? 1 : -1
+          })
       }
     },
 

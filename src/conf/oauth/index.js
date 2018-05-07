@@ -1,10 +1,12 @@
 import oauth2Module from 'simple-oauth2'
 import github from './github'
 import salesforce from './salesforce'
+import zendesk from './zendesk'
 
 export default {
   github,
-  salesforce
+  salesforce,
+  zendesk
 }
 
 export function buildConfig(type, oauthConfig, hostname) {
@@ -17,13 +19,14 @@ export function buildConfig(type, oauthConfig, hostname) {
       auth: oauthConfig.auth,
     })
 
+    let authorizeUrlObj = { redirect_uri: `${hostname}/oauth/${type}/callback` }
+    if (typeof oauthConfig.scopes === 'string' || (oauthConfig.scopes instanceof Array && oauthConfig.scopes.length > 0))
+      authorizeUrlObj.scope = oauthConfig.scopes
+
     return {
       oauthConfig,
       oauth2,
-      authorizationUri: oauth2.authorizationCode.authorizeURL({
-        redirect_uri: `${hostname}/oauth/${type}/callback`,
-        scope: oauthConfig.scopes
-      })
+      authorizationUri: oauth2.authorizationCode.authorizeURL(authorizeUrlObj)
     }
   }
 

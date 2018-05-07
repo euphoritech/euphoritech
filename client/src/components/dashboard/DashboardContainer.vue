@@ -4,6 +4,7 @@
       side-bar(:active-type-id="this.type_id")
       b-col
         b-container(style="margin-left:inherit")
+          b-alert.margin-top-medium(:show="error",variant="danger") {{ error }}
           b-row
             b-col(v-if="isLoadingLocal")
               loader
@@ -23,6 +24,7 @@
 
     data() {
       return {
+        error: null,
         isLoadingLocal: true,
         partialComponent: null,
         entityRecords: []
@@ -45,6 +47,9 @@
     },
 
     async created() {
+      if (this.$route.query && (this.$route.query.error || this.$route.query.error_code))
+        this.error = `${this.$route.query.error_code || 'N/A'} - ${this.$route.query.error || 'No more details'}`
+
       if (this.type_id) {
         this.entityRecords = (await ApiEntities.getEntityListByType({ type_id: this.type_id })).records
         this.partialComponent = 'entity-records'

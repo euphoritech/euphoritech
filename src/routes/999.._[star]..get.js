@@ -29,6 +29,7 @@ export default async function Index(req, res) {
     const currentUser     = sessionHandler.getLoggedInUserId(true)
     if (currentTeamId) {
       if (await sessionHandler.checkIfShouldRefreshSession(currentTeamId)) {
+        log.info(`Resetting session cache for user '${currentUser.username_email}' in team ID: ${currentTeamId}`)
         users.setRecord(currentUser, { last_session_refresh: new Date() })
         await users.save()
         await loginHandler.standardLogin(users.record)

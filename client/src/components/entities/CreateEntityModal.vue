@@ -114,7 +114,6 @@
 
       setEntityData(info) {
         this.entityData = Object.assign(this.entityData, info)
-        console.log("DATA", this.entityData)
       },
 
       getSelectedType() {

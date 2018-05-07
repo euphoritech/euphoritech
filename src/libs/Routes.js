@@ -1,4 +1,5 @@
 import fs from 'fs'
+import qs from 'querystring'
 import util from 'util'
 import path from 'path'
 import Users from './models/Users'
@@ -28,11 +29,15 @@ export default {
     return routes.sort((r1, r2) => r1.order - r2.order)
   },
 
-  checkAndRedirect(req, res, defaultRedirectPath='/') {
-    if (req.session && req.session.returnTo)
-      return res.redirect(req.session.returnTo)
+  checkAndRedirect(req, res, defaultRedirectPath='/', queryStringObj=null) {
+    let queryString = ''
+    if (queryStringObj)
+      queryString = qs.stringify(queryStringObj)
 
-    res.redirect(defaultRedirectPath)
+    if (req.session && req.session.returnTo)
+      return res.redirect((queryString) ? `${req.session.returnTo}?${queryString}` : req.session.returnTo)
+
+    res.redirect((queryString) ? `${defaultRedirectPath}?${queryString}` : defaultRedirectPath)
   },
 
   requireAuthExpressMiddleware() {
