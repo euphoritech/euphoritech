@@ -8,7 +8,8 @@ export default function UserOauthIntegrations(postgres) {
     {
       accessibleColumns: [
         'user_id', 'type', 'unique_id', 'access_token', 'refresh_token',
-        'first_name', 'last_name', 'email', 'expires'
+        'first_name', 'last_name', 'email', 'expires', 'mod1', 'mod2',
+        'mod3', 'mod4', 'mod5'
       ],
 
       async getAllByUserId(userId) {

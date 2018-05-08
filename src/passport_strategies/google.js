@@ -4,7 +4,7 @@ import config from '../config'
 
 const GoogleStrategy = PassportGoogle.Strategy
 
-export default function GooglePassportStrategy(postgresClient) {
+export default function GooglePassportStrategy({ postgres, redis }) {
   return {
     strategy: GoogleStrategy,
     options: {
@@ -22,7 +22,7 @@ export default function GooglePassportStrategy(postgresClient) {
           accessToken,
           refreshToken,
           profile,
-          postgresClient,
+          postgres,
           emailAddress,
           done,
           type:       'google',

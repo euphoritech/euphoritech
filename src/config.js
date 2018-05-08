@@ -72,7 +72,8 @@ export default {
 
   salesforce: {
     appId: process.env.SALESFORCE_APP_ID,
-    appSecret: process.env.SALESFORCE_APP_SECRET
+    appSecret: process.env.SALESFORCE_APP_SECRET,
+    loginCallbackUrl: `${hostName}/oauth/salesforce/callback`
   },
 
   google: {

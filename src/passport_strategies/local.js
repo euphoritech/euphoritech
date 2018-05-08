@@ -6,7 +6,7 @@ import config from '../config'
 
 const LocalStrategy = PassportLocal.Strategy
 
-export default function LocalPassportStrategy(postgresClient) {
+export default function LocalPassportStrategy({ postgres, redis }) {
   return {
     strategy: LocalStrategy,
     options: {
@@ -14,8 +14,8 @@ export default function LocalPassportStrategy(postgresClient) {
     },
     handler: async function PassportLocalHandler(req, username, password, done) {
       try {
-        const users = Users(postgresClient, req.session)
-        const login = LoginHandler(postgresClient, req.session)
+        const users = Users(postgres, req.session)
+        const login = LoginHandler(postgres, req.session)
 
         if (username && username == config.auth.GLOBAL_ADMIN)
           return done(null, (users.validateUserPassword(username, password, config.auth.GLOBAL_PASSWORD) ? username : false))

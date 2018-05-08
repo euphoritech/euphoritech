@@ -85,7 +85,7 @@ export default function webServer() {
         const strategies = fs.readdirSync("passport_strategies") || []
         strategies.forEach(stratFile => {
           try {
-            const oStrat = require(`../passport_strategies/${stratFile}`).default(pgClient)
+            const oStrat = require(`../passport_strategies/${stratFile}`).default({ postgres: pgClient, redis })
             if ((typeof oStrat.condition === 'undefined') || oStrat.condition) {
               const stratName = path.basename(stratFile, ".js")
 

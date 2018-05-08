@@ -35,5 +35,14 @@ export default {
       body: JSON.stringify({ entity })
     })
     return await handleFetchResponse(response)
+  },
+
+  async updateEntity(entity) {
+    const response = await euphoritechFetch(`/api/1.0/entities/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entity })
+    })
+    return await handleFetchResponse(response)
   }
 }

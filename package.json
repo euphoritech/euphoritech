@@ -54,6 +54,7 @@
     "nodemailer": "^4.6.2",
     "npm": "^5.7.1",
     "passport": "^0.4.0",
+    "passport-forcedotcom": "^0.1.4",
     "passport-github2": "^0.1.11",
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",

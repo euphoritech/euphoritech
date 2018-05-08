@@ -8,7 +8,7 @@
           b-row
             b-col(v-if="isLoadingLocal")
               loader
-            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",v-if="!isLoadingLocal")
+            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",@changeEntityType="removeEntity",v-if="!isLoadingLocal")
 </template>
 
 <script>
@@ -37,6 +37,12 @@
           case 'entity-records':
             return { records: this.entityRecords, type_id: this.type_id }
         }
+      }
+    },
+
+    methods: {
+      removeEntity(id) {
+        this.entityRecords = this.entityRecords.filter(r => r.id !== id)
       }
     },
 

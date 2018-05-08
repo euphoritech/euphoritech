@@ -5,9 +5,9 @@ import config from '../config'
 
 const GithubStrategy = PassportGithub.Strategy
 
-export default function GithubPassportStrategy(postgresClient) {
+export default function GithubPassportStrategy({ postgres, redis }) {
   return {
-    strategy: PassportGithub.Strategy,
+    strategy: GithubStrategy,
     options: {
       clientID:           config.github.appId,
       clientSecret:       config.github.appSecret,
@@ -24,7 +24,7 @@ export default function GithubPassportStrategy(postgresClient) {
           accessToken,
           refreshToken,
           profile,
-          postgresClient,
+          postgres,
           emailAddress,
           done,
           type:       'github',

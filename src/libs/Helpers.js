@@ -31,7 +31,7 @@ export async function passportOauthLoginHandler({
   accessToken,
   refreshToken,
   profile,
-  postgresClient,
+  postgres,
   emailAddress,
   type,
   name,
@@ -39,9 +39,9 @@ export async function passportOauthLoginHandler({
   lastName,
   done
 }) {
-  const users   = Users(postgresClient, req.session)
-  const userInt = UserOauthIntegrations(postgresClient)
-  const login   = LoginHandler(postgresClient, req.session)
+  const users   = Users(postgres, req.session)
+  const userInt = UserOauthIntegrations(postgres)
+  const login   = LoginHandler(postgres, req.session)
 
   if (!emailAddress)
     throw new Errors.NoEmailAddress('No email address found for this user.')

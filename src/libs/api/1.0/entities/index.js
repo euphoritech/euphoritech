@@ -76,5 +76,20 @@ export default {
     const newEntityId = await entities.save()
 
     res.json({ id: newEntityId })
+  },
+
+  async update({ req, res, postgres }) {
+    const entities      = TeamEntities(postgres)
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const entityRecord  = req.body.entity
+
+    const record = entities.findBy({ id: entityRecord.id, team_id: currentTeamId })
+    if (record) {
+      entities.setRecord(Object.assign(record, entityRecord))
+      await entities.save()
+      return res.json(true)
+    }
+    res.status(404).json({ error: "There is no entity record that we found to update." })
   }
 }
