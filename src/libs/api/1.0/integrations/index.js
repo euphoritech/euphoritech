@@ -105,11 +105,16 @@ export default {
     const orgType         = req.body.orgType
     const onlyUpdateOrg   = req.body.onlyUpdateOrg
 
-    const integration = (onlyUpdateOrg) ? teamInteg[intType] : userInteg[intType]
+    let integration = userInteg[intType]
+    let userIntegrationId = integration.id
+    if (onlyUpdateOrg) {
+      integration = teamInteg[intType]
+      userIntegrationId = integration.user_oauth_int_id
+    }
 
     if (integration) {
       await integrations.findOrCreateBy({ team_id: currentTeamId, integration_type: intType })
-      integrations.setRecord({ user_oauth_int_id: integration.id, mod1: defaultOrg, mod2: orgType })
+      integrations.setRecord({ user_oauth_int_id: userIntegrationId, mod1: defaultOrg, mod2: orgType })
       const newId = await integrations.save()
       await sessionHandler.resetTeamSessionRefresh(currentTeamId)
 

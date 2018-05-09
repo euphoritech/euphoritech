@@ -11,7 +11,8 @@ export default function Users(postgres, session=null) {
     {
       accessibleColumns: [
         'name', 'username_email', 'password_hash', 'first_name', 'last_name',
-        'needs_password_reset', 'last_password_reset', 'last_login', 'num_logins'
+        'needs_password_reset', 'last_password_reset', 'last_login',
+        'last_session_refresh', 'num_logins'
       ],
 
       async isUsernameAvailabile(usernameEmail) {

@@ -64,12 +64,12 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS teams (
           id bigserial PRIMARY KEY,
-          parent_team_id biginteger DEFAULT null REFERENCES teams,
+          parent_team_id bigint DEFAULT null REFERENCES teams,
           external_id varchar(255) UNIQUE,
           is_global boolean,
           type varchar(255),
           name varchar(255),
-          primary_contact_user_id biginteger REFERENCES users,
+          primary_contact_user_id bigint REFERENCES users,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );
@@ -96,8 +96,8 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS teams_users_roles_map (
           id bigserial PRIMARY KEY,
-          team_id biginteger REFERENCES teams,
-          user_id biginteger REFERENCES users,
+          team_id bigint REFERENCES teams,
+          user_id bigint REFERENCES users,
           role varchar(255),
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
@@ -115,7 +115,7 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS user_oauth_integrations (
           id bigserial PRIMARY KEY,
-          user_id biginteger REFERENCES users,
+          user_id bigint REFERENCES users,
           type varchar(255),
           unique_id varchar(255),
           access_token varchar(255),
@@ -143,8 +143,8 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_integrations (
           id bigserial PRIMARY KEY,
-          team_id biginteger REFERENCES teams,
-          user_oauth_int_id biginteger REFERENCES user_oauth_integrations,
+          team_id bigint REFERENCES teams,
+          user_oauth_int_id bigint REFERENCES user_oauth_integrations,
           integration_type varchar(255),
           mod1 varchar(255),
           mod2 varchar(255),
@@ -183,9 +183,9 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS extensions_triggers (
           id bigserial PRIMARY KEY,
-          extension_id biginteger REFERENCES extensions,
+          extension_id bigint REFERENCES extensions,
           map_table varchar(255),
-          map_id biginteger,
+          map_id bigint,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );
@@ -201,7 +201,7 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_entity_types (
           id bigserial PRIMARY KEY,
-          team_id biginteger REFERENCES teams,
+          team_id bigint REFERENCES teams,
           name varchar(255),
           is_active boolean default true,
           description text,
@@ -232,11 +232,11 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_entities (
           id bigserial PRIMARY KEY,
-          team_id biginteger REFERENCES teams,
+          team_id bigint REFERENCES teams,
           source varchar(255),
           name varchar(255),
           description text,
-          entity_type_id biginteger REFERENCES team_entity_types,
+          entity_type_id bigint REFERENCES team_entity_types,
           uid varchar(255),
           external_link varchar(255),
           due_date timestamp(6),
@@ -261,8 +261,8 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_entity_links (
           id bigserial PRIMARY KEY,
-          entity1_id biginteger REFERENCES team_entities,
-          entity2_id biginteger REFERENCES team_entities,
+          entity1_id bigint REFERENCES team_entities,
+          entity2_id bigint REFERENCES team_entities,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );
@@ -278,8 +278,8 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_user_access_request (
           id bigserial PRIMARY KEY,
-          requesting_user_id biginteger REFERENCES users,
-          team_id biginteger REFERENCES teams,
+          requesting_user_id bigint REFERENCES users,
+          team_id bigint REFERENCES teams,
           requested_time timestamp(6),
           unique_id uuid NOT NULL DEFAULT uuid_generate_v4(),
           status varchar(255),
@@ -299,7 +299,7 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_api_keys (
           id bigserial PRIMARY KEY,
-          team_id biginteger REFERENCES teams,
+          team_id bigint REFERENCES teams,
           api_key varchar(255),
           status varchar(255),
           name varchar(255),

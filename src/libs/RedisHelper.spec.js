@@ -16,4 +16,16 @@ describe('RedisHelper', () => {
     assert.equal(val, afterSetResult)
     assert.equal(null, afterDeleteResult)
   })
+
+  it(`#set with EX option`, async function() {
+    const key = 'test_1'
+    const val = 'val'
+
+    await redis.set(key, val, 'EX', 60)
+    const val2 = await redis.get(key)
+    const myTtl = await redis.ttl(key)
+
+    assert.equal(val, val2)
+    assert.equal(true, myTtl <= 60)
+  })
 })

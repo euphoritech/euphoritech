@@ -43,11 +43,8 @@ export default function SessionHandler(session, { redis } = {}) {
     },
 
     async resetTeamSessionRefresh(teamId, timestamp=moment().toISOString()) {
-      if (redis) {
-        await redis.set(`team_session_refresh_${teamId}`, timestamp)
-        return true
-      }
-      return false
+      await redis.set(`team_session_refresh_${teamId}`, timestamp, 'EX', 86400)
+      return true
     }
   }
 }

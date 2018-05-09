@@ -21,6 +21,8 @@ export default {
     state.session                 = Object.assign(state.session || {}, session)
     state.settings                = Object.assign(state.settings || {}, settings)
     state.team_hierarchy          = Object.assign(state.team_hierarchy || {}, team_hierarchy)
+
+    console.log("STATE", state)
   },
 
   TOGGLE_CREATE_ENTITY_MODAL(state) {

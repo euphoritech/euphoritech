@@ -21,7 +21,7 @@ export default {
   async updateType({ req, res, postgres, redis }) {
     const typeRecord    = req.body.record
     const typesInst     = TeamEntityTypes(postgres)
-    const session       = SessionHandler(req.session)
+    const session       = SessionHandler(req.session, { redis })
     const currentTeamId = session.getCurrentLoggedInTeam()
 
     const dbRecord = await typesInst.findBy({ team_id: currentTeamId, id: typeRecord.id })

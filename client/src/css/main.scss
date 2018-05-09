@@ -39,6 +39,13 @@ html, body {
   color: #c6d5f3;
 }
 
+table.thin {
+  th, td {
+    font-size: 0.8em;
+    padding: 8px;
+  }
+}
+
 .padding-tiny {
   padding: 3px;
 }

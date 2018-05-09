@@ -20,12 +20,17 @@ export default class RedisHelper {
     return await this.client.get(key)
   }
 
-  async set(key, value) {
-    return await this.client.set(key, value)
+  // https://redis.io/commands/set
+  async set(key, value, ...args) {
+    return await this.client.set(key, value, ...args)
   }
 
   async del(key) {
     return await this.client.del(key)
+  }
+
+  async ttl(key) {
+    return await this.client.ttl(key)
   }
 
   //http://redis.io/commands/INFO

@@ -5,7 +5,7 @@
         span There are no records of type: {{ type.name }}.&nbsp;
         a(href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
         span  to add one.
-    table.table(v-if="records.length > 0")
+    table.thin.table(v-if="records.length > 0")
       thead
         tr
           th #
@@ -22,11 +22,14 @@
           td {{ truncateString(record.description, 200) }}
           td {{ record.source }}
           td {{ record.uid }}
-          td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'No Due Date' }}
+          td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
           td
             a.cog(:id="'edit-record-' + ind",href="javascript:void(0)")
               i.fa.fa-cog
             b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
+              div
+                strong {{ truncateString(record.name, 20) }}
+              hr(style="margin-top: 5px; margin-bottom: 5px;")
               div Change record type:
               b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityType(record.id, ind)")
 </template>
@@ -75,7 +78,7 @@
     },
 
     created() {
-      this.type = this.$store.state.session.current_team_types.find(t => t.id === parseInt(this.type_id))
+      this.type = this.$store.state.session.current_team_types.find(t => parseInt(t.id) === parseInt(this.type_id)) || {}
       this.currentTypeId = parseInt(this.type_id)
       this.typeOptions = this.$store.state.session.current_team_types
         .filter(f => !!f.is_active)
