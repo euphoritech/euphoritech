@@ -4,7 +4,7 @@
       <b-col class="d-none d-md-block" cols="12">
         <b-form @submit="createRecord" onkeypress="return event.keyCode !== 13">
           <b-form-group label="Record Type">
-            <b-form-select v-model="entityData.entityTypeId" size="lg" :options="entityTypes" placeholder="Select a record type to create." />
+            <b-form-select v-model="$store.state.entityModalTypeId" size="lg" :options="entityTypes" placeholder="Select a record type to create." />
           </b-form-group>
           <hr class="separate-vert-large" />
           <b-card>
@@ -26,12 +26,17 @@
               </b-tab>
               <b-tab v-if="hasGithub" title="GitHub">
                 <component v-show="entityData.source !== 'github'" is="Github" @setEntityData="setEntityData"></component>
-                <b-row class="margin-bottom-medium" v-show="entityData.source === 'github'" v-for="(label, key) in github.dataLabelMap" :key="key">
-                  <b-col cols="3">
-                    <strong>{{ label }}</strong>
-                  </b-col>
-                  <b-col cols="9">{{ entityData[key] || 'Nothing here...' }}</b-col>
-                </b-row>
+                <div v-show="entityData.source === 'github'">
+                  <div class="text-right">
+                    <a href="javascript:void(0)" @click="resetData()">Reset</a>
+                  </div>
+                  <b-row class="margin-bottom-medium" v-for="(label, key) in github.dataLabelMap" :key="key">
+                    <b-col cols="3">
+                      <strong>{{ label }}</strong>
+                    </b-col>
+                    <b-col cols="9">{{ entityData[key] || 'Nothing here...' }}</b-col>
+                  </b-row>
+                </div>
               </b-tab>
               <b-tab v-if="hasSfdc" title="Salesforce">
                 this is SFDC!
@@ -129,10 +134,10 @@
       async loggedIn(newVal, oldVal) {
         if (!!newVal) {
           this.entityTypes = (await ApiEntities.getTypes()).types.filter(t => !!t.is_active)
-          .map(t => ({ value: t.id, text: t.name }))
-          .sort((t1, t2) => (t1.text.toLowerCase() < t2.text.toLowerCase()) ? -1 : 1)
+            .map(t => ({ value: t.id, text: t.name }))
+            .sort((t1, t2) => (t1.text.toLowerCase() < t2.text.toLowerCase()) ? -1 : 1)
 
-          this.entityData.entityTypeId = this.entityTypes[0].value
+          this.$store.state.entityModalTypeId = this.entityData.entityTypeId = this.entityTypes[0].value
           this.initData = this.initData || Object.assign({}, this.entityData, { entityTypeId: this.entityData.entityTypeId })
 
           this.hasGithub = !!this.$store.state.auth.team_integrations.github

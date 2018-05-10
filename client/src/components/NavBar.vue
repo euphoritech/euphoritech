@@ -30,7 +30,11 @@
 
     methods: {
       async showCreateEntityModal() {
-        this.$store.commit('TOGGLE_CREATE_ENTITY_MODAL')
+        this.$store.commit('TOGGLE_CREATE_ENTITY_MODAL', this.$store.state.session.current_team_types.reduce((f, t) => {
+          if (!f) return t.id
+          if (t.id < f) return t.id
+          return f
+        }))
       },
 
       async toggleSettings() {

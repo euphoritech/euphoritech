@@ -46,6 +46,12 @@ table.thin {
   }
 }
 
+.nowrap-ellipses {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .padding-tiny {
   padding: 3px;
 }
@@ -180,6 +186,14 @@ table.thin {
   }
 }
 
+.max-150 {
+  max-width: 150px;
+}
+
+.max-200 {
+  max-width: 200px;
+}
+
 .max-300 {
   max-width: 300px;
 }
@@ -189,5 +203,12 @@ table.thin {
     .modal-lg {
       max-width: 1200px !important;
     }
+  }
+}
+
+.all-small-inputs {
+  input {
+    font-size: 75%;
+    height: calc(1.8125rem + 2px);
   }
 }

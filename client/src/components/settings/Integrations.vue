@@ -7,11 +7,11 @@
         b-tabs(:card="true")
           b-tab(title="Main")
             div Manage your integration settings here.
-          b-tab(v-if="env.hasGithub",title="Github")
+          b-tab(v-if="env.hasGithub",title="GitHub")
             div(v-if="!team.hasGithub")
-              div Your team hasn't integrated with Github yet.
+              div Your team hasn't integrated with GitHub yet.
             div(v-if="team.hasGithub")
-              div Your team has integrated with Github!
+              div Your team has integrated with GitHub!
               div.default-github-org.margin-top-medium
                 b-form-group(label="Is this a GitHub organization?")
                   b-form-radio-group(v-model="github.orgType",:options="typeOptions")
@@ -26,14 +26,14 @@
             hr
             div(v-if="!user.hasGithub")
               div.
-                After you authenticate with Github, you can use PRs &amp; issues to link to
+                After you authenticate with GitHub, you can use PRs &amp; issues to link to
                 your customers, QA tickets, etc.
               b-row
                 b-col(cols="12",offset="0",md="8",offset-md="2",lg="4",offset-lg="4")
                   oauth-button(type="github",href="/oauth/github")
             div(v-if="user.hasGithub")
               div.
-                Would you like to use your Github authentication information for
+                Would you like to use your GitHub authentication information for
                 your team to search your repositories for PRs and issues that you and your
                 team would like to link to other records?
               b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info and Save

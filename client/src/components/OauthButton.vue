@@ -20,7 +20,7 @@
             deviconClass: 'devicon-github-plain',
             link:         '/auth/github',
             mainClass:    'github',
-            text:         'Github'
+            text:         'GitHub'
           },
 
           google: {

@@ -34,7 +34,7 @@
         if (isHome)
           return (!this.activeTypeId) ? 'active' : ''
 
-        return (parseInt(this.activeTypeId) === id) ? 'active' : ''
+        return (parseInt(this.activeTypeId) === parseInt(id)) ? 'active' : ''
       }
     }
   }

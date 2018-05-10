@@ -2,6 +2,10 @@
   b-row
     b-col
       b-row
+        b-col(cols="12")
+          a#reset-password-popover(href="javascript:void(0)")
+            small Add/Reset Password
+          reset-password-popover(target="reset-password-popover")
         b-col(cols="12",md="2",lg="2")
           strong Username:
         b-col(cols="12",md="10",lg="10")
@@ -24,6 +28,7 @@
 </template>
 
 <script>
+  import ResetPasswordPopover from '../ResetPasswordPopover'
   import TimeHelpers from '../../factories/TimeHelpers'
 
   export default {
@@ -56,6 +61,10 @@
           tries++
         }
       }, 500)
+    },
+
+    components: {
+      ResetPasswordPopover
     }
   }
 </script>

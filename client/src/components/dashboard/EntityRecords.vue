@@ -1,5 +1,10 @@
 <template lang="pug">
   b-col
+    div.d-flex.justify-content-between
+      h1 {{ type.name }}
+      div.align-self-start
+        a(href="javascript:void(0)",@click="$store.commit('TOGGLE_CREATE_ENTITY_MODAL', type_id)")
+          small Create New {{ type.name }}
     b-alert.text-center(:show="records.length === 0",variant="warning")
       div.text-large
         span There are no records of type: {{ type.name }}.&nbsp;
@@ -18,8 +23,11 @@
       tbody
         tr(v-for="(record, ind) in records")
           td {{ ind + 1 }}.
-          td {{ record.name }}
-          td {{ truncateString(record.description, 200) }}
+          td.nowrap-ellipses.max-150.strong-text(:id="'record-name-' + ind")
+            strong {{ record.name }}
+            b-tooltip(:target="'record-name-' + ind") {{ record.name }}
+          td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
+            b-tooltip(:target="'record-desc-' + ind") {{ record.description }}
           td {{ record.source }}
           td {{ record.uid }}
           td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
@@ -32,12 +40,15 @@
               hr(style="margin-top: 5px; margin-bottom: 5px;")
               div Change record type:
               b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityType(record.id, ind)")
+              div.all-small-inputs Due Date
+                datepicker(v-model="record.dueDate",@input="changeDueDate(record.dueDate, record.id)")
 </template>
 
 <script>
   import StringHelpers from '../../factories/StringHelpers'
   import TimeHelpers from '../../factories/TimeHelpers'
   import ApiEntities from '../../factories/ApiEntities'
+  import SnackbarFactory from '../../factories/SnackbarFactory'
 
   export default {
     props: {
@@ -57,6 +68,16 @@
       getFormattedDate: TimeHelpers.getFormattedDate,
       truncateString: StringHelpers.truncateString,
 
+      newlineToBr(str) {
+        return str.replace('\n', '<br>')
+      },
+
+      async changeDueDate(dueDate, entityId) {
+        const toast = SnackbarFactory(this)
+        await ApiEntities.updateEntity({ id: entityId, due_date: dueDate })
+        toast.open("Successfully set due date!")
+      },
+
       changeEntityType(entityId, ind) {
         // TODO: remove after the following issue is fixed:
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/1772
@@ -69,7 +90,7 @@
       },
 
       toggleCreateEntityModal() {
-        this.$store.commit('TOGGLE_CREATE_ENTITY_MODAL')
+        this.$store.commit('TOGGLE_CREATE_ENTITY_MODAL', this.type_id)
       },
 
       closeEntityEditPopover(ind) {

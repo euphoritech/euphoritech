@@ -25,7 +25,9 @@ export default {
     console.log("STATE", state)
   },
 
-  TOGGLE_CREATE_ENTITY_MODAL(state) {
+  TOGGLE_CREATE_ENTITY_MODAL(state, newEntityTypeId=null) {
+    if (newEntityTypeId)
+      state.entityModalTypeId = parseInt(newEntityTypeId)
     state.showEntityModal = !state.showEntityModal
   },
 
