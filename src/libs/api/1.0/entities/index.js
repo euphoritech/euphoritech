@@ -46,7 +46,8 @@ export default {
     const currentTeamId = session.getCurrentLoggedInTeam()
     const entityTypeId  = req.query.type_id
     const pageNumber    = req.query.page
-    const numPerPage    = req.query.perPage
+    const numPerPage    = req.query.per_page
+    // const orderBy       = req.query.order_by
 
     const records = await entities.findByTypeId(parseInt(entityTypeId), { page: pageNumber, pageSize: numPerPage })
     res.json({ records })

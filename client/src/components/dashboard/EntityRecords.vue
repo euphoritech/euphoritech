@@ -1,47 +1,62 @@
 <template lang="pug">
-  b-col
+  b-col.entity-wrapper
     div.d-flex.justify-content-between
       h1 {{ type.name }}
       div.align-self-start
         a(href="javascript:void(0)",@click="$store.commit('TOGGLE_CREATE_ENTITY_MODAL', type_id)")
           small Create New {{ type.name }}
-    b-alert.text-center(:show="records.length === 0",variant="warning")
-      div.text-large
-        span There are no records of type: {{ type.name }}.&nbsp;
-        a(href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
-        span  to add one.
-    table.thin.table(v-if="records.length > 0")
-      thead
-        tr
-          th #
-          th Name
-          th Description
-          th Source
-          th Unique ID
-          th Due Date
-          th
-      tbody
-        tr(v-for="(record, ind) in records")
-          td {{ ind + 1 }}.
-          td.nowrap-ellipses.max-150.strong-text(:id="'record-name-' + ind")
-            strong {{ record.name }}
-            b-tooltip(:target="'record-name-' + ind") {{ record.name }}
-          td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
-            b-tooltip(:target="'record-desc-' + ind") {{ record.description }}
-          td {{ record.source }}
-          td {{ record.uid }}
-          td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
-          td
-            a.cog(:id="'edit-record-' + ind",href="javascript:void(0)")
-              i.fa.fa-cog
-            b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
-              div
-                strong {{ truncateString(record.name, 20) }}
-              hr(style="margin-top: 5px; margin-bottom: 5px;")
-              div Change record type:
-              b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityType(record.id, ind)")
-              div.all-small-inputs Due Date
-                datepicker(v-model="record.dueDate",@input="changeDueDate(record.dueDate, record.id)")
+    hr
+    div.entity-wrapper
+      h5.accordion-header
+        a(href="javascript:void(0)",@click="$store.state.dashboard.accordion.visibility.dashboard = !$store.state.dashboard.accordion.visibility.dashboard")
+          i.fa(:class="($store.state.dashboard.accordion.visibility.dashboard) ? 'fa-angle-down' : 'fa-angle-right'")
+          span.margin-left-medium Dashboard
+      b-collapse#entity-dashboard(:visible="true",v-model="$store.state.dashboard.accordion.visibility.dashboard",accordion="entity-accordion",role="tabpanel")
+        b-card-body
+          div this is the dashboard body....
+      h5.accordion-header
+        a(href="javascript:void(0)",@click="$store.state.dashboard.accordion.visibility.records = !$store.state.dashboard.accordion.visibility.records")
+          i.fa(:class="($store.state.dashboard.accordion.visibility.records) ? 'fa-angle-down' : 'fa-angle-right'")
+          span.margin-left-medium Records List
+      b-collapse#entity-records(v-model="$store.state.dashboard.accordion.visibility.records",accordion="entity-accordion",role="tabpanel")
+        b-card-body
+          b-alert.text-center(:show="records.length === 0",variant="warning")
+            div.text-large
+              span There are no records of type: {{ type.name }}.&nbsp;
+              a(href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
+              span  to add one.
+          table.thin.table(v-if="records.length > 0")
+            thead
+              tr
+                th #
+                th Name
+                th Description
+                th Source
+                th Unique ID
+                th Due Date
+                th
+            tbody
+              tr(v-for="(record, ind) in recordsSorted")
+                td {{ ind + 1 }}.
+                td.nowrap-ellipses.max-150.strong-text(:id="'record-name-' + ind")
+                  strong {{ record.name }}
+                  b-tooltip(:target="'record-name-' + ind") {{ record.name }}
+                td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
+                  b-tooltip(:target="'record-desc-' + ind") {{ record.description }}
+                td {{ record.source }}
+                td {{ record.uid }}
+                td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
+                td
+                  a.cog(:id="'edit-record-' + ind",href="javascript:void(0)")
+                    i.fa.fa-cog
+                  b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
+                    div
+                      strong {{ truncateString(record.name, 20) }}
+                    hr(style="margin-top: 5px; margin-bottom: 5px;")
+                    div Change record type:
+                    b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityType(record.id, ind)")
+                    div.all-small-inputs Due Date
+                      datepicker(v-model="record.due_date",@input="changeDueDate(record.due_date, record.id)")
 </template>
 
 <script>
@@ -61,6 +76,14 @@
         type: {},
         currentTypeId: null,
         typeOptions: []
+      }
+    },
+
+    computed: {
+      recordsSorted() {
+        return this.records.sort((r1, r2) => {
+          return (r1.name.toLowerCase() < r2.name.toLowerCase()) ? -1 : 1
+        })
       }
     },
 
@@ -109,12 +132,24 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   td {
     vertical-align: middle;
   }
 
   a.cog {
     color: inherit;
+  }
+
+  .accordion-header {
+    margin: 0px;
+  }
+
+  .entity-wrapper {
+    .accordion-header:not(:first-child) {
+      border-top: 1px solid rgba(0, 0, 0, 0.125);
+      margin-top: 10px;
+      padding-top: 20px;
+    }
   }
 </style>

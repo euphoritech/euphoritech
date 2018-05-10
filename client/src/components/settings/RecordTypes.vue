@@ -71,7 +71,7 @@
 
         } catch(err) {
           console.log(`Error updating status`, err)
-          SnackbarFactory(this).open(err.error, 'error')
+          SnackbarFactory(this).open(err.message, 'error')
         }
       }
     },

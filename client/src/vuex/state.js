@@ -25,6 +25,15 @@ export default {
     // An object with the entire session object stored
   },
 
+  dashboard: {
+    accordion: {
+      visibility: {
+        dashboard: true,
+        records: false
+      }
+    }
+  },
+
   settings: {
     isOpen: false
   }

@@ -1,3 +1,4 @@
+import SessionHandler from '../../../SessionHandler'
 import Users from '../../../models/Users'
 import UserOauthIntegrations from '../../../models/UserOauthIntegrations'
 
@@ -35,5 +36,30 @@ export default {
       return obj
     }, {})
     res.json({ integrations: recordObj })
+  },
+
+  async resetPassword({ req, res, redis, postgres }) {
+    const session           = SessionHandler(req.session, { redis })
+    const users             = Users(postgres, req.session)
+    const userRec           = session.getLoggedInUserId(true)
+    const currentTeamId     = session.getCurrentLoggedInTeam()
+    const currentPassword   = req.body.current_password
+    const newPassword       = req.body.new_password
+
+    if (userRec.password_hash) {
+      if (!currentPassword)
+        return res.status(401).json({ error: res.__(`Please enter your current password to validate before changing.`) })
+
+      const isCurrentPasswordCorrect = await users.validateUserPassword(userRec.username_email, currentPassword)
+      if (!isCurrentPasswordCorrect)
+        return res.status(401).json({ error: res.__(`The current password you provided is not correct. Please try again.`) })
+    }
+
+    const newHashedPassword = await users.hashPassword(newPassword)
+    users.setRecord({ id: userRec.id, password_hash: newHashedPassword })
+    await users.save()
+    await session.resetTeamSessionRefresh(currentTeamId)
+
+    res.json(true)
   }
 }
