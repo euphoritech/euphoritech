@@ -53,6 +53,7 @@
     "node-resque": "^5.2.0",
     "nodemailer": "^4.6.2",
     "npm": "^5.7.1",
+    "object-assign-deep": "^0.4.0",
     "passport": "^0.4.0",
     "passport-forcedotcom": "^0.1.4",
     "passport-github2": "^0.1.11",

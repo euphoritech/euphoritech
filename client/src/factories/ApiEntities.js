@@ -1,6 +1,11 @@
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
+  async get(id) {
+    const response = await euphoritechFetch(`/api/1.0/entities/get?id=${id}`)
+    return await handleFetchResponse(response)
+  },
+
   async getTypes(onlyActive=true) {
     if (onlyActive === null || typeof onlyActive === 'undefined')
       onlyActive = ''

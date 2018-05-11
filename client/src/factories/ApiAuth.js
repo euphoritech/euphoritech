@@ -10,6 +10,15 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async setSession(key, data) {
+    const response = await euphoritechFetch(`/api/1.0/auth/setSession`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, data })
+    })
+    return await handleFetchResponse(response)
+  },
+
   async resetPassword({ current_password, new_password }) {
     const response = await euphoritechFetch(`/api/1.0/auth/resetPassword`, {
       method: 'POST',

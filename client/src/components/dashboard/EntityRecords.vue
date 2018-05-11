@@ -8,17 +8,17 @@
     hr
     div.entity-wrapper
       h5.accordion-header
-        a(href="javascript:void(0)",@click="$store.state.dashboard.accordion.visibility.dashboard = !$store.state.dashboard.accordion.visibility.dashboard")
-          i.fa(:class="($store.state.dashboard.accordion.visibility.dashboard) ? 'fa-angle-down' : 'fa-angle-right'")
-          span.margin-left-medium Dashboard
-      b-collapse#entity-dashboard(:visible="true",v-model="$store.state.dashboard.accordion.visibility.dashboard",accordion="entity-accordion",role="tabpanel")
+        a(href="javascript:void(0)",@click="changeActiveAccordion('overview')")
+          i.fa(:class="($store.state.session.entities.dashboard.accordion.visibility.overview) ? 'fa-angle-down' : 'fa-angle-right'")
+          span.margin-left-medium Overview
+      b-collapse#entity-overview(:visible="true",v-model="$store.state.session.entities.dashboard.accordion.visibility.overview",accordion="entity-accordion",role="tabpanel")
         b-card-body
-          div this is the dashboard body....
+          div this is the overview body....
       h5.accordion-header
-        a(href="javascript:void(0)",@click="$store.state.dashboard.accordion.visibility.records = !$store.state.dashboard.accordion.visibility.records")
-          i.fa(:class="($store.state.dashboard.accordion.visibility.records) ? 'fa-angle-down' : 'fa-angle-right'")
+        a(href="javascript:void(0)",@click="changeActiveAccordion('records')")
+          i.fa(:class="($store.state.session.entities.dashboard.accordion.visibility.records) ? 'fa-angle-down' : 'fa-angle-right'")
           span.margin-left-medium Records List
-      b-collapse#entity-records(v-model="$store.state.dashboard.accordion.visibility.records",accordion="entity-accordion",role="tabpanel")
+      b-collapse#entity-records(v-model="$store.state.session.entities.dashboard.accordion.visibility.records",accordion="entity-accordion",role="tabpanel")
         b-card-body
           b-alert.text-center(:show="records.length === 0",variant="warning")
             div.text-large
@@ -39,7 +39,8 @@
               tr(v-for="(record, ind) in recordsSorted")
                 td {{ ind + 1 }}.
                 td.nowrap-ellipses.max-150.strong-text(:id="'record-name-' + ind")
-                  strong {{ record.name }}
+                  strong
+                    a.entity-link(:href="'/dashboard/entity/' + record.id") {{ record.name }}
                   b-tooltip(:target="'record-name-' + ind") {{ record.name }}
                 td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
                   b-tooltip(:target="'record-desc-' + ind") {{ record.description }}
@@ -62,6 +63,7 @@
 <script>
   import StringHelpers from '../../factories/StringHelpers'
   import TimeHelpers from '../../factories/TimeHelpers'
+  import ApiAuth from '../../factories/ApiAuth'
   import ApiEntities from '../../factories/ApiEntities'
   import SnackbarFactory from '../../factories/SnackbarFactory'
 
@@ -90,6 +92,27 @@
     methods: {
       getFormattedDate: TimeHelpers.getFormattedDate,
       truncateString: StringHelpers.truncateString,
+
+      getAccordionSessionObj() {
+        return this.$store.state.session.entities.dashboard.accordion.visibility
+      },
+
+      async changeActiveAccordion(key) {
+        const obj = this.getAccordionSessionObj()
+        obj[key] = !obj[key]
+
+        const newSessionObj = { dashboard: { accordion: { visibility: {}}}}
+        newSessionObj.dashboard.accordion.visibility = Object.keys(obj).reduce((o, k) => {
+          if (k === key) {
+            o[k] = true
+          } else {
+            o[k] = false
+          }
+          return o
+        }, {})
+
+        await ApiAuth.setSession('entities', newSessionObj)
+      },
 
       newlineToBr(str) {
         return str.replace('\n', '<br>')
@@ -150,6 +173,11 @@
       border-top: 1px solid rgba(0, 0, 0, 0.125);
       margin-top: 10px;
       padding-top: 20px;
+    }
+
+    a.entity-link {
+      color: inherit;
+      text-decoration: underline;
     }
   }
 </style>

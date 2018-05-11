@@ -1,3 +1,4 @@
+import objectAssignDeep from 'object-assign-deep'
 import SessionHandler from '../../../SessionHandler'
 import Users from '../../../models/Users'
 import UserOauthIntegrations from '../../../models/UserOauthIntegrations'
@@ -5,6 +6,23 @@ import UserOauthIntegrations from '../../../models/UserOauthIntegrations'
 export default {
   session({ req, res }) {
     res.json({ session: req.session })
+  },
+
+  setSession({ req, res, postgres }) {
+    const users   = Users(postgres, req.session)
+    const session = SessionHandler(req.session)
+    const userId  = session.getLoggedInUserId()
+    const data    = req.body.data
+    let key       = req.body.key
+
+    if (data.toString() !== '[object Object]')
+      return res.status(400).json({ error: res.__("Make sure you pass an object to add to the session.") })
+
+    if (!key)
+      key = '__temp'
+
+    users.setSession({ [ key ]: objectAssignDeep(req.session[key] || {}, data) })
+    res.json(true)
   },
 
   async usernameAvailable({ req, res, postgres }) {

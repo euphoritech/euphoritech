@@ -12,6 +12,7 @@
 </template>
 
 <script>
+  import Entity from './Entity'
   import EntityRecords from './EntityRecords'
   import Home from './Home'
   import SideBar from './SideBar'
@@ -19,7 +20,8 @@
 
   export default {
     props: {
-      type_id: { type: [ Number, String ] }
+      id: { type: [ Number, String ], default: null },
+      type_id: { type: [ Number, String ], default: null }
     },
 
     data() {
@@ -36,6 +38,8 @@
         switch (this.partialComponent) {
           case 'entity-records':
             return { records: this.entityRecords, type_id: this.type_id }
+          case 'entity':
+            return { id: this.id }
         }
       }
     },
@@ -47,6 +51,7 @@
     },
 
     components: {
+      Entity,
       EntityRecords,
       Home,
       SideBar
@@ -55,6 +60,11 @@
     async created() {
       if (this.$route.query && (this.$route.query.error || this.$route.query.error_code))
         this.error = `${this.$route.query.error_code || 'N/A'} - ${this.$route.query.error || 'No more details'}`
+
+        if (this.id) {
+          this.partialComponent = 'entity'
+          return this.isLoadingLocal = false
+        }
 
       if (this.type_id) {
         this.entityRecords = (await ApiEntities.getEntityListByType({ type_id: this.type_id })).records

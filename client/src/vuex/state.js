@@ -23,15 +23,16 @@ export default {
 
   session: {
     // An object with the entire session object stored
-  },
-
-  dashboard: {
-    accordion: {
-      visibility: {
-        dashboard: true,
-        records: false
+    entities: {
+      dashboard: {
+        accordion: {
+          visibility: {
+            overview: true,
+            records: false
+          }
+        }
       }
-    }
+    },
   },
 
   settings: {

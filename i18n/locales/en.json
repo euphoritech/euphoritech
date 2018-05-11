@@ -8,5 +8,6 @@
 	"Your passwords do not match.": "Your passwords do not match.",
 	"We could not find your integration. Make sure you've authenticated and try again.": "We could not find your integration. Make sure you've authenticated and try again.",
 	"No item with the ID provided.": "No item with the ID provided.",
-	"The current password you provided is not correct. Please try again.": "The current password you provided is not correct. Please try again."
+	"The current password you provided is not correct. Please try again.": "The current password you provided is not correct. Please try again.",
+	"There is no record with the ID provided. Please try again.": "There is no record with the ID provided. Please try again."
 }

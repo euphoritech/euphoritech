@@ -4,6 +4,19 @@ import TeamEntityLinks from '../../../models/TeamEntityLinks'
 import TeamEntityTypes from '../../../models/TeamEntityTypes'
 
 export default {
+  async get({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const entities      = TeamEntities(postgres)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const recordId      = req.query.id
+
+    const record = await entities.findBy({ id: recordId, team_id: currentTeamId })
+    if (!record)
+      return res.status(404).json({ error: res.__("There is no record with the ID provided. Please try again.") })
+
+    res.json({ record })
+  },
+
   async getTypes({ req, res, postgres }) {
     const onlyActive    = req.query.onlyActive || true
     const typesInst     = TeamEntityTypes(postgres)
