@@ -2,17 +2,17 @@ import { handleFetchResponse } from './ApiHelpers'
 
 export default {
   async checkTeamAvailability(teamId) {
-    const response = await euphoritechFetch(`/api/1.0/teams/teamAvailable?teamId=${teamId}`)
+    const response = await euphoritechFetch(`/api/1.0/teams/team/available?teamId=${teamId}`)
     return await handleFetchResponse(response)
   },
 
   async checkTeamExists(teamId) {
-    const response = await euphoritechFetch(`/api/1.0/teams/teamExists?teamId=${teamId}`)
+    const response = await euphoritechFetch(`/api/1.0/teams/team/exists?teamId=${teamId}`)
     return await handleFetchResponse(response)
   },
 
   async getTeamHierarchy(teamId='') {
-    const response = await euphoritechFetch(`/api/1.0/teams/getCurrentHierarchy?teamId=${teamId}`)
+    const response = await euphoritechFetch(`/api/1.0/teams/hierarchy/get?teamId=${teamId}`)
     return await handleFetchResponse(response)
   },
 
@@ -26,7 +26,7 @@ export default {
   },
 
   async requestJoinTeam({ teamId }) {
-    const response = await euphoritechFetch(`/api/1.0/teams/requestJoinTeam`, {
+    const response = await euphoritechFetch(`/api/1.0/teams/team/join/request`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId })
@@ -35,7 +35,7 @@ export default {
   },
 
   async getCurrentTeamIntegrations() {
-    const response = await euphoritechFetch(`/api/1.0/teams/getCurrentTeamIntegrations`)
+    const response = await euphoritechFetch(`/api/1.0/teams/integrations/session/get`)
     return await handleFetchResponse(response)
   },
 
@@ -50,12 +50,12 @@ export default {
   },
 
   async getTeamEntityTypes() {
-    const response = await euphoritechFetch(`/api/1.0/teams/entityTypes`)
+    const response = await euphoritechFetch(`/api/1.0/teams/types/get`)
     return await handleFetchResponse(response)
   },
 
   async getApiKeys() {
-    const response = await euphoritechFetch(`/api/1.0/teams/getApiKeys`)
+    const response = await euphoritechFetch(`/api/1.0/teams/api/keys/get`)
     return await handleFetchResponse(response)
   }
 }

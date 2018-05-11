@@ -8,18 +8,15 @@ export default {
     res.json({ session: req.session })
   },
 
-  setSession({ req, res, postgres }) {
+  ['session/set']({ req, res, postgres }) {
     const users   = Users(postgres, req.session)
     const session = SessionHandler(req.session)
     const userId  = session.getLoggedInUserId()
     const data    = req.body.data
-    let key       = req.body.key
+    const key     = req.body.key || '__temp'
 
     if (data.toString() !== '[object Object]')
       return res.status(400).json({ error: res.__("Make sure you pass an object to add to the session.") })
-
-    if (!key)
-      key = '__temp'
 
     users.setSession({ [ key ]: objectAssignDeep(req.session[key] || {}, data) })
     res.json(true)
@@ -33,7 +30,7 @@ export default {
     res.json(!userRecord)
   },
 
-  setRedirect({ req, res }) {
+  ['redirect/set']({ req, res }) {
     req.session.returnTo = req.body.target
     req.session.save()
     res.json(null)
@@ -45,7 +42,7 @@ export default {
     res.json(!!currentIntegr[intTypeToCheck])
   },
 
-  async getIntegrations({ req, res, postgres }) {
+  async ['integrations/get']({ req, res, postgres }) {
     const users   = Users(postgres, req.session)
     const integ   = UserOauthIntegrations(postgres)
     const records = await integ.getAllByUserId(users.getLoggedInUserId())
@@ -56,7 +53,7 @@ export default {
     res.json({ integrations: recordObj })
   },
 
-  async resetPassword({ req, res, redis, postgres }) {
+  async ['password/reset']({ req, res, redis, postgres }) {
     const session           = SessionHandler(req.session, { redis })
     const users             = Users(postgres, req.session)
     const userRec           = session.getLoggedInUserId(true)

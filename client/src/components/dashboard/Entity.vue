@@ -1,9 +1,11 @@
 <template lang="pug">
   b-col
-    b-alert(:show="!!error",variant="warning") {{ error }}
-    div(v-if="!error")
-      h2 {{ truncateString(entityRecord.name, 30) }}
-      div This is an entity - ID: {{ id }}
+    loader(v-if="isLoadingLocal")
+    div(v-if="!isLoadingLocal")
+      b-alert(:show="!!error",variant="warning") {{ error }}
+      div(v-if="!error")
+        h2 {{ truncateString(entityRecord.name, 30) }}
+        div This is an entity - ID: {{ id }}
 </template>
 
 <script>
@@ -18,6 +20,7 @@
 
     data() {
       return {
+        isLoadingLocal: true,
         entityRecord: null,
         error: null
       }
@@ -32,6 +35,8 @@
         this.entityRecord = (await ApiEntities.get(this.id)).record
       } catch(err) {
         this.error = err.message
+      } finally {
+        this.isLoadingLocal = false
       }
     }
   }

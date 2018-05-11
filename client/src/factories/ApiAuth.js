@@ -2,7 +2,7 @@ import { handleFetchResponse } from './ApiHelpers'
 
 export default {
   async setRedirect(targetUrl) {
-    const response = await euphoritechFetch(`/api/1.0/auth/setRedirect`, {
+    const response = await euphoritechFetch(`/api/1.0/auth/redirect/set`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ target: targetUrl })
@@ -11,7 +11,7 @@ export default {
   },
 
   async setSession(key, data) {
-    const response = await euphoritechFetch(`/api/1.0/auth/setSession`, {
+    const response = await euphoritechFetch(`/api/1.0/auth/session/set`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key, data })
@@ -20,7 +20,7 @@ export default {
   },
 
   async resetPassword({ current_password, new_password }) {
-    const response = await euphoritechFetch(`/api/1.0/auth/resetPassword`, {
+    const response = await euphoritechFetch(`/api/1.0/auth/password/reset`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ current_password, new_password })
@@ -39,7 +39,7 @@ export default {
   },
 
   async getLoggedInUsersIntegrations() {
-    const response = await euphoritechFetch(`/api/1.0/auth/getIntegrations`)
+    const response = await euphoritechFetch(`/api/1.0/auth/integrations/get`)
     return await handleFetchResponse(response)
   },
 

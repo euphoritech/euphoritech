@@ -10,12 +10,12 @@ export default {
     if (onlyActive === null || typeof onlyActive === 'undefined')
       onlyActive = ''
 
-    const response = await euphoritechFetch(`/api/1.0/entities/getTypes?onlyActive=${onlyActive}`)
+    const response = await euphoritechFetch(`/api/1.0/entities/types/get?onlyActive=${onlyActive}`)
     return await handleFetchResponse(response)
   },
 
   async updateType(updatedTypeRecord) {
-    const response = await euphoritechFetch(`/api/1.0/entities/updateType`, {
+    const response = await euphoritechFetch(`/api/1.0/entities/type/update`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ record: updatedTypeRecord })
@@ -24,12 +24,12 @@ export default {
   },
 
   async getLinkedEntities(entityId) {
-    const response = await euphoritechFetch(`/api/1.0/entities/getLinks?id=${entityId}`)
+    const response = await euphoritechFetch(`/api/1.0/entities/links/get?id=${entityId}`)
     return await handleFetchResponse(response)
   },
 
   async getEntityListByType({ type_id, page, perPage }) {
-    const response = await euphoritechFetch(`/api/1.0/entities/getByType?type_id=${type_id}&page=${page || ''}&perPage=${perPage || ''}`)
+    const response = await euphoritechFetch(`/api/1.0/entities/get/by/type?type_id=${type_id}&page=${page || ''}&perPage=${perPage || ''}`)
     return await handleFetchResponse(response)
   },
 

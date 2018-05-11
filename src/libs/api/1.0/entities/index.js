@@ -17,7 +17,7 @@ export default {
     res.json({ record })
   },
 
-  async getTypes({ req, res, postgres }) {
+  async ['types/get']({ req, res, postgres }) {
     const onlyActive    = req.query.onlyActive || true
     const typesInst     = TeamEntityTypes(postgres)
     const session       = SessionHandler(req.session)
@@ -31,7 +31,7 @@ export default {
     res.json({ types })
   },
 
-  async updateType({ req, res, postgres, redis }) {
+  async ['type/update']({ req, res, postgres, redis }) {
     const typeRecord    = req.body.record
     const typesInst     = TeamEntityTypes(postgres)
     const session       = SessionHandler(req.session, { redis })
@@ -47,13 +47,13 @@ export default {
     res.json(true)
   },
 
-  async getLinks({ req, res, postgres }) {
+  async ['links/get']({ req, res, postgres }) {
     const entityId = req.query.id
 
     res.json(true)
   },
 
-  async getByType({ req, res, postgres }) {
+  async ['get/by/type']({ req, res, postgres }) {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()

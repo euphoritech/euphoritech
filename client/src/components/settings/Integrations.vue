@@ -22,7 +22,7 @@
                   b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Save Organization
                 div(v-if="!github.org")
                   b-form-checkbox(@change="selectGithubOrg({ login: true })") Use your personal GitHub account as the team's organization
-                  typeahead-input(:params="{ src: '/api/1.0/integrations/githubSearchForOrgs', keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
+                  typeahead-input(:params="{ src: '/api/1.0/integrations/github/orgs/search', keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
             hr
             div(v-if="!user.hasGithub")
               div.

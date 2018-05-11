@@ -10,7 +10,7 @@ import Users from '../../../models/Users'
 import config from '../../../../config'
 
 export default {
-  async teamAvailable({ req, res, postgres }) {
+  async ['team/available']({ req, res, postgres }) {
     const teams   = Teams(postgres)
     const teamId  = req.query.teamId
 
@@ -18,13 +18,13 @@ export default {
     res.json(!teamRecord)
   },
 
-  async teamExists({ req, res, postgres }) {
+  async ['team/exists']({ req, res, postgres }) {
     let teamIsAvailable
     await this.teamAvailable({ req, res: { json: available => teamIsAvailable = available }, postgres })
     res.json(!teamIsAvailable)
   },
 
-  async getApiKeys({ req, res, postgres }) {
+  async ['api/keys/get']({ req, res, postgres }) {
     const keysInst  = TeamApiKeys(postgres)
     const session   = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
@@ -60,7 +60,7 @@ export default {
     return res.json(null)
   },
 
-  async requestJoinTeam({ req, res, postgres, redis }) {
+  async ['team/join/request']({ req, res, postgres, redis }) {
     const queue       = new NodeResque.Queue({ connection: { redis: redis.client }})
     const teams       = Teams(postgres)
     const users       = Users(postgres, req.session)
@@ -116,7 +116,7 @@ export default {
     }
   },
 
-  async getCurrentHierarchy({ req, res, postgres }) {
+  async ['hierarchy/get']({ req, res, postgres }) {
     const teams         = Teams(postgres)
     const turm          = TeamsUsersRolesMap(postgres)
     const users         = Users(postgres, req.session)
@@ -143,7 +143,7 @@ export default {
     res.json(!!currentIntegr[intTypeToCheck])
   },
 
-  async getCurrentTeamIntegrations({ req, res, postgres }) {
+  async ['integrations/session/get']({ req, res, postgres }) {
     const teamIntegrations        = TeamIntegrations(postgres)
     const session                 = SessionHandler(req.session)
     const currentLoggedInTeamId   = session.getCurrentLoggedInTeam()
@@ -155,7 +155,7 @@ export default {
     res.json({ integrations: currentLoggedInTeamInt })
   },
 
-  async entityTypes({ req, res, postgres }) {
+  async ['types/get']({ req, res, postgres }) {
     const session   = SessionHandler(req.session)
     const teamId    = session.getCurrentLoggedInTeam()
 

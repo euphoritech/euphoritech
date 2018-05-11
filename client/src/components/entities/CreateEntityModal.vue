@@ -110,6 +110,7 @@
       async createRecord(e) {
         e.preventDefault()
 
+        this.entityData.entityTypeId = this.$store.state.entityModalTypeId
         await ApiEntities.createEntity(this.entityData)
 
         this.$store.commit('TOGGLE_CREATE_ENTITY_MODAL')

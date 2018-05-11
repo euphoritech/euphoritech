@@ -4,7 +4,7 @@ import TeamIntegrations from '../../../models/TeamIntegrations'
 import UserOauthIntegrations from '../../../models/UserOauthIntegrations'
 
 export default {
-  async githubGetUserProfile({ req, res, postgres }) {
+  async ['github/user']({ req, res, postgres }) {
     const session = SessionHandler(req.session)
     const userId  = session.getLoggedInUserId()
     const userInt = session.getLoggedInUserIntegrations()
@@ -20,7 +20,7 @@ export default {
     }
   },
 
-  async githubSearchRepos({ req, res, postgres }) {
+  async ['github/repos/search']({ req, res, postgres }) {
     const searchText  = req.query.search
     const session     = SessionHandler(req.session)
     const userId      = session.getLoggedInUserId()
@@ -46,7 +46,7 @@ export default {
     }
   },
 
-  async githubSearchForOrgs({ req, res, postgres }) {
+  async ['github/orgs/search']({ req, res, postgres }) {
     const session     = SessionHandler(req.session)
     const userId      = session.getLoggedInUserId()
     const teamInt     = session.getLoggedInTeamIntegrations()
@@ -70,7 +70,7 @@ export default {
     }
   },
 
-  async githubFindItemInRepo({ req, res, postgres}) {
+  async ['github/item/find']({ req, res, postgres}) {
     const session     = SessionHandler(req.session)
     const userId      = session.getLoggedInUserId()
     const teamInt     = session.getLoggedInTeamIntegrations()
@@ -93,7 +93,7 @@ export default {
     }
   },
 
-  async saveTeamIntegration({ req, res, postgres, redis }) {
+  async ['team/save']({ req, res, postgres, redis }) {
     const sessionHandler  = SessionHandler(req.session, { redis })
     const integrations    = TeamIntegrations(postgres)
     const currentTeamId   = sessionHandler.getCurrentLoggedInTeam()
