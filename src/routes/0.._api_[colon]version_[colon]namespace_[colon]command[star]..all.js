@@ -9,20 +9,24 @@ const log = bunyan.createLogger(config.logger.options)
 const postgres  = new PostgresClient()
 const redis     = new RedisHelper()
 
-export default [
-    Routes.requireAuthExpressMiddleware(),
-    async function ApiNamespaceCommand(req, res) {
-    const version       = req.params.version
-    const namespace     = req.params.namespace
-    const command       = req.params.command
-    const additional    = req.params[0]
-    const finalCommand  = (additional) ? `${command}${additional}` : command
+export default {
+  createRouteWithOptions({ io }) {
+    return [
+        Routes.requireAuthExpressMiddleware(),
+        async function ApiNamespaceCommand(req, res) {
+        const version       = req.params.version
+        const namespace     = req.params.namespace
+        const command       = req.params.command
+        const additional    = req.params[0]
+        const finalCommand  = (additional) ? `${command}${additional}` : command
 
-    try {
-      await ApiVersions[version][namespace][finalCommand]({ req, res, log, postgres, redis })
-    } catch(err) {
-      log.error("Error with API request", err)
-      res.sendStatus(500)
-    }
+        try {
+          await ApiVersions[version][namespace][finalCommand]({ req, res, log, postgres, redis, io })
+        } catch(err) {
+          log.error("Error with API request", err)
+          res.sendStatus(500)
+        }
+      }
+    ]
   }
-]
+}

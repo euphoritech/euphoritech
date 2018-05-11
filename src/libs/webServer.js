@@ -69,12 +69,13 @@ export default function webServer() {
         // initialize routes object to be used to bind express routes
         const aRoutes = fs.readdirSync('routes').filter(file => fs.lstatSync(path.join('routes', file)).isFile())
         let oRoutes = {}
-        aRoutes.forEach(r => oRoutes[r] = require(path.join('..', 'routes', r)))
+        aRoutes.forEach(r => oRoutes[r] = require(path.join('..', 'routes', r)).default)
 
         //setup route handlers in the express app
         routes.forEach(route => {
           try {
-            app[route.verb.toLowerCase()](route.path, oRoutes[route.file].default)
+            const routeHandler = (oRoutes[route.file].toString() === '[object Object]' && oRoutes[route.file].createRouteWithOptions) ? oRoutes[route.file].createRouteWithOptions({ io }) : oRoutes[route.file]
+            app[ route.verb.toLowerCase() ](route.path, routeHandler)
             log.debug(`Successfully bound route to express; method: ${route.verb}; path: ${route.path}`)
           } catch(err) {
             log.error(err, `Error binding route to express; method: ${route.verb}; path: ${route.path}`)
