@@ -25,10 +25,6 @@
     },
 
     methods: {
-      async githubSearchRepos(searchText) {
-        const results = await ApiIntegrations.githubSearchRepos(searchText)
-      },
-
       selectGithubRepo(repo) {
         this.selectedRepo = repo.name
       },

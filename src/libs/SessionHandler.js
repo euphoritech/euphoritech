@@ -45,6 +45,23 @@ export default function SessionHandler(session, { redis } = {}) {
     async resetTeamSessionRefresh(teamId, timestamp=moment().toISOString()) {
       await redis.set(`team_session_refresh_${teamId}`, timestamp, 'EX', 86400)
       return true
+    },
+
+    setSession(object, sessionObj=session) {
+      if (session && sessionObj) {
+        for (var _key in object) {
+          if (object[_key] && object[_key].toString() === '[object Object]') {
+            sessionObj[_key] = sessionObj[_key] || {}
+            this.setSession(object[_key], sessionObj[_key])
+          } else {
+            sessionObj[_key] = object[_key]
+          }
+        }
+
+        session.save()
+        return true
+      }
+      return false
     }
   }
 }

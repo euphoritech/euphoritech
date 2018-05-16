@@ -31,6 +31,10 @@ export default {
     state.showEntityModal = !state.showEntityModal
   },
 
+  TOGGLE_CHAT_WIDGET(state) {
+    state.chatWidget.isOpen = !state.chatWidget.isOpen
+  },
+
   TOGGLE_SETTINGS_MODAL(state) {
     state.settings.isOpen = !state.settings.isOpen
   }

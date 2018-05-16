@@ -5,8 +5,8 @@
     div(v-if="!isLoadingLocal")
       b-card(:no-body="true")
         b-tabs(:card="true")
-          b-tab(title="Main")
-            div Manage your integration settings here.
+          //- b-tab(title="Main")
+          //-   div Manage your integration settings here.
           b-tab(v-if="env.hasGithub",title="GitHub")
             div(v-if="!team.hasGithub")
               div Your team hasn't integrated with GitHub yet.
@@ -18,34 +18,49 @@
                 div(v-if="github.org")
                   small The organization that you can pull down PRs and Issues from:
                   h3 {{ github.org }}
-                    i.remove-org-icon.margin-left-small.fa.fa-times(@click="selectGithubOrg({ login: null })")
+                    i.remove-icon.margin-left-small.fa.fa-times(@click="selectGithubOrg({ login: null })")
                   b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Save Organization
                 div(v-if="!github.org")
                   b-form-checkbox(@change="selectGithubOrg({ login: true })") Use your personal GitHub account as the team's organization
                   typeahead-input(:params="{ src: '/api/1.0/integrations/github/orgs/search', keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
-            hr
-            div(v-if="!user.hasGithub")
-              div.
-                After you authenticate with GitHub, you can use PRs &amp; issues to link to
-                your customers, QA tickets, etc.
-              b-row
-                b-col(cols="12",offset="0",md="8",offset-md="2",lg="4",offset-lg="4")
-                  oauth-button(type="github",href="/oauth/github")
-            div(v-if="user.hasGithub")
-              div.
-                Would you like to use your GitHub authentication information for
-                your team to search your repositories for PRs and issues that you and your
-                team would like to link to other records?
-              b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info and Save
+            hr(v-if="!userIsTeamIntegration('github')")
+            div(v-if="!userIsTeamIntegration('github')")
+              div(v-if="!user.hasGithub")
+                div.
+                  After you authenticate with GitHub, you can use PRs &amp; issues to link to
+                  your customers, QA tickets, etc.
+                b-row
+                  b-col(cols="12",offset="0",md="8",offset-md="2",lg="4",offset-lg="4")
+                    oauth-button(type="github",href="/oauth/github")
+              div(v-if="user.hasGithub")
+                div.
+                  Would you like to use your GitHub authentication information for
+                  your team to search your repositories for PRs and issues that you and your
+                  team would like to link to other records?
+                b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info and Save
           b-tab(v-if="env.hasSfdc",title="Salesforce")
-            div You can pull records from your Salesforce instance here, such as your customer or user information.
-            b-row
-              b-col(cols="12",offset="0",md="8",offset-md="2",lg="4",offset-lg="4")
-                oauth-button(type="salesforce",href="/oauth/salesforce")
+            div(v-if="!team.hasSfdc")
+              div No team integration yet...
+            div(v-if="team.hasSfdc")
+              integrations-salesforce-objects
+            hr(v-if="!userIsTeamIntegration('salesforce')")
+            div(v-if="!userIsTeamIntegration('salesforce')")
+              div(v-if="!user.hasSfdc")
+                div You can pull records from your Salesforce instance here, such as your customer or user information.
+                b-row
+                  b-col(cols="12",offset="0",md="8",offset-md="2",lg="4",offset-lg="4")
+                    oauth-button(type="salesforce",href="/oauth/salesforce")
+              div(v-if="user.hasSfdc")
+                div.
+                  Would you like to use your Salesforce authentication information
+                  for your team to search your SF objects that you and your team
+                  would like to link to other records?
+                b-button.separate-vert-medium(@click="useUserIntegration('salesforce', false)",variant="primary",size="sm") Use my Info and Save
 </template>
 
 <script>
   import OauthButton from '../OauthButton'
+  import IntegrationsSalesforceObjects from './IntegrationsSalesforceObjects'
   import ApiEnv from '../../factories/ApiEnv'
   import ApiIntegrations from '../../factories/ApiIntegrations'
   import SnackbarFactory from '../../factories/SnackbarFactory'
@@ -82,6 +97,14 @@
     },
 
     methods: {
+      userIsTeamIntegration(type) {
+        return (
+          this.$store.state.auth.team_integrations[type] &&
+          this.$store.state.auth.user_integrations[type] &&
+          parseInt(this.$store.state.auth.team_integrations[type].user_oauth_int_id) == parseInt(this.$store.state.auth.user_integrations[type].id)
+        )
+      },
+
       async selectGithubOrg(repoInfo) {
         if (repoInfo.login === true) {
           const res = await ApiIntegrations.githubGetUserProfile()
@@ -95,12 +118,23 @@
 
       async useUserIntegration(type, onlyUpdateOrg=true) {
         const toast   = SnackbarFactory(this)
-        const org     = this.github.org
-        const orgType = this.github.orgType
-        // if (!org)
-        //   return toast.open("Please make sure you add an organization or user to fetch records from.", 'error')
 
-        const response = await ApiIntegrations.saveTeamIntegration({ type, org, orgType, onlyUpdateOrg })
+        let requestObject = { type }
+        switch(type) {
+          case 'github':
+            requestObject = Object.assign(requestObject, {
+              org: this.github.org,
+              orgType: this.github.orgType,
+              onlyUpdateOrg
+            })
+            break
+
+          case 'salesforce':
+            // TODO: Determine if other data will be passed and add it here
+            break
+        }
+
+        const response = await ApiIntegrations.saveTeamIntegration(requestObject)
         toast.open(`Successfully added your ${type} integration to the team!`)
       }
     },
@@ -114,8 +148,12 @@
       this.env.hasGithub  = envHasGithub
       this.env.hasSfdc    = envHasSfdc
       this.env.hasZendesk = envHasZendesk
+
       this.team.hasGithub = !!this.$store.state.auth.team_integrations.github
       this.user.hasGithub = !!this.$store.state.auth.user_integrations.github
+
+      this.team.hasSfdc = !!this.$store.state.auth.team_integrations.salesforce
+      this.user.hasSfdc = !!this.$store.state.auth.user_integrations.salesforce
 
       this.github = (this.$store.state.auth.team_integrations && this.$store.state.auth.team_integrations.github)
         ? { org: this.$store.state.auth.team_integrations.github.mod1, orgType:  this.$store.state.auth.team_integrations.github.mod2 }
@@ -125,14 +163,8 @@
     },
 
     components: {
-      OauthButton
+      OauthButton,
+      IntegrationsSalesforceObjects
     }
   }
 </script>
-
-<style scoped>
-  .remove-org-icon {
-    color: red;
-    cursor: pointer;
-  }
-</style>

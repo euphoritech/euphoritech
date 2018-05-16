@@ -16,8 +16,6 @@ import LoaderInline from './components/LoaderInline'
 import Datepicker from './components/Datepicker'
 import ToggleSwitch from './components/ToggleSwitch'
 import TypeaheadInput from './components/TypeaheadInput'
-import CreateEntityModal from './components/entities/CreateEntityModal'
-import SettingsContainer from './components/settings/SettingsContainer'
 import { handleFetchResponse } from './factories/ApiHelpers'
 
 // css
@@ -41,8 +39,6 @@ Vue.component('datepicker', Datepicker)
 Vue.component('TypeaheadInput', TypeaheadInput)
 Vue.component('toggle-switch', ToggleSwitch)
 Vue.component('vue-toastr', Toastr)
-Vue.component('settings', SettingsContainer)
-Vue.component('create-entity', CreateEntityModal)
 
 Vue.config.productionTip = false
 
@@ -50,9 +46,10 @@ Vue.config.productionTip = false
 // https://github.com/pespantelis/vue-typeahead/blob/master/src/main.js
 Vue.prototype.$http = {
   async get(src, { params }) {
+    const queryStringDelim = (src.includes('?')) ? '&' : '?'
     if (params && params.search)
-      src = `${src}?search=${params.search}`
-      
+      src = `${src}${queryStringDelim}search=${params.search}`
+
     const response = await window.euphoritechFetch(src)
     const data = await handleFetchResponse(response)
     return { data }

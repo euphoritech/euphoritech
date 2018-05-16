@@ -21,6 +21,10 @@ export default {
     }
   },
 
+  chatWidget: {
+    isOpen: false
+  },
+
   session: {
     // An object with the entire session object stored
     entities: {

@@ -162,6 +162,23 @@ export function migrations(postgres) {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_integrations_user_oauth_int_id_idx on team_integrations (user_oauth_int_id)`)
     },
 
+    async function createTeamIntegrationsSalesforce() {
+      await postgres.query(`
+        CREATE TABLE IF NOT EXISTS team_integrations_salesforce (
+          id bigserial PRIMARY KEY,
+          team_id bigint REFERENCES teams,
+          object_name varchar(255),
+          attribute_info jsonb,
+          created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
+          updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
+        );
+      `)
+    },
+
+    async function createTeamIntegrationsSalesforceIndexes() {
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_integrations_salesforce_team_id_idx on team_integrations_salesforce (team_id)`)
+    },
+
     async function createExtensions() {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS extensions (

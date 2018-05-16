@@ -1,4 +1,4 @@
-import app from "./socketApp"
+import app from "./socketAppStore"
 import Github from "./Github"
 import Global from "./Global"
 import GeoIP from "../GeoIP"
@@ -18,12 +18,19 @@ export default function WebSocket({ io, log, postgres, redis }) {
         socket.on(evt, handlers[category][evt])
       })
     })
+    socket.on('disconnect', disconnectSocket)
 
     if (user && user.id) {
       let realClientIpAddress = (req.headers['x-forwarded-for'] || req.ip || socket.handshake.address || "").split(',')
       realClientIpAddress = realClientIpAddress[realClientIpAddress.length - 1]
 
-      const geoData = (await GeoIP.location(realClientIpAddress)) || {}
+      let geoData
+      try {
+        geoData = (await GeoIP.location(realClientIpAddress)) || {}
+      } catch(e) {
+        log.error(`Error getting geo data for socket`, e)
+        geoData = {}
+      }
 
       app.sockets[ socket.id ] = user.id
       app.users[ user.id ] = {
@@ -44,6 +51,34 @@ export default function WebSocket({ io, log, postgres, redis }) {
   })
 }
 
-export function addToRoom(socketId, room) {
-  return socketApp.rooms[room] = socketId
+export function getSocketById(io, socketId, namespace='/') {
+  return io.nsps[namespace].sockets[socketId]
+}
+
+export function addToRoom(socket, room) {
+  const socketId = socket.id
+  socket.join(room)
+
+  app.rooms[room] = app.rooms[room] || []
+  app.rooms[room].push(socketId)
+
+  const userId = app.sockets[ socketId ]
+  if (userId) {
+    app.userRooms[userId] = app.userRooms[userId] || []
+    app.userRooms[userId].push(room)
+  }
+
+  return room
+}
+
+export function disconnectSocket(socket) {
+  const userId = app.sockets[ socket.id ]
+  delete(app.sockets[ socket.id ])
+  delete(app.users[ userId ])
+
+  const userRooms = app.userRooms[userId]
+  if (userRooms) {
+    userRooms.forEach(r => app.rooms[room].splice(app.rooms[room].indexOf(socket.id), 1))
+    delete(app.userRooms[userId])
+  }
 }

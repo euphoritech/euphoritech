@@ -16,6 +16,30 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async getSfdcObjects({ search }={}) {
+    const response = await euphoritechFetch(`/api/1.0/integrations/salesforce/objects/get?search=${search}`)
+    return await handleFetchResponse(response)
+  },
+
+  async getSfdcRecords({ id, search }={}) {
+    const response = await euphoritechFetch(`/api/1.0/integrations/salesforce/records/get?int_id=${id}&search=${search}`)
+    return await handleFetchResponse(response)
+  },
+
+  async getSfdcObjectsFromTeamIntegration() {
+    const response = await euphoritechFetch(`/api/1.0/integrations/salesforce/team/objects/get`)
+    return await handleFetchResponse(response)
+  },
+
+  async saveSfdcObjectAndAttributesIntegration(obj) {
+    const response = await euphoritechFetch(`/api/1.0/integrations/salesforce/team/objects/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(obj)
+    })
+    return await handleFetchResponse(response)
+  },
+
   async saveTeamIntegration(obj) {
     const response = await euphoritechFetch(`/api/1.0/integrations/team/save`, {
       method: 'POST',

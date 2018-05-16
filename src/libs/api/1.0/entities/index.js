@@ -72,6 +72,16 @@ export default {
     const currentTeamId = session.getCurrentLoggedInTeam()
     const entityRecord  = req.body.entity
 
+    const existingRecord = await entities.findBy({
+      team_id:        currentTeamId,
+      source:         entityRecord.source,
+      entity_type_id: entityRecord.entityTypeId,
+      uid:            entityRecord.uid
+    })
+
+    if (existingRecord)
+      entities.setRecord(existingRecord)
+
     entities.setRecord({
       team_id:        currentTeamId,
       name:           entityRecord.name,

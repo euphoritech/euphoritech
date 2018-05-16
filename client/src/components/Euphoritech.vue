@@ -6,12 +6,16 @@
       nav-bar
       router-view
     vue-toastr(ref="toastr")
+    chat-widget(:logged-in="isLoggedIn")
     create-entity(:logged-in="isLoggedIn")
     settings(:logged-in="isLoggedIn")
 </template>
 
 <script>
   import NavBar from './NavBar'
+  import ChatWidget from './ChatWidget'
+  import CreateEntityModal from './entities/CreateEntityModal'
+  import SettingsContainer from './settings/SettingsContainer'
   import ApiAuth from '../factories/ApiAuth'
   import euphoritechSocket from '../factories/EuphoritechSocket'
 
@@ -22,10 +26,6 @@
       return {
         isLoggedIn: false
       }
-    },
-
-    components: {
-      NavBar
     },
 
     mounted() {
@@ -57,6 +57,13 @@
         this.$store.commit('APP_NO_LONGER_LOADING')
         this.isLoggedIn = isLoggedIn
       })
+    },
+
+    components: {
+      ChatWidget,
+      CreateEntity: CreateEntityModal,
+      NavBar,
+      Settings: SettingsContainer,
     }
   }
 </script>

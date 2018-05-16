@@ -24,26 +24,46 @@ export default function SalesforceApi({ id, postgres }) {
       })
     },
 
-    async attributes(sfdcObjectName, entireAttributeObject=false) {
+    async objects(onlyName=true) {
+      await this.connect()
+      const info = await this.connection.describeGlobal()
+
+      // Only return name if we don't care about all the other
+      // info for all objects.
+      if (onlyName)
+        return info.sobjects.map(o => o.name)
+
+      return info.sobjects
+    },
+
+    async objectAttributes(sfdcObjectName, onlyName=true) {
       await this.connect()
       const info = await this.connection.describe(sfdcObjectName)
 
       // Only return name if we don't care about all the other
       // info for all objects.
-      if (!entireAttributeObject)
+      if (onlyName)
         return info.fields.map(f => f.name)
 
       return info.fields
     },
 
+    // https://jsforce.github.io/document/#search
+    async search(objectName, searchText) {
+      await this.connect()
+      const result  = await this.connection.search(`FIND {*${searchText}*} IN ALL FIELDS RETURNING ${objectName}(Id, Name)`)
+      return result.searchRecords
+    },
+
     // https://jsforce.github.io/document/#using-soql
     async query(queryString, individualCallback=NOOP, maxFetch=5000) {
+      await this.connect()
       return await new Promise((resolve, reject) => {
-        const query = connection.query(queryString)
+        const query = this.connection.query(queryString)
         .on("record", individualCallback)
         .on("end", () => resolve(query))
         .on("error", reject)
-        .run({ autoFetch : true, maxFetch : maxFetch })
+        .run({ autoFetch: true, maxFetch })
       })
     }
   }

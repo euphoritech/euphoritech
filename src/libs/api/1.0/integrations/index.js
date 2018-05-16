@@ -1,6 +1,8 @@
 import GithubApi from '../../../GithubApi'
+import SalesforceApi from '../../../SalesforceApi'
 import SessionHandler from '../../../SessionHandler'
 import TeamIntegrations from '../../../models/TeamIntegrations'
+import TeamIntegrationsSalesforce from '../../../models/TeamIntegrationsSalesforce'
 import UserOauthIntegrations from '../../../models/UserOauthIntegrations'
 
 export default {
@@ -70,7 +72,7 @@ export default {
     }
   },
 
-  async ['github/item/find']({ req, res, postgres}) {
+  async ['github/item/find']({ req, res, postgres }) {
     const session     = SessionHandler(req.session)
     const userId      = session.getLoggedInUserId()
     const teamInt     = session.getLoggedInTeamIntegrations()
@@ -91,6 +93,112 @@ export default {
     } else {
       res.status(400).json({ error: res.__(`No GitHub team integration found for your user ID`) })
     }
+  },
+
+  async ['salesforce/objects/get']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const integrations  = session.getLoggedInTeamIntegrations()
+    const searchText    = req.query.search
+
+    let objectNames = []
+    if (integrations && integrations.salesforce) {
+      if (integrations.salesforce.objects) {
+        objectNames = integrations.salesforce.objects
+      } else {
+        const userIntegrationid = integrations.salesforce.user_oauth_int_id
+        const api = SalesforceApi({ id: userIntegrationid, postgres })
+        objectNames = await api.objects()
+
+        // Set in the session for caching later until session is reset
+        session.setSession({ objects: objectNames }, integrations.salesforce)
+      }
+
+      if (searchText)
+        objectNames = objectNames.filter(n => (new RegExp(`.*${searchText}.*`, 'i')).test(n))
+    }
+
+    res.json({ objects: objectNames })
+  },
+
+  async ['salesforce/attributes/get']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const integrations  = session.getLoggedInTeamIntegrations()
+    const objectName    = req.query.object
+    const searchText    = req.query.search
+
+    let attributes = []
+    if (integrations && integrations.salesforce) {
+      if (integrations.salesforce.object && integrations.salesforce.object[objectName]) {
+        attributes = integrations.salesforce.object[objectName]
+      } else {
+        const userIntegrationid = integrations.salesforce.user_oauth_int_id
+        const api = SalesforceApi({ id: userIntegrationid, postgres })
+        attributes = await api.objectAttributes(objectName)
+
+        // Set in the session for caching later until session is reset
+        session.setSession({ object: { [objectName]: attributes }}, integrations.salesforce)
+      }
+
+      if (searchText)
+        attributes = attributes.filter(n => (new RegExp(`.*${searchText}.*`, 'i')).test(n))
+    }
+
+    res.json({ attributes })
+  },
+
+  async ['salesforce/records/get']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const sfdcInst      = TeamIntegrationsSalesforce(postgres)
+    const integrations  = session.getLoggedInTeamIntegrations()
+    const sfdcIntId     = req.query.int_id
+    const searchText    = req.query.search
+
+    let records = []
+    if (integrations && integrations.salesforce) {
+      const userIntegrationid = integrations.salesforce.user_oauth_int_id
+      const api = SalesforceApi({ id: userIntegrationid, postgres })
+      const instRecord = await sfdcInst.find(sfdcIntId)
+      const foundRecords = await api.search(instRecord.object_name, searchText)
+
+      await api.query(`
+        select ${Object.values(instRecord.attribute_info).filter(a => !!a)}
+        from ${instRecord.object_name}
+        where Id in ('${foundRecords.map(r => r.Id).join("','")}')
+      `, rec => records.push(rec))
+    }
+
+    res.json({ records })
+  },
+
+  async ['salesforce/team/objects/get']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const sfdcInst      = TeamIntegrationsSalesforce(postgres)
+    const searchText    = req.query.search
+
+    let records = await sfdcInst.getAllBy({ team_id: currentTeamId })
+    if (searchText)
+      records = records.filter(int => (new RegExp(`.*${searchText}.*`, 'i')).test(int.object_name))
+
+    res.json({ records })
+  },
+
+  async ['salesforce/team/objects/save']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const sfdcInst      = TeamIntegrationsSalesforce(postgres)
+    const recordId      = req.body.id
+    const objectName    = req.body.object
+    const attrInfo      = req.body.attrs
+
+    if (recordId) {
+      const record = await sfdcInst.findBy({ team_id: currentTeamId, id: recordId })
+      sfdcInst.setRecord(record || {})
+    }
+
+    sfdcInst.setRecord({ team_id: currentTeamId, object_name: objectName, attribute_info: attrInfo })
+    await sfdcInst.save()
+    return res.json(true)
   },
 
   async ['team/save']({ req, res, postgres, redis }) {

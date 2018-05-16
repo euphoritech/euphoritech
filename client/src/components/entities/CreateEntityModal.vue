@@ -39,7 +39,18 @@
                 </div>
               </b-tab>
               <b-tab v-if="hasSfdc" title="Salesforce">
-                this is SFDC!
+                <component v-show="entityData.source !== 'salesforce'" is="Salesforce" @setEntityData="setEntityData"></component>
+                <div v-show="entityData.source === 'salesforce'">
+                  <div class="text-right">
+                    <a href="javascript:void(0)" @click="resetData()">Reset</a>
+                  </div>
+                  <b-row class="margin-bottom-medium" v-for="(label, key) in salesforce.dataLabelMap" :key="key">
+                    <b-col cols="3">
+                      <strong>{{ label }}</strong>
+                    </b-col>
+                    <b-col cols="9">{{ entityData[key] || 'Nothing here...' }}</b-col>
+                  </b-row>
+                </div>
               </b-tab>
             </b-tabs>
           </b-card>
@@ -55,6 +66,7 @@
 
 <script>
   import Github from './Github'
+  import Salesforce from './Salesforce'
   import ApiEntities from '../../factories/ApiEntities'
   import SnackbarFactory from '../../factories/SnackbarFactory'
   import EuphoritechSocket from '../../factories/EuphoritechSocket'
@@ -95,6 +107,21 @@
             mod3: 'API Link',
             mod4: 'User Created',
             mod5: 'Closed At'
+          }
+        },
+
+        salesforce: {
+          dataLabelMap: {
+            uid: 'Unique Identifier',
+            name: 'Name',
+            description: 'Description',
+            external_link: 'External Link',
+            due_date: 'Due Date',
+            mod1: 'Extra Parameter 1',
+            mod2: 'Extra Parameter 2',
+            mod3: 'Extra Parameter 3',
+            mod4: 'Extra Parameter 4',
+            mod5: 'Extra Parameter 5'
           }
         }
       }
@@ -148,7 +175,8 @@
     },
 
     components: {
-      Github
+      Github,
+      Salesforce
     },
   }
 </script>
