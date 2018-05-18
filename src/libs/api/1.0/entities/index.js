@@ -57,12 +57,13 @@ export default {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
+    const status        = req.query.status || 'active'
     const entityTypeId  = req.query.type_id
     const pageNumber    = req.query.page
     const numPerPage    = req.query.per_page
     // const orderBy       = req.query.order_by
 
-    const records = await entities.findByTypeId(parseInt(entityTypeId), { page: pageNumber, pageSize: numPerPage })
+    const records = await entities.findByTypeId(parseInt(entityTypeId), status, { page: pageNumber, pageSize: numPerPage })
     res.json({ records })
   },
 
@@ -108,12 +109,27 @@ export default {
     const currentTeamId = session.getCurrentLoggedInTeam()
     const entityRecord  = req.body.entity
 
-    const record = entities.findBy({ id: entityRecord.id, team_id: currentTeamId })
+    const record = await entities.findBy({ team_id: currentTeamId, id: entityRecord.id })
     if (record) {
       entities.setRecord(Object.assign(record, entityRecord))
       await entities.save()
       return res.json(true)
     }
-    res.status(404).json({ error: "There is no entity record that we found to update." })
+    res.status(404).json({ error: res.__("There is no entity record that we found to update.") })
+  },
+
+  async delete({ req, res, postgres, log }) {
+    const entities      = TeamEntities(postgres)
+    const session       = SessionHandler(req.session)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const entityId      = req.query.id
+
+    const record = await entities.findBy({ team_id: currentTeamId, id: parseInt(entityId) })
+    if (record) {
+      entities.setRecord(Object.assign(record, { status: 'deleted' }))
+      await entities.save()
+      return res.json(true)
+    }
+    res.status(404).json({ error: res.__("There is no entity record that we found to delete.") })
   }
 }

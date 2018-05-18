@@ -8,7 +8,7 @@
           b-row
             b-col(v-if="isLoadingLocal")
               loader
-            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",@changeEntityType="removeEntity",v-if="!isLoadingLocal")
+            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",@changeEntityTypeOrRemove="removeEntity",v-if="!isLoadingLocal")
 </template>
 
 <script>

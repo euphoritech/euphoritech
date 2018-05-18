@@ -101,7 +101,7 @@
             uid: 'Unique ID',
             name: 'Title',
             description: 'Description',
-            dueDate: 'Due Date',
+            // dueDate: 'Due Date',
             mod1: 'Repository',
             mod2: 'HTML Link',
             mod3: 'API Link',

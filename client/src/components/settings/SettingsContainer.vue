@@ -61,7 +61,7 @@
             { header: 'Personal', id: "personal", component: Personal },
             { header: 'Integrations', id: "integrations", component: Integrations },
             { header: 'Record Types', id: 'entities', component: RecordTypes },
-            { header: 'Teams', id: 'teams', content: 'My infor' },
+            // { header: 'Teams', id: 'teams', content: 'My infor' },
             { header: 'Team Users', id: "users", component: TeamUsers }
           ]
         }

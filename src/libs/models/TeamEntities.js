@@ -7,17 +7,26 @@ export default function TeamEntities(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'team_id', 'name', 'description', 'source', 'entity_type_id',
+        'team_id', 'status', 'name', 'description', 'source', 'entity_type_id',
         'uid', 'external_link', 'due_date', 'mod1', 'mod2', 'mod3', 'mod4', 'mod5'
       ],
 
-      async findByTypeId(typeId, { page, pageSize, searchFilter, orderBy } = {}) {
+      async findByTypeId(typeId, status='active', { page, pageSize, searchFilter, orderBy } = {}) {
         page = page || 1
         pageSize = pageSize || 30
         searchFilter = searchFilter || null
         orderBy = orderBy || 'lower(e.name)'
 
+        let queryParams = [ typeId, orderBy, pageSize, (page-1) * pageSize ]
         let additionalSearchFilter = ''
+        if (status) {
+          if (status instanceof Array) {
+            // TODO handle if multiple statuses are provided as array
+          } else {
+            additionalSearchFilter = `${additionalSearchFilter} and e.status = '${status.replace("'", "''")}'`
+          }
+        }
+
         if (searchFilter)
           additionalSearchFilter = `and e.name ilike '%${searchFilter}%'`
 
@@ -29,7 +38,7 @@ export default function TeamEntities(postgres) {
           order by $2
           limit $3
           offset $4
-        `, [ typeId, orderBy, pageSize, (page-1) * pageSize ])
+        `, queryParams)
         return rows
       },
 

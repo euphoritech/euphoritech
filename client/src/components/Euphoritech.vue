@@ -3,7 +3,7 @@
     div(v-if="$store.state.isLoading")
       loader
     div(v-if="!$store.state.isLoading")
-      nav-bar
+      top-main-nav-bar
       div.primary-view-wrapper
         div.d-none.d-sm-block(v-if="isLoggedIn")
           side-main-nav
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  import NavBar from './NavBar'
+  import TopMainNavBar from './TopMainNavBar'
   import ChatWidget from './ChatWidget'
   import SideMainNav from './SideMainNav'
   import CreateEntityModal from './entities/CreateEntityModal'
@@ -66,7 +66,7 @@
     components: {
       ChatWidget,
       CreateEntity: CreateEntityModal,
-      NavBar,
+      TopMainNavBar,
       Settings: SettingsContainer,
       SideMainNav
     }

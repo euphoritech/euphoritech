@@ -49,5 +49,13 @@ export default {
       body: JSON.stringify({ entity })
     })
     return await handleFetchResponse(response)
-  }
+  },
+
+  async deleteEntity(id) {
+    const response = await euphoritechFetch(`/api/1.0/entities/delete?id=${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    return await handleFetchResponse(response)
+  },
 }

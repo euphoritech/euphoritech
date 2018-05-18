@@ -250,6 +250,7 @@ export function migrations(postgres) {
         CREATE TABLE IF NOT EXISTS team_entities (
           id bigserial PRIMARY KEY,
           team_id bigint REFERENCES teams,
+          status varchar(255) default 'active',
           source varchar(255),
           name varchar(255),
           description text,
@@ -270,6 +271,7 @@ export function migrations(postgres) {
 
     async function createTeamEntitiesIndexes() {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_idx on team_entities (team_id)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_status_idx on team_entities (team_id, status)`)
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_source_idx on team_entities (team_id, source)`)
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_entity_type_id_idx on team_entities (team_id, entity_type_id)`)
     },

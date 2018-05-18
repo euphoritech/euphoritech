@@ -34,10 +34,22 @@
                 th Source
                 th Unique ID
                 th Due Date
-                th
             tbody
               tr(v-for="(record, ind) in recordsSorted")
-                td {{ ind + 1 }}.
+                td
+                  span {{ ind + 1 }}.
+                  a.cog.margin-left-small(:id="'edit-record-' + ind",href="javascript:void(0)")
+                    i.fa.fa-cog
+                  b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
+                    div
+                      strong {{ truncateString(record.name, 20) }}
+                    hr(style="margin-top: 5px; margin-bottom: 5px;")
+                    div Change record type:
+                    b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityTypeOrRemove(record.id, ind)")
+                    div.all-small-inputs Due Date
+                      datepicker(v-model="record.due_date",@input="changeDueDate(record.due_date, record.id)")
+                    div.margin-top-medium.text-center
+                      a.text-danger(href="javascript:void(0)",@click="deleteEntity(record.id, ind)") Delete Record
                 td.nowrap-ellipses.max-150.strong-text(:id="'record-name-' + ind")
                   strong
                     a.entity-link(:href="'/dashboard/entity/' + record.id") {{ record.name }}
@@ -47,17 +59,6 @@
                 td {{ record.source }}
                 td {{ record.uid }}
                 td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
-                td
-                  a.cog(:id="'edit-record-' + ind",href="javascript:void(0)")
-                    i.fa.fa-cog
-                  b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
-                    div
-                      strong {{ truncateString(record.name, 20) }}
-                    hr(style="margin-top: 5px; margin-bottom: 5px;")
-                    div Change record type:
-                    b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityType(record.id, ind)")
-                    div.all-small-inputs Due Date
-                      datepicker(v-model="record.due_date",@input="changeDueDate(record.due_date, record.id)")
 </template>
 
 <script>
@@ -124,14 +125,22 @@
         toast.open("Successfully set due date!")
       },
 
-      changeEntityType(entityId, ind) {
+      async deleteEntity(entityId, ind) {
+        const toast = SnackbarFactory(this)
+        await ApiEntities.deleteEntity(entityId)
+        this.closeEntityEditPopover(ind)
+        this.$emit('changeEntityTypeOrRemove', entityId)
+        toast.open("Successfully deleted record!")
+      },
+
+      changeEntityTypeOrRemove(entityId, ind) {
         // TODO: remove after the following issue is fixed:
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/1772
         setTimeout(async () => {
           await ApiEntities.updateEntity({ id: entityId, entity_type_id: this.currentTypeId })
           this.closeEntityEditPopover(ind)
           this.currentTypeId = this.type_id
-          this.$emit('changeEntityType', entityId)
+          this.$emit('changeEntityTypeOrRemove', entityId)
         }, 100)
       },
 

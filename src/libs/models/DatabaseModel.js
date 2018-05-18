@@ -128,6 +128,10 @@ export default function DatabaseModel(postgres, table) {
          }
       }
       return false
+    },
+
+    async delete(id) {
+      return await postgres.query(`delete from ${table} where id = $1`, [ id ])
     }
   }
 }
