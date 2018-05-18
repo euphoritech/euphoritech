@@ -4,7 +4,10 @@
       loader
     div(v-if="!$store.state.isLoading")
       nav-bar
-      router-view
+      div.primary-view-wrapper
+        div.d-none.d-sm-block(v-if="isLoggedIn")
+          side-main-nav
+        router-view
     vue-toastr(ref="toastr")
     chat-widget(:logged-in="isLoggedIn")
     create-entity(:logged-in="isLoggedIn")
@@ -14,6 +17,7 @@
 <script>
   import NavBar from './NavBar'
   import ChatWidget from './ChatWidget'
+  import SideMainNav from './SideMainNav'
   import CreateEntityModal from './entities/CreateEntityModal'
   import SettingsContainer from './settings/SettingsContainer'
   import ApiAuth from '../factories/ApiAuth'
@@ -64,6 +68,7 @@
       CreateEntity: CreateEntityModal,
       NavBar,
       Settings: SettingsContainer,
+      SideMainNav
     }
   }
 </script>
