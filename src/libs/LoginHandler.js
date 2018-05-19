@@ -1,4 +1,4 @@
-import Errors from './errors'
+import Errors from '../errors'
 import Teams from './models/Teams'
 import TeamEntityTypes from './models/TeamEntityTypes'
 import TeamUserAccessRequest from './models/TeamUserAccessRequest'

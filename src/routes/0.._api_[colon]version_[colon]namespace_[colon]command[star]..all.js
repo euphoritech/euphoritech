@@ -9,7 +9,7 @@ import config from '../config'
 const log = bunyan.createLogger(config.logger.options)
 const postgres  = new PostgresClient()
 const redis     = new RedisHelper()
-const events    = TeamEvents(postgres, { logger: log, redis })
+const events    = TeamEvents(postgres, { redis })
 
 export default {
   createRouteWithOptions({ io }) {

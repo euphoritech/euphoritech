@@ -1,4 +1,4 @@
-import Errors from './errors'
+import Errors from '../errors'
 import Users from './models/Users'
 import UserOauthIntegrations from './models/UserOauthIntegrations'
 import LoginHandler from './LoginHandler'

@@ -3,8 +3,7 @@ import config from '../../config'
 
 export default function EventWorkers(options={}) {
   const postgres  = options.postgres
-  const logger    = options.log
-  const events    = TeamEvents(postgres, { logger })
+  const events    = TeamEvents(postgres)
 
   return {
     fireEvent: {
@@ -15,8 +14,8 @@ export default function EventWorkers(options={}) {
           retryDelay: 1000 * 5,
         }
       },
-      perform: async (teamId, type) => {
-        const results = await events.fireSync(teamId, type)
+      perform: async (teamId, type, params) => {
+        const results = await events.fireSync(teamId, type, params)
         return (results) ? results.length : results
       }
     }

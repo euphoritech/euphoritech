@@ -15,12 +15,12 @@ export default function Extensions(postgres) {
         'description', 'filename', 'name', 'method', 'params'
       ],
 
-      async execute(id=this.record.id, params=[]) {
+      async execute(id=this.record.id, params=null) {
         const record        = await this.find(id)
         const fileContents  = await s3.getFile(record.filename)
         const localExports  = requireFromString(fileContents.Body.toString('utf8'))
         if (record.method)
-          return await localExports[record.method](...params)
+          return await localExports[record.method](params)
 
         return localExports
       }

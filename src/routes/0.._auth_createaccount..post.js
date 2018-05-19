@@ -1,6 +1,6 @@
 import bunyan from 'bunyan'
 import NodeResque from 'node-resque'
-import Errors from '../libs/errors'
+import Errors from '../errors'
 import PostgresClient from '../libs/PostgresClient'
 import RedisHelper from '../libs/RedisHelper'
 import LoginHandler from '../libs/LoginHandler'

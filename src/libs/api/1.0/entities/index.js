@@ -2,7 +2,6 @@ import SessionHandler from '../../../SessionHandler'
 import TeamEntities from '../../../models/TeamEntities'
 import TeamEntityLinks from '../../../models/TeamEntityLinks'
 import TeamEntityTypes from '../../../models/TeamEntityTypes'
-import TeamEvents from '../../../models/TeamEvents'
 
 export default {
   async get({ req, res, postgres }) {

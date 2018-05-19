@@ -7,7 +7,7 @@ import config from '../../config'
 
 const s3 = Aws().S3
 
-export default function TeamEvents(postgres, { logger, redis }) {
+export default function TeamEvents(postgres, { redis }={}) {
   const factoryToExtend = DatabaseModel(postgres, 'team_events')
   const extensions      = Extensions(postgres)
 
@@ -25,27 +25,27 @@ export default function TeamEvents(postgres, { logger, redis }) {
         UPDATE_ENTITY:      'Update Record'
       },
 
-      async fire(team_id, type) {
+      async fire(team_id, type, params=null) {
         const queue = new NodeResque.Queue({ connection: { redis: redis.client }})
         await queue.connect()
-        await queue.enqueue(config.resque.default_queue, 'fireEvent', [team_id, type])
+        await queue.enqueue(config.resque.default_queue, 'fireEvent', [team_id, type, params])
       },
 
-      async fireSync(team_id, type) {
-        try {
-          const eventsToFire = await this.getAllBy({ team_id, type })
-          if (eventsToFire && eventsToFire.length > 0) {
-            const results = await Promise.all(
-              eventsToFire.map(async evt => await extensions.execute(evt.extension_id, evt.params))
-            )
-            return results
-          }
-          return false
-
-        } catch(err) {
-          if (logger)
-            logger.error(err)
+      async fireSync(team_id, type, params=null) {
+        const eventsToFire = await this.getAllBy({ team_id, type })
+        if (eventsToFire && eventsToFire.length > 0) {
+          return await Promise.all(
+            eventsToFire.map(async evt => {
+              // TODO: evt.params contains what parameters that may need
+              // to be specified by the user when configuring a new event.
+              // params passed as an argument in fireSync is any information
+              // passed about the event itself. Determine how to link them here
+              // before passing them to extension#execute
+              return await extensions.execute(evt.extension_id, Object.assign({}, evt.params || {}, params || {}))
+            })
+          )
         }
+        return false
       }
     }
   )

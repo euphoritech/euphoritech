@@ -1,6 +1,6 @@
 import PassportLocal from "passport-local"
 import Users from '../libs/models/Users'
-import Errors from '../libs/errors'
+import Errors from '../errors'
 import LoginHandler from '../libs/LoginHandler'
 import config from '../config'
 
