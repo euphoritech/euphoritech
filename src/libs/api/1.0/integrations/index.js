@@ -87,7 +87,7 @@ export default {
       const itemInfo = await api.repo.getIssueOrPullRequest(number, repo, teamGithubInt.mod1)
 
       if (!itemInfo)
-        return res.status(404).json({ error: res.__("No item with the ID provided.") })
+        return res.status(404).json({ error: res.__("No issue or PR with the ID provided.") })
 
       return res.json({ result: itemInfo.data })
     } else {

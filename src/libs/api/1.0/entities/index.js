@@ -2,6 +2,7 @@ import SessionHandler from '../../../SessionHandler'
 import TeamEntities from '../../../models/TeamEntities'
 import TeamEntityLinks from '../../../models/TeamEntityLinks'
 import TeamEntityTypes from '../../../models/TeamEntityTypes'
+import TeamEvents from '../../../models/TeamEvents'
 
 export default {
   async get({ req, res, postgres }) {
@@ -31,7 +32,7 @@ export default {
     res.json({ types })
   },
 
-  async ['type/update']({ req, res, postgres, redis }) {
+  async ['type/update']({ req, res, postgres, redis, events }) {
     const typeRecord    = req.body.record
     const typesInst     = TeamEntityTypes(postgres)
     const session       = SessionHandler(req.session, { redis })
@@ -45,6 +46,8 @@ export default {
     await typesInst.save()
     await session.resetTeamSessionRefresh(currentTeamId)
     res.json(true)
+
+    await events.fire(currentTeamId, events.types.UPDATE_ENTITY_TYPE)
   },
 
   async ['links/get']({ req, res, postgres }) {
@@ -67,7 +70,7 @@ export default {
     res.json({ records })
   },
 
-  async create({ req, res, postgres }) {
+  async create({ req, res, postgres, events }) {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
@@ -101,9 +104,11 @@ export default {
     const newEntityId = await entities.save()
 
     res.json({ id: newEntityId })
+
+    await events.fire(currentTeamId, events.types.CREATE_ENTITY)
   },
 
-  async update({ req, res, postgres }) {
+  async update({ req, res, postgres, events }) {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
@@ -113,12 +118,14 @@ export default {
     if (record) {
       entities.setRecord(Object.assign(record, entityRecord))
       await entities.save()
-      return res.json(true)
+      res.json(true)
+
+      return await events.fire(currentTeamId, events.types.UPDATE_ENTITY)
     }
     res.status(404).json({ error: res.__("There is no entity record that we found to update.") })
   },
 
-  async delete({ req, res, postgres, log }) {
+  async delete({ req, res, postgres, events }) {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
@@ -128,7 +135,9 @@ export default {
     if (record) {
       entities.setRecord(Object.assign(record, { status: 'deleted' }))
       await entities.save()
-      return res.json(true)
+      res.json(true)
+
+      return await events.fire(currentTeamId, events.types.DELETE_ENTITY)
     }
     res.status(404).json({ error: res.__("There is no entity record that we found to delete.") })
   }

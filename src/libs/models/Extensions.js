@@ -12,15 +12,15 @@ export default function Extensions(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'description', 'filename', 'name'
+        'description', 'filename', 'name', 'method', 'params'
       ],
 
-      async execute(id=this.record.id, methodToInvoke=null) {
-        const record        = await this.findByColumn(id)
+      async execute(id=this.record.id, params=[]) {
+        const record        = await this.find(id)
         const fileContents  = await s3.getFile(record.filename)
         const localExports  = requireFromString(fileContents.Body.toString('utf8'))
-        if (methodToInvoke)
-          return await localExports[methodToInvoke]
+        if (record.method)
+          return await localExports[record.method](...params)
 
         return localExports
       }

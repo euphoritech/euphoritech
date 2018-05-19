@@ -99,6 +99,20 @@ export default {
       }
       return data
     }
+  },
+
+  watch: {
+    error(newVal) {
+      this.$emit('onError', newVal)
+    },
+
+    isEmpty(newVal) {
+      this.$emit('isEmpty', newVal)
+    },
+
+    loading(newVal) {
+      this.$emit('isLoading', newVal)
+    }
   }
 }
 </script>

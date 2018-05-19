@@ -10,6 +10,9 @@
           strong {{ selectedRepo }}
           i.margin-left-small.fa.fa-times(style="color: red; cursor: pointer;",@click="selectedRepo = null")
         b-form-input(v-model="itemNumber",@keyup.native="getIssueOrPr")
+        div.text-center(v-if="isLoadingLocal")
+          loader
+        b-alert.text-center.margin-top-medium(:show="!!error",variant="danger") {{ error }}
 </template>
 
 <script>
@@ -19,6 +22,8 @@
   export default {
     data() {
       return {
+        error: null,
+        isLoadingLocal: false,
         itemNumber: null,
         selectedRepo: null
       }
@@ -30,11 +35,21 @@
       },
 
       async getIssueOrPr(evt) {
+        this.error = null
         const toast = SnackbarFactory(this)
 
         if (evt.keyCode === 13) {
           if (this.itemNumber) {
-            const result = (await ApiIntegrations.githubFindItemInRepo({ repo: this.selectedRepo, num: this.itemNumber })).result
+            this.isLoadingLocal = true
+
+            let result
+            try {
+              result = (await ApiIntegrations.githubFindItemInRepo({ repo: this.selectedRepo, num: this.itemNumber })).result
+            } catch(err) {
+              this.isLoadingLocal = false
+              return this.error = err.message
+            }
+
             this.$emit("setEntityData", {
               source: 'github',
               name: result.title,
@@ -46,6 +61,8 @@
               mod4: result.user.login,
               mod5: result.closed_at
             })
+
+            this.isLoadingLocal = false
           } else {
             toast.open("Please enter a valid issue or PR ID to find.", 'error')
           }

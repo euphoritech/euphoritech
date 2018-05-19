@@ -183,9 +183,11 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS extensions (
           id bigserial PRIMARY KEY,
-          name varchar(255),
           filename varchar(255),
+          name varchar(255),
           description text,
+          method varchar(255),
+          params jsonb,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );
@@ -193,25 +195,28 @@ export function migrations(postgres) {
     },
 
     async function createExtensionsIndexes() {
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS extensions_name_idx on extensions (name)`)
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS extensions_filename_idx on extensions (filename)`)
     },
 
-    async function createExtensionsTriggers() {
+    async function createTeamEvents() {
       await postgres.query(`
-        CREATE TABLE IF NOT EXISTS extensions_triggers (
+        CREATE TABLE IF NOT EXISTS team_events (
           id bigserial PRIMARY KEY,
+          team_id bigint REFERENCES teams,
+          user_id bigint REFERENCES users,
+          type varchar(255),
           extension_id bigint REFERENCES extensions,
-          map_table varchar(255),
-          map_id bigint,
+          params jsonb,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );
       `)
     },
 
-    async function createExtensionsTriggersIndexes() {
-      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS extensions_triggers_extension_id_idx on extensions_triggers (extension_id)`)
-      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS extensions_triggers_table_map_id_idx on extensions_triggers (map_table, map_id)`)
+    async function createTeamEventsIndexes() {
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_events_team_id_type_idx on team_events (team_id, type)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_events_team_id_user_id_idx on team_events (team_id, user_id)`)
     },
 
     async function createTeamEntityTypes() {

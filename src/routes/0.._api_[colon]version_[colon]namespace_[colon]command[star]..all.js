@@ -3,11 +3,13 @@ import ApiVersions from '../libs/api/'
 import PostgresClient from '../libs/PostgresClient'
 import RedisHelper from '../libs/RedisHelper'
 import Routes from '../libs/Routes'
+import TeamEvents from '../libs/models/TeamEvents'
 import config from '../config'
 
 const log = bunyan.createLogger(config.logger.options)
 const postgres  = new PostgresClient()
 const redis     = new RedisHelper()
+const events    = TeamEvents(postgres, { logger: log, redis })
 
 export default {
   createRouteWithOptions({ io }) {
@@ -21,7 +23,15 @@ export default {
         const finalCommand  = (additional) ? `${command}${additional}` : command
 
         try {
-          await ApiVersions[version][namespace][finalCommand]({ req, res, log, postgres, redis, io })
+          await ApiVersions[version][namespace][finalCommand]({
+            req,
+            res,
+            log,
+            postgres,
+            redis,
+            io,
+            events
+          })
         } catch(err) {
           log.error("Error with API request", err)
           res.sendStatus(500)
