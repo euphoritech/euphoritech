@@ -43,7 +43,7 @@ export default function webServer() {
 
         const RedisStore = ConnectRedis(session)
         const sessionMiddleware = session({
-          store:              new RedisStore({client: config.redis.client, ttl: 60 * 60 * 24 * 30}),
+          store:              new RedisStore({ client: redis.client, ttl: 60 * 60 * 24 * 30 }),
           secret:             config.session.sessionSecret,
           key:                config.session.sessionCookieKey,
           resave:             true,

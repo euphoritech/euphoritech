@@ -11,13 +11,42 @@ export default function TeamEntities(postgres) {
         'uid', 'external_link', 'due_date', 'mod1', 'mod2', 'mod3', 'mod4', 'mod5'
       ],
 
-      async findByTypeId(typeId, status='active', { page, pageSize, searchFilter, orderBy } = {}) {
+      async createOrUpdate(teamId, entityRecord) {
+        const existingRecord = await this.findBy({
+          team_id:        teamId,
+          source:         entityRecord.source,
+          entity_type_id: entityRecord.entityTypeId,
+          uid:            entityRecord.uid
+        })
+
+        if (existingRecord)
+          this.setRecord(existingRecord)
+
+        this.setRecord({
+          team_id:        teamId,
+          name:           entityRecord.name,
+          description:    entityRecord.description,
+          source:         entityRecord.source,
+          entity_type_id: entityRecord.entityTypeId,
+          uid:            entityRecord.uid,
+          external_link:  entityRecord.external_link,
+          due_date:       entityRecord.dueDate,
+          mod1:           entityRecord.mod1,
+          mod2:           entityRecord.mod2,
+          mod3:           entityRecord.mod3,
+          mod4:           entityRecord.mod4,
+          mod5:           entityRecord.mod5
+        })
+        return await this.save()
+      },
+
+      async findByTypeId(teamId, typeId, status='active', { page, pageSize, searchFilter, orderBy } = {}) {
         page = page || 1
         pageSize = pageSize || 30
         searchFilter = searchFilter || null
         orderBy = orderBy || 'lower(e.name)'
 
-        let queryParams = [ typeId, orderBy, pageSize, (page-1) * pageSize ]
+        let queryParams = [ teamId, typeId, orderBy, pageSize, (page-1) * pageSize ]
         let additionalSearchFilter = ''
         if (status) {
           if (status instanceof Array) {
@@ -33,11 +62,12 @@ export default function TeamEntities(postgres) {
         const { rows } = await postgres.query(`
           select e.*
           from team_entity_types as t
-          inner join team_entities as e on e.entity_type_id = t.id
-          where t.id = $1 ${additionalSearchFilter}
-          order by $2
-          limit $3
-          offset $4
+          inner join team_entities as e on e.team_id = t.team_id and e.entity_type_id = t.id
+          where t.team_id = $1 and
+          t.id = $2 ${additionalSearchFilter}
+          order by $3
+          limit $4
+          offset $5
         `, queryParams)
         return rows
       },

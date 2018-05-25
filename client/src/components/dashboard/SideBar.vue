@@ -14,6 +14,7 @@
             strong
               u Record Types
           b-list-group-item(:class="isActiveClass(type.id)",:href="'/dashboard/type/' + type.id",v-for="type in typesSorted",:key="type.id") {{ type.name }}
+          b-list-group-item(class="soft-text",:class="isActiveClass('deleted')",href="/dashboard/type/deleted") Deleted Records
 </template>
 
 <script>
@@ -37,7 +38,7 @@
         if (isHome)
           return (!this.activeTypeId) ? 'active' : ''
 
-        return (parseInt(this.activeTypeId) === parseInt(id)) ? 'active' : ''
+        return (this.activeTypeId && this.activeTypeId.toString() === id.toString()) ? 'active' : ''
       }
     }
   }

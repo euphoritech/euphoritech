@@ -22,7 +22,7 @@
                   b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Save Organization
                 div(v-if="!github.org")
                   b-form-checkbox(@change="selectGithubOrg({ login: true })") Use your personal GitHub account as the team's organization
-                  typeahead-input(:params="{ src: '/api/1.0/integrations/github/orgs/search', keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
+                  typeahead-input(src="/api/1.0/integrations/github/orgs/search",:params="{ keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
             hr(v-if="!userIsTeamIntegration('github')")
             div(v-if="!userIsTeamIntegration('github')")
               div(v-if="!user.hasGithub")
@@ -38,6 +38,27 @@
                   your team to search your repositories for PRs and issues that you and your
                   team would like to link to other records?
                 b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info and Save
+            div(v-if="github.orgType == 'org' && !!github.org")
+              hr
+              h3
+                span Bulk Record Import
+                b-badge.margin-left-small(v-if="github.bulk.numImported && github.bulk.numImported > 0",variant="primary",:pill="true") {{ github.bulk.numImported }} processed
+              div(v-if="!github.bulk.repo")
+                div
+                  small Find a repository in {{ github.org }}:
+                typeahead-input(:src="'/api/1.0/integrations/github/repos/search?org=' + github.org",:params="{ keysFromResponse: 'results', showProp: 'name', minChars: 1 }",@onHit="bulkImportSelectRepo")
+              div(v-if="github.bulk.repo")
+                div
+                  small
+                    a(href="javascript:void(0)",@click="github.bulk.repo = null") Reset Repo
+                //- div Repository to import records from:
+                //-   strong  {{ github.bulk.repo }}
+                b-row
+                  b-col(cols="12",md="6")
+                    div
+                      small Select a record type to assign the imported records to
+                    b-form-select(v-model="github.bulk.entityTypeId",:options="entityTypes",placeholder="Select a record type to assign the imported records to")
+                b-button.margin-top-small(variant="primary",@click="startBulkImport") Import Issues and Pull Requests from '{{ github.bulk.repo }}'
           b-tab(v-if="env.hasSfdc",title="Salesforce")
             div(v-if="!team.hasSfdc")
               div No team integration yet...
@@ -61,14 +82,17 @@
 <script>
   import OauthButton from '../OauthButton'
   import IntegrationsSalesforceObjects from './IntegrationsSalesforceObjects'
+  import ApiEntities from '../../factories/ApiEntities'
   import ApiEnv from '../../factories/ApiEnv'
   import ApiIntegrations from '../../factories/ApiIntegrations'
+  import EuphoritechSocket from '../../factories/EuphoritechSocket'
   import SnackbarFactory from '../../factories/SnackbarFactory'
 
   export default {
     data() {
       return {
         isLoadingLocal: true,
+        entityTypes: [],
         typeOptions: [{ text: 'Yes', value: 'org' }, { text: 'No', value: 'user' }],
 
         env: {
@@ -91,12 +115,29 @@
 
         github: {
           org: null,
-          orgType: 'org'
+          orgType: 'org',
+
+          bulk: {
+            isProcessing: false,
+            repo: null,
+            user: null,
+            entityTypeId: null,
+            numImported: 0
+          }
         }
       }
     },
 
     methods: {
+      bindSocketEvents() {
+        EuphoritechSocket.on('githubBulkAddedRecord', ({ record }) => {
+          // console.log("IMPORTED REC", record)
+          this.github.bulk.numImported++
+        })
+
+        EuphoritechSocket.on('githubBulkFinished', () => this.github.bulk.isProcessing = false)
+      },
+
       userIsTeamIntegration(type) {
         return (
           this.$store.state.auth.team_integrations[type] &&
@@ -105,19 +146,34 @@
         )
       },
 
+      bulkImportSelectRepo(repoRecord) {
+        this.github.bulk.repo = repoRecord.name
+      },
+
+      async startBulkImport() {
+        const toast = SnackbarFactory(this)
+
+        if (!this.github.bulk.entityTypeId)
+          return toast.open(`Please enter a valid entity type to classify the records being bulk imported.`, 'error')
+
+        this.github.bulk.isProcessing = true
+        EuphoritechSocket.emit('githubBulkRecordImportStart', { org: this.github.org, repo: this.github.bulk.repo, entityTypeId: this.github.bulk.entityTypeId })
+        toast.open(`Starting your bulk import now!`)
+      },
+
       async selectGithubOrg(repoInfo) {
         if (repoInfo.login === true) {
           const res = await ApiIntegrations.githubGetUserProfile()
-          return this.github = {
+          return this.github = Object.assign(this.github, {
             org: res.profile.login,
             orgType: 'user'
-          }
+          })
         }
         this.github.org = repoInfo.login
       },
 
       async useUserIntegration(type, onlyUpdateOrg=true) {
-        const toast   = SnackbarFactory(this)
+        const toast = SnackbarFactory(this)
 
         let requestObject = { type }
         switch(type) {
@@ -135,19 +191,26 @@
         }
 
         const response = await ApiIntegrations.saveTeamIntegration(requestObject)
-        toast.open(`Successfully added your ${type} integration to the team!`)
+        toast.open(`Starting your bulk import now!`)
       }
     },
 
     async created() {
-      const [ envHasGithub, envHasSfdc, envHasZendesk ] = await Promise.all([
+      this.bindSocketEvents()
+
+      const [ envHasGithub, envHasSfdc, envHasZendesk, entityTypes ] = await Promise.all([
         ApiEnv.hasIntegration('github'),
         ApiEnv.hasIntegration('salesforce'),
-        ApiEnv.hasIntegration('zendesk')
+        ApiEnv.hasIntegration('zendesk'),
+        ApiEntities.getTypes()
       ])
       this.env.hasGithub  = envHasGithub
       this.env.hasSfdc    = envHasSfdc
       this.env.hasZendesk = envHasZendesk
+
+      this.entityTypes = entityTypes.types.filter(t => !!t.is_active)
+        .map(t => ({ value: t.id, text: t.name }))
+        .sort((t1, t2) => (t1.text.toLowerCase() < t2.text.toLowerCase()) ? -1 : 1)
 
       this.team.hasGithub = !!this.$store.state.auth.team_integrations.github
       this.user.hasGithub = !!this.$store.state.auth.user_integrations.github
@@ -155,9 +218,9 @@
       this.team.hasSfdc = !!this.$store.state.auth.team_integrations.salesforce
       this.user.hasSfdc = !!this.$store.state.auth.user_integrations.salesforce
 
-      this.github = (this.$store.state.auth.team_integrations && this.$store.state.auth.team_integrations.github)
+      this.github = Object.assign(this.github, (this.$store.state.auth.team_integrations && this.$store.state.auth.team_integrations.github)
         ? { org: this.$store.state.auth.team_integrations.github.mod1, orgType:  this.$store.state.auth.team_integrations.github.mod2 }
-        : this.github
+        : this.github)
 
       this.isLoadingLocal = false
     },

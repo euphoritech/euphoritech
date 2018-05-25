@@ -27,7 +27,7 @@
       h3
         u Add new SF object integration
       div Search for Salesforce Objects
-      typeahead-input(:params="{ src: '/api/1.0/integrations/salesforce/objects/get', keysFromResponse: 'objects', minChars: 1 }",@onHit="selectSfdcObject")
+      typeahead-input(src="/api/1.0/integrations/salesforce/objects/get",:params="{ keysFromResponse: 'objects', minChars: 1 }",@onHit="selectSfdcObject")
     div(v-if="current.object")
       b-row
         b-col(cols="12",lg="4")
@@ -45,7 +45,7 @@
             b-form-radio-group(v-model="current.column")
               b-form-radio(v-for="(text, col) in columnKeyMap",v-if="!doesCurrentDataHaveAttributeSelected(col)",:value="col",:key="col") {{ columnKeyMap[col] }}
           div Search for an attribute in the
-          typeahead-input(:params="{ src: '/api/1.0/integrations/salesforce/attributes/get?object=' + current.object, keysFromResponse: 'attributes', minChars: 1 }",@onHit="selectSfdcAttribute")
+          typeahead-input(:src="'/api/1.0/integrations/salesforce/attributes/get?object=' + current.object",:params="{ keysFromResponse: 'attributes', minChars: 1 }",@onHit="selectSfdcAttribute")
         b-col.margin-top-medium.text-right(cols="12")
           b-button(size="lg",variant="primary",@click="saveObjectAndAttribute") Save Object and Attributes
 </template>

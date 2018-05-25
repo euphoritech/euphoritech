@@ -28,6 +28,7 @@ export default {
     const userId      = session.getLoggedInUserId()
     const teamInt     = session.getLoggedInTeamIntegrations()
     const userInt     = session.getLoggedInUserIntegrations()
+    const searchOrg   = req.query.org
 
     const teamGithubInt = teamInt['github']
     if (teamGithubInt) {
@@ -36,7 +37,7 @@ export default {
       const api = GithubApi(userIntegrationRecord.access_token)
 
       if (teamGithubInt.mod2 === 'org')
-        await api.getOrganization(teamGithubInt.mod1)
+        await api.getOrganization(searchOrg || teamGithubInt.mod1)
       if (teamGithubInt.mod2 === 'user')
         await api.getUser()
 
@@ -69,6 +70,60 @@ export default {
       res.json({ results })
     } else {
       res.status(400).json({ error: res.__(`No GitHub team integration found for your user ID`) })
+    }
+  },
+
+  async ['github/orgs/members']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const userId        = session.getLoggedInUserId()
+    const teamInt       = session.getLoggedInTeamIntegrations()
+    const teamGithubInt = teamInt['github']
+
+    if (!!teamGithubInt) {
+      if (teamGithubInt.mod2 !== 'org')
+        return res.status(400).json({ error: res.__(`Your team's current GitHub integration is not an organization.`) })
+
+      const userOauth = UserOauthIntegrations(postgres)
+      const userIntegrationRecord = await userOauth.find(teamGithubInt.user_oauth_int_id)
+      const api = GithubApi(userIntegrationRecord.access_token)
+      await api.getOrganization(teamGithubInt.mod1)
+      const info = await api.org.listMembers()
+      return res.json({ records: info.data })
+    } else {
+      res.status(404).json({ error: res.__(`No GitHub team integration found for your current team.`) })
+    }
+  },
+
+  async ['github/user/issues/find']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const userId        = session.getLoggedInUserId()
+    const teamInt       = session.getLoggedInTeamIntegrations()
+    const userInt       = session.getLoggedInUserIntegrations()
+    const repo          = req.query.repo
+    const userToGet     = req.query.user || 'me'
+    const userGithubInt = userInt['github']
+    const teamGithubInt = teamInt['github']
+
+    if (!!teamGithubInt) {
+      let userGithubLogin
+      if (userToGet && userToGet !== 'me') {
+        userGithubLogin = userToGet
+      } else if (!!userGithubInt) {
+        const userApi = GithubApi(userGithubInt.access_token)
+        await userApi.getUser()
+        const userInfo = (await userApi.user.getProfile()).data
+        userGithubLogin = userInfo.login
+      } else {
+        return res.status(404).json({ error: res.__(`You have not integrated with GitHub yet.`) })
+      }
+
+      const userOauth = UserOauthIntegrations(postgres)
+      const userIntegrationRecord = await userOauth.find(teamGithubInt.user_oauth_int_id)
+      const api = GithubApi(userIntegrationRecord.access_token)
+      const records = (await api.repo.listIssues(repo, { assignee: userGithubLogin }, teamGithubInt.mod1)).data
+      return res.json({ records })
+    } else {
+      res.status(404).json({ error: res.__(`No GitHub team integration found for your current team.`) })
     }
   },
 

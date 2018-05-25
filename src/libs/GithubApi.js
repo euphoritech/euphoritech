@@ -3,43 +3,48 @@ import GitHub from 'github-api'
 export default function GithubApi(oauthToken, userOrOrganization=null) {
   let client    = new GitHub({ token: oauthToken })
   let userOrOrg = userOrOrganization
-  let user      = null
-  let org       = null
-  let repo      = null
+  let _user     = null
+  let _org      = null
+  let _repo     = null
 
   return {
     client,
 
     async getUser() {
-      return user = await client.getUser()
+      return _user = await client.getUser()
     },
 
     async getOrganization(userOrOrganization=userOrOrg) {
-      return org = await client.getOrganization(userOrOrganization)
+      return _org = await client.getOrganization(userOrOrganization)
     },
 
-    async getRepo(repo, userOrOrganization=userOrOrg) {
-      return repo = await client.getRepo(userOrOrganization, repo)
+    async getRepo(repository, userOrOrganization=userOrOrg) {
+      return _repo = await client.getRepo(userOrOrganization, repository)
     },
 
     org: {
-      org,
+      _org,
 
       async listRepos() {
-        return await org.getRepos()
+        return await _org.getRepos()
+      },
+
+      // http://github-tools.github.io/github/docs/3.1.0/Organization.html#listMembers
+      async listMembers() {
+        return await _org.listMembers()
       }
     },
 
     repo: {
-      repo,
+      _repo,
 
       // http://github-tools.github.io/github/docs/3.1.0/Repository.html#getDetails
       async getDetails() {
-        return await repo.getDetails()
+        return await _repo.getDetails()
       },
 
       async getIssueOrPullRequest(id, repository, userOrOrganization) {
-        repo = await client.getRepo(userOrOrganization, repository)
+        _repo = await client.getRepo(userOrOrganization, repository)
 
         const notFoundHandler = async (itemNum, which='issue') => {
           let result
@@ -63,12 +68,12 @@ export default function GithubApi(oauthToken, userOrOrganization=null) {
 
       // http://github-tools.github.io/github/docs/3.1.0/Repository.html#getPullRequest
       async getPullRequest(id) {
-        return await repo.getPullRequest(id)
+        return await _repo.getPullRequest(id)
       },
 
       // http://github-tools.github.io/github/docs/3.1.0/Repository.html#listPullRequests
       async listPullRequests(options={ state: 'all' }) {
-        return await repo.listPullRequests(options)
+        return await _repo.listPullRequests(options)
       },
 
       // http://github-tools.github.io/github/docs/3.1.0/Issue.html#listIssues
@@ -91,25 +96,25 @@ export default function GithubApi(oauthToken, userOrOrganization=null) {
     },
 
     user: {
-      user,
+      _user,
 
       // http://github-tools.github.io/github/docs/3.1.0/User.html#getEmails
       async getEmails() {
-        return await user.getEmails()
+        return await _user.getEmails()
       },
 
       async getProfile() {
-        return await user.getProfile()
+        return await _user.getProfile()
       },
 
       // http://github-tools.github.io/github/docs/3.0.0/User.html#listOrgs
       async listOrgs() {
-        return await user.listOrgs()
+        return await _user.listOrgs()
       },
 
       // http://github-tools.github.io/github/docs/3.0.0/User.html#listOrgs
       async listRepos() {
-        return await user.listRepos()
+        return await _user.listRepos()
       }
     }
   }

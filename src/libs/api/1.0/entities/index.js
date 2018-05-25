@@ -65,7 +65,14 @@ export default {
     const numPerPage    = req.query.per_page
     // const orderBy       = req.query.order_by
 
-    const records = await entities.findByTypeId(parseInt(entityTypeId), status, { page: pageNumber, pageSize: numPerPage })
+    let records
+    if (entityTypeId === 'deleted') {
+      records = await entities.getAllBy({ team_id: currentTeamId, status: 'deleted' })
+    } else if (!isNaN(parseInt(entityTypeId))) {
+      records = await entities.findByTypeId(currentTeamId, parseInt(entityTypeId), status, { page: pageNumber, pageSize: numPerPage })
+    } else {
+      return res.status(400).json({ error: res.__(`Please provide a valid type ID to search for records.`) })
+    }
     res.json({ records })
   },
 
@@ -74,34 +81,7 @@ export default {
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
     const entityRecord  = req.body.entity
-
-    const existingRecord = await entities.findBy({
-      team_id:        currentTeamId,
-      source:         entityRecord.source,
-      entity_type_id: entityRecord.entityTypeId,
-      uid:            entityRecord.uid
-    })
-
-    if (existingRecord)
-      entities.setRecord(existingRecord)
-
-    entities.setRecord({
-      team_id:        currentTeamId,
-      name:           entityRecord.name,
-      description:    entityRecord.description,
-      source:         entityRecord.source,
-      entity_type_id: entityRecord.entityTypeId,
-      uid:            entityRecord.uid,
-      external_link:  entityRecord.external_link,
-      due_date:       entityRecord.dueDate,
-      mod1:           entityRecord.mod1,
-      mod2:           entityRecord.mod2,
-      mod3:           entityRecord.mod3,
-      mod4:           entityRecord.mod4,
-      mod5:           entityRecord.mod5,
-    })
-    const newEntityId = await entities.save()
-
+    const newEntityId   = await entities.createOrUpdate(currentTeamId, entityRecord)
     res.json({ id: newEntityId })
 
     await events.fire(currentTeamId, events.types.CREATE_ENTITY)

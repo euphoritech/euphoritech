@@ -6,8 +6,18 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  async githubSearchRepos(searchText) {
-    const response = await euphoritechFetch(`/api/1.0/integrations/github/repos/search?search=${searchText}`)
+  async githubGetUserIssues(repo, user='me') {
+    const response = await euphoritechFetch(`/api/1.0/integrations/github/user/issues/find?repo=${repo}&user=${user}`)
+    return await handleFetchResponse(response)
+  },
+
+  async githubSearchRepos(searchText, org='') {
+    const response = await euphoritechFetch(`/api/1.0/integrations/github/repos/search?search=${searchText}&org=${org}`)
+    return await handleFetchResponse(response)
+  },
+
+  async githubOrgMembers() {
+    const response = await euphoritechFetch(`/api/1.0/integrations/github/orgs/members`)
     return await handleFetchResponse(response)
   },
 

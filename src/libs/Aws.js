@@ -1,6 +1,7 @@
 import fs from 'fs'
 import url from 'url'
 import AWS from 'aws-sdk'
+import { sleep } from './Helpers'
 import config from '../config'
 
 export default function Aws(options={}) {
@@ -25,7 +26,6 @@ export default function Aws(options={}) {
       getFileStreamWithBackoff(streamToPipeTo, options, backoffAttempt=1) {
         const totalAllowedBackoffTries = 5
         const backoffSecondsToWait = 2 + Math.pow(backoffAttempt, 2)
-        const sleep = () => new Promise(resolve => setTimeout(resolve, backoffSecondsToWait * 1000))
 
         return new Promise((resolve, reject) => {
           const filename = options.filename
@@ -39,7 +39,7 @@ export default function Aws(options={}) {
               return reject(err)
 
             try {
-              await sleep()
+              await sleep(backoffSecondsToWait * 1000)
               await this.getFileStreamWithBackoff(streamToPipeTo, options, backoffAttempt + 1)
               resolve()
             } catch(e) {

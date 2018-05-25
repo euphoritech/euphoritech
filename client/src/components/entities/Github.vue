@@ -2,7 +2,7 @@
   div
     div(v-if="!selectedRepo")
       div Find a repository to search in:
-      typeahead-input(:params="{ src: '/api/1.0/integrations/github/repos/search', keysFromResponse: 'results', showProp: 'name' }",@onHit="selectGithubRepo")
+      typeahead-input(src="/api/1.0/integrations/github/repos/search",:params="{ keysFromResponse: 'results', showProp: 'name' }",@onHit="selectGithubRepo")
     div(v-if="selectedRepo")
       div
         div Enter an issue or PR number in repo:
@@ -68,6 +68,11 @@
           }
         }
       }
+    },
+
+    async created() {
+      // await ApiIntegrations.githubOrgMembers()
+      // await ApiIntegrations.githubGetUserIssues('useriq-app')
     }
   }
 </script>

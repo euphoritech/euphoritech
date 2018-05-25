@@ -37,19 +37,19 @@ export default {
   extends: VueTypeahead,
 
   props: {
+    src: { type: String },
     // expects:
-    //    `src` (required): backend route to return data,
     //    `showProp` (optional): property in each item to show in the output,
     //    `showPropFunction` (optional): function to return a string to show - NOTE: this takes precedence over `showProp`,
     //    `keysFromResponse` (optional): key(s) to get array of data, ex. 'ary', 'object.ary', 'object1.object2.ary'
-    params: { type: Object }
+    params: { type: Object, default: {} }
   },
 
   data () {
     return {
       // The source url
       // (required)
-      src: this.params.src,
+      // src: this.params.src,
 
       // Limit the number of items which is shown at the list
       // (optional)

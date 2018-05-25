@@ -1,17 +1,17 @@
 <template lang="pug">
-  b-col.entity-wrapper
+  b-col
     div.d-flex.justify-content-between
       h1 {{ type.name }}
-      div.align-self-start
+      div.align-self-start(v-if="isRealType()")
         a(href="javascript:void(0)",@click="$store.commit('TOGGLE_CREATE_ENTITY_MODAL', type_id)")
           small Create New {{ type.name }}
-    hr
+    hr(v-if="isRealType()")
     div.entity-wrapper
-      h5.accordion-header
+      h5.accordion-header(v-if="isRealType()")
         a(href="javascript:void(0)",@click="changeActiveAccordion('overview')")
           i.fa(:class="($store.state.session.entities.dashboard.accordion.visibility.overview) ? 'fa-angle-down' : 'fa-angle-right'")
           span.margin-left-medium Overview
-      b-collapse#entity-overview(:visible="true",v-model="$store.state.session.entities.dashboard.accordion.visibility.overview",accordion="entity-accordion",role="tabpanel")
+      b-collapse#entity-overview(:visible="isRealType()",v-model="$store.state.session.entities.dashboard.accordion.visibility.overview",accordion="entity-accordion",role="tabpanel")
         b-card-body
           div this is the overview body....
       h5.accordion-header
@@ -23,8 +23,8 @@
           b-alert.text-center(:show="records.length === 0",variant="warning")
             div.text-large
               span There are no records of type: {{ type.name }}.&nbsp;
-              a(href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
-              span  to add one.
+              a(v-if="isRealType()",href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
+              span(v-if="isRealType()")  to add one.
           table.table.thin(v-if="records.length > 0")
             thead
               tr
@@ -34,11 +34,12 @@
                 th Source
                 th Unique ID
                 th Due Date
+                th(v-if="!isRealType()") Restore
             tbody
               tr(v-for="(record, ind) in recordsSorted")
                 td
                   span {{ ind + 1 }}.
-                  a.cog.margin-left-small(:id="'edit-record-' + ind",href="javascript:void(0)")
+                  a.cog.margin-left-small(v-if="isRealType()",:id="'edit-record-' + ind",href="javascript:void(0)")
                     i.fa.fa-cog
                   b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
                     div
@@ -59,6 +60,8 @@
                 td {{ record.source }}
                 td {{ record.uid }}
                 td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
+                td(v-if="!isRealType()")
+                  a(href="javascript:void(0)",@click="restoreEntity(record.id, ind)") Restore Record
 </template>
 
 <script>
@@ -133,6 +136,14 @@
         toast.open("Successfully deleted record!")
       },
 
+      async restoreEntity(entityId, ind) {
+        const toast = SnackbarFactory(this)
+        await ApiEntities.updateEntity({ id: entityId, status: 'active' })
+        this.closeEntityEditPopover(ind)
+        this.$emit('changeEntityTypeOrRemove', entityId)
+        toast.open("Successfully restored record!")
+      },
+
       changeEntityTypeOrRemove(entityId, ind) {
         // TODO: remove after the following issue is fixed:
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/1772
@@ -142,6 +153,10 @@
           this.currentTypeId = this.type_id
           this.$emit('changeEntityTypeOrRemove', entityId)
         }, 100)
+      },
+
+      isRealType() {
+        return !isNaN(parseInt(this.type_id))
       },
 
       toggleCreateEntityModal() {
@@ -154,8 +169,14 @@
     },
 
     created() {
-      this.type = this.$store.state.session.current_team_types.find(t => parseInt(t.id) === parseInt(this.type_id)) || {}
-      this.currentTypeId = parseInt(this.type_id)
+      if (this.type_id === 'deleted') {
+        this.type = { name: 'Deleted' }
+        this.currentTypeId = this.type_id
+      } else {
+        this.type = this.$store.state.session.current_team_types.find(t => parseInt(t.id) === parseInt(this.type_id)) || {}
+        this.currentTypeId = parseInt(this.type_id)
+      }
+
       this.typeOptions = this.$store.state.session.current_team_types
         .filter(f => !!f.is_active)
         .sort((t1, t2) => (t1.name.toLowerCase() > t2.name.toLowerCase()) ? 1 : -1)
