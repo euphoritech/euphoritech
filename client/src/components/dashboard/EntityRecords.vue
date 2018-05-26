@@ -62,6 +62,9 @@
                 td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
                 td(v-if="!isRealType()")
                   a(href="javascript:void(0)",@click="restoreEntity(record.id, ind)") Restore Record
+          div(v-if="numberOfPages > 1")
+            hr
+            b-pagination(size="sm",align="right",:total-rows="pagination.totalCount",v-model="pagination.currentPage",:per-page="pagination.perPage",@change="changePage")
 </template>
 
 <script>
@@ -81,7 +84,12 @@
       return {
         type: {},
         currentTypeId: null,
-        typeOptions: []
+        typeOptions: [],
+        pagination: {
+          currentPage: 1,
+          perPage: 30,
+          totalCount: null
+        }
       }
     },
 
@@ -90,12 +98,22 @@
         return this.records.sort((r1, r2) => {
           return (r1.name.toLowerCase() < r2.name.toLowerCase()) ? -1 : 1
         })
+      },
+
+      numberOfPages() {
+        return (this.pagination.totalCount && this.pagination.perPage)
+          ? Math.ceil(this.pagination.totalCount / this.pagination.perPage)
+          : 1
       }
     },
 
     methods: {
       getFormattedDate: TimeHelpers.getFormattedDate,
       truncateString: StringHelpers.truncateString,
+
+      changePage(newPage) {
+        this.$emit('changePage', newPage)
+      },
 
       getAccordionSessionObj() {
         return this.$store.state.session.entities.dashboard.accordion.visibility
@@ -177,6 +195,7 @@
         this.currentTypeId = parseInt(this.type_id)
       }
 
+      this.pagination.totalCount = (this.records.length > 0 && this.records[0].full_count) ? parseInt(this.records[0].full_count) : null
       this.typeOptions = this.$store.state.session.current_team_types
         .filter(f => !!f.is_active)
         .sort((t1, t2) => (t1.name.toLowerCase() > t2.name.toLowerCase()) ? 1 : -1)

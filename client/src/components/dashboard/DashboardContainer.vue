@@ -8,7 +8,7 @@
           b-row
             b-col(v-if="isLoadingLocal")
               loader
-            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",@changeEntityTypeOrRemove="removeEntity",v-if="!isLoadingLocal")
+            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",@changeEntityTypeOrRemove="removeEntity",@changePage="changePage",v-if="!isLoadingLocal")
 </template>
 
 <script>
@@ -45,6 +45,10 @@
     },
 
     methods: {
+      changePage(newPage) {
+        console.log("PAGECHANGE", newPage)
+      },
+
       removeEntity(id) {
         this.entityRecords = this.entityRecords.filter(r => r.id !== id)
       }

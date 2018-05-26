@@ -1,3 +1,4 @@
+import PostgresSqlParser from '../PostgresSqlParser'
 import config from '../../config'
 
 export default function DatabaseModel(postgres, table) {
@@ -18,10 +19,9 @@ export default function DatabaseModel(postgres, table) {
       return rows
     },
 
-    // TODO: Support pagination
     // Uses AND logic between columns
     // Ex. keyValuePairs = { col1: 'val1', col2: 'col2', ... }
-    async getAllBy(keyValuePairs) {
+    async getAllBy(keyValuePairs, pagination=null) {
       const columnAry     = Object.keys(keyValuePairs)
       const paramsAry     = []
       const filters       = columnAry.map((col, ind) => {
@@ -29,7 +29,14 @@ export default function DatabaseModel(postgres, table) {
         return `${col} = $${ind + 1}`
       })
       const filterString  = filters.join(' AND ')
-      const { rows }      = await postgres.query(`select * from ${table} where ${filterString}`, paramsAry)
+      let query           = `select * from ${table} where ${filterString}`
+
+      if (typeof pagination === 'object' && pagination != null) {
+        const parser = PostgresSqlParser(query).setPagination(pagination.page, pagination.pageSize || 100).deparse()
+        query = parser.query
+      }
+
+      const { rows } = await postgres.query(query, paramsAry)
       return rows
     },
 

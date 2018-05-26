@@ -60,6 +60,7 @@
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",
     "pg": "^6.1.5",
+    "pg-query-parser": "^0.2.1",
     "pg-query-stream": "^1.0.0",
     "pug": "^2.0.0-rc.3",
     "request": "^2.81.0",

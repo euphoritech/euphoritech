@@ -1,4 +1,5 @@
 import DatabaseModel from './DatabaseModel'
+import PostgresSqlParser from '../PostgresSqlParser'
 
 export default function TeamEntities(postgres) {
   const factoryToExtend = DatabaseModel(postgres, 'team_entities')
@@ -46,7 +47,7 @@ export default function TeamEntities(postgres) {
         searchFilter = searchFilter || null
         orderBy = orderBy || 'lower(e.name)'
 
-        let queryParams = [ teamId, typeId, orderBy, pageSize, (page-1) * pageSize ]
+        let queryParams = [ teamId, typeId, orderBy ]
         let additionalSearchFilter = ''
         if (status) {
           if (status instanceof Array) {
@@ -59,16 +60,15 @@ export default function TeamEntities(postgres) {
         if (searchFilter)
           additionalSearchFilter = `and e.name ilike '%${searchFilter}%'`
 
-        const { rows } = await postgres.query(`
+        const query = `
           select e.*
           from team_entity_types as t
           inner join team_entities as e on e.team_id = t.team_id and e.entity_type_id = t.id
           where t.team_id = $1 and
           t.id = $2 ${additionalSearchFilter}
-          order by $3
-          limit $4
-          offset $5
-        `, queryParams)
+          order by $3`
+        const parser = PostgresSqlParser(query).setPagination(page, pageSize).deparse()
+        const { rows } = await postgres.query(parser.query, queryParams)
         return rows
       },
 

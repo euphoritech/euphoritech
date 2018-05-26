@@ -61,13 +61,13 @@ export default {
     const currentTeamId = session.getCurrentLoggedInTeam()
     const status        = req.query.status || 'active'
     const entityTypeId  = req.query.type_id
-    const pageNumber    = req.query.page
-    const numPerPage    = req.query.per_page
+    const pageNumber    = req.query.page || 1
+    const numPerPage    = req.query.per_page || 30
     // const orderBy       = req.query.order_by
 
     let records
     if (entityTypeId === 'deleted') {
-      records = await entities.getAllBy({ team_id: currentTeamId, status: 'deleted' })
+      records = await entities.getAllBy({ team_id: currentTeamId, status: 'deleted' }, { page: pageNumber, pageSize: numPerPage })
     } else if (!isNaN(parseInt(entityTypeId))) {
       records = await entities.findByTypeId(currentTeamId, parseInt(entityTypeId), status, { page: pageNumber, pageSize: numPerPage })
     } else {
