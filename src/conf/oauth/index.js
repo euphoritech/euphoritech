@@ -1,11 +1,9 @@
 import oauth2Module from 'simple-oauth2'
 import github from './github'
-import salesforce from './salesforce'
 import zendesk from './zendesk'
 
 export default {
   github,
-  salesforce,
   zendesk
 }
 
