@@ -2,7 +2,7 @@ import app from "./socketAppStore"
 import Github from "./Github"
 import Global from "./Global"
 import Salesforce from "./Salesforce"
-import GeoIP from "../GeoIP"
+import GeoIP from "../GeoIp"
 
 export default function WebSocket({ io, log, postgres, redis }) {
   io.on('connection', async socket => {
