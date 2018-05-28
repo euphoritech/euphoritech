@@ -39,10 +39,19 @@ html, body {
   color: $soft_color2;
 }
 
-table.thin {
-  th, td {
-    font-size: 0.8em;
-    padding: 8px;
+table {
+  &.thin {
+    th, td {
+      font-size: 0.8em;
+      padding: 8px;
+    }
+  }
+
+  &.very-thin {
+    th, td {
+      font-size: 0.8em;
+      padding: 3px;
+    }
   }
 }
 

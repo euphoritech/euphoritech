@@ -11,5 +11,6 @@
 	"The current password you provided is not correct. Please try again.": "The current password you provided is not correct. Please try again.",
 	"There is no record with the ID provided. Please try again.": "There is no record with the ID provided. Please try again.",
 	"No issue or PR with the ID provided.": "No issue or PR with the ID provided.",
-	"Please provide a valid type ID to search for records.": "Please provide a valid type ID to search for records."
+	"Please provide a valid type ID to search for records.": "Please provide a valid type ID to search for records.",
+	"No GitHub team integration found for your user ID": "No GitHub team integration found for your user ID"
 }

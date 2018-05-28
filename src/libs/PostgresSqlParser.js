@@ -75,7 +75,21 @@ export default function PostgresSqlParser(query=null) {
       return this
     },
 
+    async runPaginationQuery(postgres, query, params, page, pageSize) {
+      this.setQuery(query).setPagination(page, pageSize).deparse()
+      const { rows } = await postgres.query(this.query, params)
+      const size = parseInt((rows.length > 0) ? rows[0].full_count : 0)
+
+      return {
+        data:         rows,
+        numberPages:  Math.ceil(size/pageSize),
+        currentPage:  parseInt(page),
+        totalCount:   size
+      }
+    },
+
     // NOTE: assumes a select statement for the query type
+    // https://stackoverflow.com/questions/156114/best-way-to-get-result-count-before-limit-was-applied/8242764#8242764
     addFullCountColumn() {
       if (!this.parsedObj) {
         this.parse()

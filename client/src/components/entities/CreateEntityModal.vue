@@ -30,7 +30,7 @@
                   <div class="text-right">
                     <a href="javascript:void(0)" @click="resetData()">Reset</a>
                   </div>
-                  <b-row class="margin-bottom-medium" v-for="(label, key) in github.dataLabelMap" :key="key">
+                  <b-row class="margin-bottom-medium" v-for="(label, key) in $store.state.dataLabelMaps.github" :key="key">
                     <b-col cols="3">
                       <strong>{{ label }}</strong>
                     </b-col>
@@ -44,7 +44,7 @@
                   <div class="text-right">
                     <a href="javascript:void(0)" @click="resetData()">Reset</a>
                   </div>
-                  <b-row class="margin-bottom-medium" v-for="(label, key) in salesforce.dataLabelMap" :key="key">
+                  <b-row class="margin-bottom-medium" v-for="(label, key) in $store.state.dataLabelMaps.salesforce" :key="key">
                     <b-col cols="3">
                       <strong>{{ label }}</strong>
                     </b-col>
@@ -94,35 +94,6 @@
           mod3: null,
           mod4: null,
           mod5: null
-        },
-
-        github: {
-          dataLabelMap: {
-            uid: 'Unique ID',
-            name: 'Title',
-            description: 'Description',
-            // dueDate: 'Due Date',
-            mod1: 'Repository',
-            mod2: 'HTML Link',
-            mod3: 'API Link',
-            mod4: 'User Created',
-            mod5: 'Closed At'
-          }
-        },
-
-        salesforce: {
-          dataLabelMap: {
-            uid: 'Unique Identifier',
-            name: 'Name',
-            description: 'Description',
-            external_link: 'External Link',
-            due_date: 'Due Date',
-            mod1: 'Extra Parameter 1',
-            mod2: 'Extra Parameter 2',
-            mod3: 'Extra Parameter 3',
-            mod4: 'Extra Parameter 4',
-            mod5: 'Extra Parameter 5'
-          }
         }
       }
     },

@@ -20,12 +20,12 @@
           span.margin-left-medium Records List
       b-collapse#entity-records(v-model="$store.state.session.entities.dashboard.accordion.visibility.records",accordion="entity-accordion",role="tabpanel")
         b-card-body
-          b-alert.text-center(:show="records.length === 0",variant="warning")
+          b-alert.text-center(:show="data.data.length === 0",variant="warning")
             div.text-large
               span There are no records of type: {{ type.name }}.&nbsp;
               a(v-if="isRealType()",href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
               span(v-if="isRealType()")  to add one.
-          table.table.thin(v-if="records.length > 0")
+          table.table.thin(v-if="data.data.length > 0")
             thead
               tr
                 th #
@@ -38,7 +38,7 @@
             tbody
               tr(v-for="(record, ind) in recordsSorted")
                 td
-                  span {{ ind + 1 }}.
+                  span {{ (ind + 1) + ((data.currentPage - 1) * 30) }}.
                   a.cog.margin-left-small(v-if="isRealType()",:id="'edit-record-' + ind",href="javascript:void(0)")
                     i.fa.fa-cog
                   b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
@@ -56,7 +56,7 @@
                     a.entity-link(:href="'/dashboard/entity/' + record.id") {{ record.name }}
                   b-tooltip(:target="'record-name-' + ind") {{ record.name }}
                 td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
-                  b-tooltip(:target="'record-desc-' + ind") {{ record.description }}
+                  b-tooltip(:target="'record-desc-' + ind") {{ truncateString(record.description, 400) }}
                 td {{ record.source }}
                 td {{ record.uid }}
                 td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
@@ -64,7 +64,7 @@
                   a(href="javascript:void(0)",@click="restoreEntity(record.id, ind)") Restore Record
           div(v-if="numberOfPages > 1")
             hr
-            b-pagination(size="sm",align="right",:total-rows="pagination.totalCount",v-model="pagination.currentPage",:per-page="pagination.perPage",@change="changePage")
+            b-pagination(size="sm",align="right",:total-rows="data.totalCount",v-model="data.currentPage",:per-page="30",@change="changePage")
 </template>
 
 <script>
@@ -76,7 +76,7 @@
 
   export default {
     props: {
-      records: { type: Array, default: [] },
+      data: { type: Object },
       type_id: { type: [ Number, String ] }
     },
 
@@ -84,25 +84,20 @@
       return {
         type: {},
         currentTypeId: null,
-        typeOptions: [],
-        pagination: {
-          currentPage: 1,
-          perPage: 30,
-          totalCount: null
-        }
+        typeOptions: []
       }
     },
 
     computed: {
       recordsSorted() {
-        return this.records.sort((r1, r2) => {
+        return this.data.data.sort((r1, r2) => {
           return (r1.name.toLowerCase() < r2.name.toLowerCase()) ? -1 : 1
         })
       },
 
       numberOfPages() {
-        return (this.pagination.totalCount && this.pagination.perPage)
-          ? Math.ceil(this.pagination.totalCount / this.pagination.perPage)
+        return (this.data.totalCount && 30)
+          ? Math.ceil(this.data.totalCount / 30)
           : 1
       }
     },
@@ -190,12 +185,15 @@
       if (this.type_id === 'deleted') {
         this.type = { name: 'Deleted' }
         this.currentTypeId = this.type_id
+        this.$store.state.session.entities.dashboard.accordion.visibility = {
+          overview: false,
+          records: true
+        }
       } else {
         this.type = this.$store.state.session.current_team_types.find(t => parseInt(t.id) === parseInt(this.type_id)) || {}
         this.currentTypeId = parseInt(this.type_id)
       }
 
-      this.pagination.totalCount = (this.records.length > 0 && this.records[0].full_count) ? parseInt(this.records[0].full_count) : null
       this.typeOptions = this.$store.state.session.current_team_types
         .filter(f => !!f.is_active)
         .sort((t1, t2) => (t1.name.toLowerCase() > t2.name.toLowerCase()) ? 1 : -1)

@@ -25,6 +25,33 @@ export default {
     isOpen: false
   },
 
+  dataLabelMaps: {
+    github: {
+      uid: 'Unique ID',
+      name: 'Title',
+      description: 'Description',
+      // dueDate: 'Due Date',
+      mod1: 'Repository',
+      mod2: 'Number',
+      mod3: 'API Link',
+      mod4: 'User Created',
+      mod5: 'Closed At'
+    },
+
+    salesforce: {
+      uid: 'Unique Identifier',
+      name: 'Name',
+      description: 'Description',
+      external_link: 'External Link',
+      due_date: 'Due Date',
+      mod1: 'Extra Parameter 1',
+      mod2: 'Extra Parameter 2',
+      mod3: 'Extra Parameter 3',
+      mod4: 'Extra Parameter 4',
+      mod5: 'Extra Parameter 5'
+    }
+  },
+
   session: {
     // An object with the entire session object stored
     entities: {

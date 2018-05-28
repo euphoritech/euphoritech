@@ -58,12 +58,12 @@
                     div
                       small Select a record type to assign the imported records to
                     b-form-select(v-model="github.bulk.entityTypeId",:options="entityTypes",placeholder="Select a record type to assign the imported records to")
-                b-button.margin-top-small(variant="primary",@click="startBulkImport") Import Issues and Pull Requests from '{{ github.bulk.repo }}'
+                b-button.margin-top-small(variant="primary",@click="startGithubBulkImport") Import Issues and Pull Requests from '{{ github.bulk.repo }}'
           b-tab(v-if="env.hasSfdc",title="Salesforce")
             div(v-if="!team.hasSfdc")
               div No team integration yet...
             div(v-if="team.hasSfdc")
-              integrations-salesforce-objects
+              integrations-salesforce-objects(:entityTypes="entityTypes",@bulkImport="startSalesforceBulkImport")
             hr(v-if="!userIsTeamIntegration('salesforce')")
             div(v-if="!userIsTeamIntegration('salesforce')")
               div(v-if="!user.hasSfdc")
@@ -124,6 +124,13 @@
             entityTypeId: null,
             numImported: 0
           }
+        },
+
+        salesforce: {
+          bulk: {
+            isProcessing: false,
+            numImported: 0
+          }
         }
       }
     },
@@ -136,6 +143,7 @@
         })
 
         EuphoritechSocket.on('githubBulkFinished', () => this.github.bulk.isProcessing = false)
+        EuphoritechSocket.on('salesforceBulkFinished', () => this.salesforce.bulk.isProcessing = false)
       },
 
       userIsTeamIntegration(type) {
@@ -150,7 +158,7 @@
         this.github.bulk.repo = repoRecord.name
       },
 
-      async startBulkImport() {
+      startGithubBulkImport() {
         const toast = SnackbarFactory(this)
 
         if (!this.github.bulk.entityTypeId)
@@ -158,6 +166,17 @@
 
         this.github.bulk.isProcessing = true
         EuphoritechSocket.emit('githubBulkRecordImportStart', { org: this.github.org, repo: this.github.bulk.repo, entityTypeId: this.github.bulk.entityTypeId })
+        toast.open(`Starting your bulk import now!`)
+      },
+
+      startSalesforceBulkImport({ integrationId, entityTypeId }) {
+        const toast = SnackbarFactory(this)
+
+        if (!entityTypeId)
+          return toast.open(`Please enter a valid entity type to classify the records being bulk imported.`, 'error')
+
+        this.salesforce.bulk.isProcessing = true
+        EuphoritechSocket.emit('salesforceBulkRecordImportStart', { entityTypeId, integrationId })
         toast.open(`Starting your bulk import now!`)
       },
 

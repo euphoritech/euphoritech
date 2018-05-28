@@ -28,6 +28,15 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async createLink(id1, id2) {
+    const response = await euphoritechFetch(`/api/1.0/entities/links/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id1, id2 })
+    })
+    return await handleFetchResponse(response)
+  },
+
   async getEntityListByType({ type_id, page, perPage }) {
     const response = await euphoritechFetch(`/api/1.0/entities/get/by/type?type_id=${type_id}&page=${page || ''}&perPage=${perPage || ''}`)
     return await handleFetchResponse(response)

@@ -32,8 +32,7 @@ export default function DatabaseModel(postgres, table) {
       let query           = `select * from ${table} where ${filterString}`
 
       if (typeof pagination === 'object' && pagination != null) {
-        const parser = PostgresSqlParser(query).setPagination(pagination.page, pagination.pageSize || 100).deparse()
-        query = parser.query
+        return await PostgresSqlParser().runPaginationQuery(postgres, query, paramsAry, pagination.page, pagination.pageSize || 100)
       }
 
       const { rows } = await postgres.query(query, paramsAry)

@@ -54,9 +54,9 @@
               source: 'github',
               name: result.title,
               description: result.body,
-              uid: result.number,
+              uid: result.id,
               mod1: this.selectedRepo,
-              mod2: result.html_url,
+              mod2: result.number,
               mod3: result.url,
               mod4: result.user.login,
               mod5: result.closed_at

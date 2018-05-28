@@ -3,6 +3,7 @@ import GithubApi from '../GithubApi'
 import SessionHandler from '../SessionHandler'
 import TeamEntities from '../models/TeamEntities'
 import UserOauthIntegrations from '../models/UserOauthIntegrations'
+import { sleep } from '../Helpers'
 
 export default function Github({ app, socket, log, io, postgres, redis }) {
   const req       = socket.request
@@ -41,35 +42,39 @@ export default function Github({ app, socket, log, io, postgres, redis }) {
         }
 
         await Promise.each(pullRequests.data, async pr => {
+          await sleep(300)
           await teamEnt.createOrUpdate(teamId, {
             source:         'github',
             entityTypeId:   entityTypeId,
-            uid:            pr.number,
+            uid:            pr.id,
             name:           pr.title,
             description:    pr.body,
             external_link:  pr.html_url,
             mod1:           repo,
-            mod2:           pr.html_url,
+            mod2:           pr.number,
             mod3:           pr.url,
             mod4:           pr.user.login,
-            mod5:           pr.closed_at
+            mod5:           pr.closed_at,
+            raw_info:       pr
           })
           socket.emit('githubBulkAddedRecord', { record: pr })
         })
 
         await Promise.each(issues.data, async issue => {
+          await sleep(300)
           await teamEnt.createOrUpdate(teamId, {
             source:         'github',
             entityTypeId:   entityTypeId,
-            uid:            issue.number,
+            uid:            issue.id,
             name:           issue.title,
             description:    issue.body,
             external_link:  issue.html_url,
             mod1:           repo,
-            mod2:           issue.html_url,
+            mod2:           issue.number,
             mod3:           issue.url,
             mod4:           issue.user.login,
-            mod5:           issue.closed_at
+            mod5:           issue.closed_at,
+            raw_info:       issue
           })
           socket.emit('githubBulkAddedRecord', { record: issue })
         })

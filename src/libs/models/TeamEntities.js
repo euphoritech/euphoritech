@@ -9,15 +9,15 @@ export default function TeamEntities(postgres) {
     {
       accessibleColumns: [
         'team_id', 'status', 'name', 'description', 'source', 'entity_type_id',
-        'uid', 'external_link', 'due_date', 'mod1', 'mod2', 'mod3', 'mod4', 'mod5'
+        'uid', 'external_link', 'due_date', 'mod1', 'mod2', 'mod3', 'mod4', 'mod5',
+        'raw_info'
       ],
 
       async createOrUpdate(teamId, entityRecord) {
         const existingRecord = await this.findBy({
-          team_id:        teamId,
-          source:         entityRecord.source,
-          entity_type_id: entityRecord.entityTypeId,
-          uid:            entityRecord.uid
+          team_id:  teamId,
+          source:   entityRecord.source,
+          uid:      entityRecord.uid
         })
 
         if (existingRecord)
@@ -36,7 +36,8 @@ export default function TeamEntities(postgres) {
           mod2:           entityRecord.mod2,
           mod3:           entityRecord.mod3,
           mod4:           entityRecord.mod4,
-          mod5:           entityRecord.mod5
+          mod5:           entityRecord.mod5,
+          raw_info:       entityRecord.raw_info
         })
         return await this.save()
       },
@@ -47,7 +48,7 @@ export default function TeamEntities(postgres) {
         searchFilter = searchFilter || null
         orderBy = orderBy || 'lower(e.name)'
 
-        let queryParams = [ teamId, typeId, orderBy ]
+        let queryParams = [ teamId, typeId ]
         let additionalSearchFilter = ''
         if (status) {
           if (status instanceof Array) {
@@ -66,17 +67,25 @@ export default function TeamEntities(postgres) {
           inner join team_entities as e on e.team_id = t.team_id and e.entity_type_id = t.id
           where t.team_id = $1 and
           t.id = $2 ${additionalSearchFilter}
-          order by $3`
-        const parser = PostgresSqlParser(query).setPagination(page, pageSize).deparse()
-        const { rows } = await postgres.query(parser.query, queryParams)
+          order by ${orderBy}`
+        const data = PostgresSqlParser().runPaginationQuery(postgres, query, queryParams, page, pageSize)
+        return data
+      },
+
+      async recordSearch(teamId, searchQuery) {
+        const { rows } = await postgres.query(`
+          select * from team_entities
+          where team_id = $1 and name || uid || mod1 || mod2 ilike '%' || $2 || '%'
+          order by lower(name)
+        `, [ teamId, searchQuery ])
+
         return rows
       },
 
       seedTypes: [
         { name: 'Customer', description: 'Your customers or clients.' },
         { name: 'Customer User', description: 'Users that belong to your customers or clients.' },
-        { name: 'Development Code Update', description: 'A version control commit.' },
-        { name: 'Development Pull Request', description: 'A version control pull request.' },
+        { name: 'R&D Record', description: 'A development version control pull request, issue, or commit.' },
         { name: 'QA Note', description: 'A bug or feature request or other requested code change.' },
         { name: 'Release Note', description: 'Documentation about a code update or release to describe new or changed functionality.' },
         { name: 'Support Ticket', description: 'Tickets submitted by your customers as support requests.' }

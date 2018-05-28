@@ -268,6 +268,7 @@ export function migrations(postgres) {
           mod3 varchar(255),
           mod4 varchar(255),
           mod5 varchar(255),
+          raw_info jsonb,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );

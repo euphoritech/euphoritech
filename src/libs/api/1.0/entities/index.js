@@ -17,6 +17,16 @@ export default {
     res.json({ record })
   },
 
+  async search({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const entities      = TeamEntities(postgres)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const query         = req.query.search
+
+    const records = await entities.recordSearch(currentTeamId, query)
+    res.json({ records })
+  },
+
   async ['types/get']({ req, res, postgres }) {
     const onlyActive    = req.query.onlyActive || true
     const typesInst     = TeamEntityTypes(postgres)
@@ -50,9 +60,29 @@ export default {
   },
 
   async ['links/get']({ req, res, postgres }) {
-    const entityId = req.query.id
+    const links     = TeamEntityLinks(postgres)
+    const entityId  = req.query.id
 
-    res.json(true)
+    const linkRecords = await links.findByEntity(entityId)
+    res.json({ records: linkRecords })
+  },
+
+  async ['links/create']({ req, res, postgres }) {
+    const links     = TeamEntityLinks(postgres)
+    const entity1Id = req.body.id1
+    const entity2Id = req.body.id2
+
+    if (entity1Id == entity2Id)
+      return res.status(400).json({ error: res.__("You cannot create a link between the same record.") })
+
+    const linkId = await links.getLinkId(entity1Id, entity2Id)
+    if (linkId)
+      return res.json(true)
+
+    links.setRecord({ entity1_id: entity1Id, entity2_id: entity2Id })
+    const newId = await links.save()
+
+    res.json({ link_id: newId })
   },
 
   async ['get/by/type']({ req, res, postgres }) {
@@ -65,15 +95,15 @@ export default {
     const numPerPage    = req.query.per_page || 30
     // const orderBy       = req.query.order_by
 
-    let records
+    let info
     if (entityTypeId === 'deleted') {
-      records = await entities.getAllBy({ team_id: currentTeamId, status: 'deleted' }, { page: pageNumber, pageSize: numPerPage })
+      info = await entities.getAllBy({ team_id: currentTeamId, status: 'deleted' }, { page: pageNumber, pageSize: numPerPage })
     } else if (!isNaN(parseInt(entityTypeId))) {
-      records = await entities.findByTypeId(currentTeamId, parseInt(entityTypeId), status, { page: pageNumber, pageSize: numPerPage })
+      info = await entities.findByTypeId(currentTeamId, parseInt(entityTypeId), status, { page: pageNumber, pageSize: numPerPage })
     } else {
-      return res.status(400).json({ error: res.__(`Please provide a valid type ID to search for records.`) })
+      return res.status(400).json({ error: res.__(`Please provide a valid type ID to get records.`) })
     }
-    res.json({ records })
+    res.json({ info })
   },
 
   async create({ req, res, postgres, events }) {

@@ -1,6 +1,7 @@
 import app from "./socketAppStore"
 import Github from "./Github"
 import Global from "./Global"
+import Salesforce from "./Salesforce"
 import GeoIP from "../GeoIP"
 
 export default function WebSocket({ io, log, postgres, redis }) {
@@ -9,8 +10,9 @@ export default function WebSocket({ io, log, postgres, redis }) {
     const user  = req.session.user
 
     const handlers = {
-      github: Github({ app, socket, log, io, postgres, redis }),
-      global: Global({ app, socket, log, io, postgres, redis })
+      github:     Github({ app, socket, log, io, postgres, redis }),
+      global:     Global({ app, socket, log, io, postgres, redis }),
+      salesforce: Salesforce({ app, socket, log, io, postgres, redis })
     }
 
     Object.keys(handlers).forEach(category => {

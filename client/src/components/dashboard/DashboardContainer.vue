@@ -29,7 +29,7 @@
         error: null,
         isLoadingLocal: true,
         partialComponent: null,
-        entityRecords: []
+        recordInfo: {},
       }
     },
 
@@ -37,7 +37,7 @@
       currentComponentProps() {
         switch (this.partialComponent) {
           case 'entity-records':
-            return { records: this.entityRecords, type_id: this.type_id }
+            return { data: this.recordInfo, type_id: this.type_id }
           case 'entity':
             return { id: this.id }
         }
@@ -45,12 +45,12 @@
     },
 
     methods: {
-      changePage(newPage) {
-        console.log("PAGECHANGE", newPage)
+      async changePage(newPage) {
+        this.recordInfo = (await ApiEntities.getEntityListByType({ type_id: this.type_id, page: newPage })).info
       },
 
       removeEntity(id) {
-        this.entityRecords = this.entityRecords.filter(r => r.id !== id)
+        this.recordInfo.data = this.recordInfo.data.filter(r => r.id !== id)
       }
     },
 
@@ -71,7 +71,7 @@
         }
 
       if (this.type_id) {
-        this.entityRecords = (await ApiEntities.getEntityListByType({ type_id: this.type_id })).records
+        this.recordInfo = (await ApiEntities.getEntityListByType({ type_id: this.type_id })).info
         this.partialComponent = 'entity-records'
         return this.isLoadingLocal = false
       }

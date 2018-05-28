@@ -13,7 +13,7 @@
               th Edit
               th Mass Import
           tbody
-            tr(v-for="int in objectTeamIntegrations")
+            tr(v-for="(int, ind) in objectTeamIntegrations")
               td {{ int.object_name }}
               td
                 b-badge.margin-left-small(v-if="sfdcField",v-for="(sfdcField, col) in int.attribute_info",variant="primary",:key="col")
@@ -21,7 +21,13 @@
               td
                 a(href="javascript:void(0)",@click="editExistingSfdcIntegration(int)") Edit
               td
-                a(href="javascript:void(0)") Mass Import Records
+                a(:id="'mass-import-' + ind",href="javascript:void(0)") Mass Import Records
+                b-popover(ref="mass-import-popover",:target="'mass-import-' + ind",title="Mass Import")
+                  div
+                    small Select Record Type:
+                  b-form-select(size="sm",v-model="entityTypeId",:options="entityTypes",placeholder="Select a record type to assign the imported records to")
+                  div.text-center.margin-top-small
+                    b-button(size="sm",variant="primary",@click="bulkImport(int.id)") Import Records
     hr
     div(v-if="!current.object")
       h3
@@ -58,11 +64,14 @@
 
   export default {
     props: {
+      entityTypes: { type: Array, default: [] },
       integration: { type: Object, default: null }
     },
 
     data() {
       return {
+        entityTypeId: null,
+
         columnKeyMap: {
           uid: 'Unique Identifier',
           name: 'Name',
@@ -170,6 +179,10 @@
           object:     intRecord.object_name,
           fieldsMap:  intRecord.attribute_info
         })
+      },
+
+      bulkImport(intId) {
+        this.$emit('bulkImport', { integrationId: intId, entityTypeId: this.entityTypeId })
       }
     },
 
