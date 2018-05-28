@@ -286,8 +286,10 @@ export function migrations(postgres) {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_entity_links (
           id bigserial PRIMARY KEY,
+          team_id bigint REFERENCES teams,
           entity1_id bigint REFERENCES team_entities,
           entity2_id bigint REFERENCES team_entities,
+          status varchar(255) default 'active',
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
         );

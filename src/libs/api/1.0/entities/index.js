@@ -43,6 +43,29 @@ export default {
     res.json({ types })
   },
 
+  async ['type/create']({ req, res, postgres, redis, events }) {
+    const typeRecord    = req.body.record
+    const typesInst     = TeamEntityTypes(postgres)
+    const session       = SessionHandler(req.session, { redis })
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const typeName      = req.body.name
+    const typeDesc      = req.body.description
+
+    const dbRecord = await typesInst.findBy({ team_id: currentTeamId, name: typeName })
+    console.log("REC", dbRecord)
+    if (dbRecord) {
+      typesInst.setRecord(Object.assign(dbRecord, { description: typeDesc }))
+    } else {
+      typesInst.setRecord({ team_id: currentTeamId, name: typeName, description: typeDesc })
+    }
+
+    const newId = await typesInst.save()
+    await session.resetTeamSessionRefresh(currentTeamId)
+    res.json({ new_id: newId })
+
+    await events.fire(currentTeamId, events.types.CREATE_ENTITY_TYPE)
+  },
+
   async ['type/update']({ req, res, postgres, redis, events }) {
     const typeRecord    = req.body.record
     const typesInst     = TeamEntityTypes(postgres)
@@ -62,26 +85,33 @@ export default {
   },
 
   async ['links/get']({ req, res, postgres }) {
-    const links     = TeamEntityLinks(postgres)
-    const entityId  = req.query.id
+    const session       = SessionHandler(req.session)
+    const links         = TeamEntityLinks(postgres)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const entityId      = req.query.id
 
-    const linkRecords = await links.findByEntity(entityId)
+    const linkRecords = await links.findByEntity(currentTeamId, entityId)
     res.json({ records: linkRecords })
   },
 
   async ['links/create']({ req, res, postgres }) {
-    const links     = TeamEntityLinks(postgres)
-    const entity1Id = req.body.id1
-    const entity2Id = req.body.id2
+    const session       = SessionHandler(req.session)
+    const links         = TeamEntityLinks(postgres)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const entity1Id     = req.body.id1
+    const entity2Id     = req.body.id2
 
     if (entity1Id == entity2Id)
       return res.status(400).json({ error: res.__("You cannot create a link between the same record.") })
 
     const linkId = await links.getLinkId(entity1Id, entity2Id)
-    if (linkId)
+    if (linkId) {
+      links.setRecord({ id: linkId, status: 'active' })
+      await links.save()
       return res.json(true)
+    }
 
-    links.setRecord({ entity1_id: entity1Id, entity2_id: entity2Id })
+    links.setRecord({ team_id: currentTeamId, entity1_id: entity1Id, entity2_id: entity2Id })
     const newId = await links.save()
 
     res.json({ link_id: newId })

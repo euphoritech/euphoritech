@@ -38,6 +38,18 @@ export default {
       mod5: 'Closed At'
     },
 
+    manual: {
+      uid: 'Unique ID',
+      name: 'Name',
+      description: 'Description',
+      // dueDate: 'Due Date',
+      mod1: 'Extra Parameter 1',
+      mod2: 'Extra Parameter 2',
+      mod3: 'Extra Parameter 3',
+      mod4: 'Extra Parameter 4',
+      mod5: 'Extra Parameter 5'
+    },
+
     salesforce: {
       uid: 'Unique Identifier',
       name: 'Name',

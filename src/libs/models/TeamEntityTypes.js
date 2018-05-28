@@ -7,7 +7,7 @@ export default function TeamEntityTypes(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'team_id', 'type', 'is_active', 'description'
+        'team_id', 'name', 'is_active', 'description'
       ]
     }
   )

@@ -7,17 +7,18 @@ export default function TeamEntityLinks(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'entity1_id', 'entity2_id'
+        'team_id', 'entity1_id', 'entity2_id', 'status'
       ],
 
-      async getLinkId(id1, id2) {
+      async getLinkId(teamId, id1, id2) {
         const { rows } = await postgres.query(`
           select *
           from team_entity_links
           where
-            (entity1_id = $1 or entity2_id = $1) and
-            (entity1_id = $2 or entity2_id = $2)
-        `, [ id1, id2 ])
+            team_id = $1 and
+            (entity1_id = $2 or entity2_id = $2) and
+            (entity1_id = $3 or entity2_id = $3)
+        `, [ teamId, id1, id2 ])
 
         if (rows.length > 0)
           return parseInt(rows[0].id)
@@ -25,7 +26,7 @@ export default function TeamEntityLinks(postgres) {
         return null
       },
 
-      async findByEntity(entityId) {
+      async findByEntity(teamId, entityId, status='active') {
         const { rows } = await postgres.query(`
           select
             e2.*,
@@ -33,10 +34,10 @@ export default function TeamEntityLinks(postgres) {
             l.entity2_id
           from team_entities as e
           inner join team_entity_links as l on e.id = l.entity1_id or e.id = l.entity2_id
-          inner join team_entities as e2 on e2.id <> $1 and (e2.id = l.entity1_id or e2.id = l.entity2_id)
-          where e.id = $1
+          inner join team_entities as e2 on e2.id <> $2 and (e2.id = l.entity1_id or e2.id = l.entity2_id)
+          where e.team_id = $1 and e.id = $2 and l.status = $3
           order by lower(e2.name)
-        `, [ entityId ])
+        `, [ teamId, entityId, status ])
         return rows
       }
     }

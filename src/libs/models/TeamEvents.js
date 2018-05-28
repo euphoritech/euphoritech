@@ -21,6 +21,7 @@ export default function TeamEvents(postgres, { redis }={}) {
       types: {
         CREATE_ENTITY:      'Create Record',
         DELETE_ENTITY:      'Delete Record',
+        CREATE_ENTITY_TYPE: 'Create Record Type',
         UPDATE_ENTITY_TYPE: 'Update Record Type',
         UPDATE_ENTITY:      'Update Record'
       },

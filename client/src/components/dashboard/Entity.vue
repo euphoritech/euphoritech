@@ -5,13 +5,14 @@
       b-alert(:show="!!error",variant="warning") {{ error }}
       b-row(v-if="!error")
         b-col(cols="12")
-          h2(style="border-bottom: 1px #f0f0f0 solid") {{ truncateString(entityRecord.name, 40) }}
+          h2 {{ truncateString(entityRecord.name, 40) }}
+          hr
         b-col(cols="12",md="7")
-          b-row
+          b-row.border-subtle
             b-col(cols="12",md="3")
               strong Source:
-            b-col(cols="12",md="9") {{ entityRecord.source }}
-          b-row(v-for="(string, col) in $store.state.dataLabelMaps.github",:key="col")
+            b-col(cols="12",md="9") {{ titleCase(entityRecord.source) }}
+          b-row.border-subtle(v-for="(string, col) in $store.state.dataLabelMaps.github",:key="col",v-if="entityRecord[col] && entityRecord[col].length > 0")
             b-col(cols="12",md="3")
               strong {{ $store.state.dataLabelMaps[entityRecord.source][col] }}:
             b-col(cols="12",md="9") {{ truncateString(entityRecord[col], 50) }}
@@ -29,7 +30,7 @@
             tbody
               tr(v-for="(link, ind) in links",:key="link.id")
                 td {{ ind+1 }}
-                td {{ link.source }}
+                td {{ titleCase(link.source) }}
                 td
                   a(:href="'/dashboard/entity/' + link.id") {{ truncateString(link.name, 30) }}
           b-alert(:show="links.length === 0",variant="warning") There are no other records linked to this one yet.
@@ -58,6 +59,7 @@
     methods: {
       getFormattedDate: TimeHelpers.getFormattedDate,
       truncateString: StringHelpers.truncateString,
+      titleCase: StringHelpers.titleCase,
 
       async createLink(record) {
         await ApiEntities.createLink(this.id, record.id)
@@ -81,3 +83,9 @@
     }
   }
 </script>
+
+<style scoped>
+  .border-subtle {
+    border-bottom: 1px #f0f0f0 solid;
+  }
+</style>

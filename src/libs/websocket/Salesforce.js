@@ -32,15 +32,13 @@ export default function Salesforce({ app, socket, log, io, postgres, redis }) {
         const columns = Object.values(sfdcRecord.attribute_info).filter(a => !!a)
         let records = []
         await api.query(`select ${columns.join(',')} from ${sfdcRecord.object_name}`, async rec => records.push(rec))
-        await Promise.each(
-          records.map(async rec => {
-            await sleep(300)
-            let info = { source: 'salesforce', entityTypeId, raw_info: rec }
-            Object.keys(sfdcRecord.attribute_info).forEach(col => info[col] = (sfdcRecord.attribute_info[col]) ? rec[ sfdcRecord.attribute_info[col] ] : null)
-            await teamEnt.createOrUpdate(teamId, info)
-            socket.emit('salesforceBulkAddedRecord', { record: rec })
-          })
-        )
+        await Promise.each(records, async rec => {
+          await sleep(300)
+          let info = { source: 'salesforce', entityTypeId, raw_info: rec }
+          Object.keys(sfdcRecord.attribute_info).forEach(col => info[col] = (sfdcRecord.attribute_info[col]) ? rec[ sfdcRecord.attribute_info[col] ] : null)
+          await teamEnt.createOrUpdate(teamId, info)
+          socket.emit('salesforceBulkAddedRecord', { record: rec })
+        })
 
         socket.emit('salesforceBulkFinished')
       }
