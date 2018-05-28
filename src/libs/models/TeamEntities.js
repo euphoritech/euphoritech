@@ -68,18 +68,28 @@ export default function TeamEntities(postgres) {
           where t.team_id = $1 and
           t.id = $2 ${additionalSearchFilter}
           order by ${orderBy}`
-        const data = PostgresSqlParser().runPaginationQuery(postgres, query, queryParams, page, pageSize)
-        return data
+        return await PostgresSqlParser().runPaginationQuery(postgres, query, queryParams, page, pageSize)
       },
 
-      async recordSearch(teamId, searchQuery) {
-        const { rows } = await postgres.query(`
-          select * from team_entities
-          where team_id = $1 and name || uid || mod1 || mod2 ilike '%' || $2 || '%'
-          order by lower(name)
-        `, [ teamId, searchQuery ])
+      async recordSearch(teamId, searchQuery, { page, pageSize, type_id }) {
+        page = page || 1
+        pageSize = pageSize || 30
+        let additionalQueryInfo = ''
+        let queryParams = [ teamId, searchQuery ]
+        if (type_id) {
+          additionalQueryInfo = `entity_type_id = $2 and`
+          queryParams.splice(1, 0, type_id)
+        }
 
-        return rows
+        const query = `
+          select * from team_entities
+          where
+            team_id = $1 and
+            ${additionalQueryInfo}
+            coalesce(name, '') || coalesce(uid, '') || coalesce(mod1, '') || coalesce(mod2, '') ilike '%' || $${queryParams.length} || '%'
+          order by lower(name)`
+
+        return await PostgresSqlParser().runPaginationQuery(postgres, query, queryParams, page, pageSize)
       },
 
       seedTypes: [

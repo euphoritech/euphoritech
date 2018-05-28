@@ -22,9 +22,11 @@ export default {
     const entities      = TeamEntities(postgres)
     const currentTeamId = session.getCurrentLoggedInTeam()
     const query         = req.query.search
+    const page          = req.query.page
+    const type_id       = req.query.type_id
 
-    const records = await entities.recordSearch(currentTeamId, query)
-    res.json({ records })
+    const info = await entities.recordSearch(currentTeamId, query, { page, type_id })
+    res.json({ info })
   },
 
   async ['types/get']({ req, res, postgres }) {

@@ -8,7 +8,7 @@
           b-row
             b-col(v-if="isLoadingLocal")
               loader
-            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",@changeEntityTypeOrRemove="removeEntity",@changePage="changePage",v-if="!isLoadingLocal")
+            component.padding-medium(:is="partialComponent",v-bind="currentComponentProps",@changeEntityTypeOrRemove="removeEntity",@changePage="changePage",@searchForRecords="recordSearch",v-if="!isLoadingLocal")
 </template>
 
 <script>
@@ -45,8 +45,15 @@
     },
 
     methods: {
-      async changePage(newPage) {
+      async changePage(searchTerm, newPage) {
+        if (searchTerm)
+          return this.recordInfo = (await ApiEntities.search({ type_id: this.type_id, search: searchTerm, page: newPage })).info
+
         this.recordInfo = (await ApiEntities.getEntityListByType({ type_id: this.type_id, page: newPage })).info
+      },
+
+      async recordSearch(search) {
+        this.recordInfo = (await ApiEntities.search({ type_id: this.type_id, page: 1, search })).info
       },
 
       removeEntity(id) {

@@ -20,51 +20,54 @@
           span.margin-left-medium Records List
       b-collapse#entity-records(v-model="$store.state.session.entities.dashboard.accordion.visibility.records",accordion="entity-accordion",role="tabpanel")
         b-card-body
+          b-form.margin-bottom-medium(@submit="searchForRecords")
+            b-form-input(v-model="searchTerm",placeholder="Search for records...")
           b-alert.text-center(:show="data.data.length === 0",variant="warning")
             div.text-large
               span There are no records of type: {{ type.name }}.&nbsp;
               a(v-if="isRealType()",href="javascript:void(0)",@click.prevent="toggleCreateEntityModal") Click Here
               span(v-if="isRealType()")  to add one.
-          table.table.thin(v-if="data.data.length > 0")
-            thead
-              tr
-                th #
-                th Name
-                th Description
-                th Source
-                th Unique ID
-                th Due Date
-                th(v-if="!isRealType()") Restore
-            tbody
-              tr(v-for="(record, ind) in recordsSorted")
-                td
-                  span {{ (ind + 1) + ((data.currentPage - 1) * 30) }}.
-                  a.cog.margin-left-small(v-if="isRealType()",:id="'edit-record-' + ind",href="javascript:void(0)")
-                    i.fa.fa-cog
-                  b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
-                    div
-                      strong {{ truncateString(record.name, 20) }}
-                    hr(style="margin-top: 5px; margin-bottom: 5px;")
-                    div Change record type:
-                    b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityTypeOrRemove(record.id, ind)")
-                    div.all-small-inputs Due Date
-                      datepicker(v-model="record.due_date",@input="changeDueDate(record.due_date, record.id)")
-                    div.margin-top-medium.text-center
-                      a.text-danger(href="javascript:void(0)",@click="deleteEntity(record.id, ind)") Delete Record
-                td.nowrap-ellipses.max-150.strong-text(:id="'record-name-' + ind")
-                  strong
-                    a.entity-link(:href="'/dashboard/entity/' + record.id") {{ record.name }}
-                  b-tooltip(:target="'record-name-' + ind") {{ record.name }}
-                td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
-                  b-tooltip(:target="'record-desc-' + ind") {{ truncateString(record.description, 400) }}
-                td {{ record.source }}
-                td {{ record.uid }}
-                td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
-                td(v-if="!isRealType()")
-                  a(href="javascript:void(0)",@click="restoreEntity(record.id, ind)") Restore Record
-          div(v-if="numberOfPages > 1")
-            hr
-            b-pagination(size="sm",align="right",:total-rows="data.totalCount",v-model="data.currentPage",:per-page="30",@change="changePage")
+          div(v-if="data.data.length > 0")
+            table.table.thin
+              thead
+                tr
+                  th #
+                  th Name
+                  th Description
+                  th Source
+                  th Unique ID
+                  th Due Date
+                  th(v-if="!isRealType()") Restore
+              tbody
+                tr(v-for="(record, ind) in recordsSorted")
+                  td
+                    span {{ (ind + 1) + ((data.currentPage - 1) * 30) }}.
+                    a.cog.margin-left-small(v-if="isRealType()",:id="'edit-record-' + ind",href="javascript:void(0)")
+                      i.fa.fa-cog
+                    b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
+                      div
+                        strong {{ truncateString(record.name, 20) }}
+                      hr(style="margin-top: 5px; margin-bottom: 5px;")
+                      div Change record type:
+                      b-form-select(size="sm",:options="typeOptions",v-model="currentTypeId",@change.native="changeEntityTypeOrRemove(record.id, ind)")
+                      div.all-small-inputs Due Date
+                        datepicker(v-model="record.due_date",@input="changeDueDate(record.due_date, record.id)")
+                      div.margin-top-medium.text-center
+                        a.text-danger(href="javascript:void(0)",@click="deleteEntity(record.id, ind)") Delete Record
+                  td.nowrap-ellipses.max-150.strong-text(:id="'record-name-' + ind")
+                    strong
+                      a.entity-link(:href="'/dashboard/entity/' + record.id") {{ record.name }}
+                    b-tooltip(:target="'record-name-' + ind") {{ record.name }}
+                  td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
+                    b-tooltip(:target="'record-desc-' + ind") {{ truncateString(record.description, 400) }}
+                  td {{ record.source }}
+                  td {{ record.uid }}
+                  td {{ (record.due_date) ? getFormattedDate(record.due_date) : 'N/A' }}
+                  td(v-if="!isRealType()")
+                    a(href="javascript:void(0)",@click="restoreEntity(record.id, ind)") Restore Record
+            div(v-if="numberOfPages > 1")
+              hr
+              b-pagination(size="sm",align="right",:total-rows="data.totalCount",v-model="data.currentPage",:per-page="30",@change="changePage")
 </template>
 
 <script>
@@ -84,7 +87,8 @@
       return {
         type: {},
         currentTypeId: null,
-        typeOptions: []
+        typeOptions: [],
+        searchTerm: null
       }
     },
 
@@ -106,8 +110,13 @@
       getFormattedDate: TimeHelpers.getFormattedDate,
       truncateString: StringHelpers.truncateString,
 
+      async searchForRecords($event) {
+        $event.preventDefault()
+        this.$emit('searchForRecords', this.searchTerm)
+      },
+
       changePage(newPage) {
-        this.$emit('changePage', newPage)
+        this.$emit('changePage', this.searchTerm, newPage)
       },
 
       getAccordionSessionObj() {

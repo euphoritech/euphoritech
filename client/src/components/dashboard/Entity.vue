@@ -19,7 +19,7 @@
           h5 Records Linked ({{ links.length }})
           div
             small Add record link:
-          typeahead-input.margin-bottom-small(src="/api/1.0/entities/search",:params="{ keysFromResponse: 'records', showProp: 'name', minChars: 3 }",@onHit="createLink")
+          typeahead-input.margin-bottom-small(src="/api/1.0/entities/search",:params="{ keysFromResponse: 'info.data', showProp: 'name', minChars: 3 }",@onHit="createLink")
           table.table.very-thin.table-striped.table-bordered(v-if="links.length > 0")
             thead
               tr

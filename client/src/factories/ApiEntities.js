@@ -6,6 +6,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async search({ search, page, type_id }) {
+    const response = await euphoritechFetch(`/api/1.0/entities/search?type_id=${type_id}&page=${page || 1}&search=${search}`)
+    return await handleFetchResponse(response)
+  },
+
   async getTypes(onlyActive=true) {
     if (onlyActive === null || typeof onlyActive === 'undefined')
       onlyActive = ''
