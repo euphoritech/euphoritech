@@ -15,18 +15,19 @@ const log = bunyan.createLogger(config.logger.options)
 
 export default async function Index(req, res) {
   try {
-    if (req.params[0].indexOf("favicon.ico") !== 0) {
+    const loginHandler    = LoginHandler(postgres, req.session)
+    const sessionHandler  = SessionHandler(req.session, { redis: redisClient })
+    const users           = Users(postgres, req.session)
+    const currentTeamId   = sessionHandler.getCurrentLoggedInTeam()
+    const currentUser     = sessionHandler.getLoggedInUserId(true)
+
+    if (req.params[0].indexOf("favicon.ico") !== 0 && currentTeamId) {
       req.session.returnTo = req.params[0]
       req.session.save()
     }
 
     res.render('index', {})
 
-    const loginHandler    = LoginHandler(postgres, req.session)
-    const sessionHandler  = SessionHandler(req.session, { redis: redisClient })
-    const users           = Users(postgres, req.session)
-    const currentTeamId   = sessionHandler.getCurrentLoggedInTeam()
-    const currentUser     = sessionHandler.getLoggedInUserId(true)
     if (currentTeamId) {
       if (await sessionHandler.checkIfShouldRefreshSession(currentTeamId)) {
         log.info(`Resetting session cache for user '${currentUser.username_email}' in team ID: ${currentTeamId}`)
