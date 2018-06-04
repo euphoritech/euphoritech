@@ -42,6 +42,7 @@
               hr
               h3
                 span Bulk Record Import
+                loader-inline(v-if="github.bulk.numImported === -1")
                 b-badge.margin-left-small(v-if="github.bulk.numImported && github.bulk.numImported > 0",variant="primary",:pill="true") {{ github.bulk.numImported }} processed
               div(v-if="!github.bulk.repo")
                 div
@@ -122,14 +123,14 @@
             repo: null,
             user: null,
             entityTypeId: null,
-            numImported: 0
+            numImported: -2
           }
         },
 
         salesforce: {
           bulk: {
             isProcessing: false,
-            numImported: 0
+            numImported: -2
           }
         }
       }
@@ -139,7 +140,14 @@
       bindSocketEvents() {
         EuphoritechSocket.on('githubBulkAddedRecord', ({ record }) => {
           // console.log("IMPORTED REC", record)
+          this.github.bulk.numImported = Math.max(0, this.github.bulk.numImported)
           this.github.bulk.numImported++
+        })
+
+        EuphoritechSocket.on('salesforceBulkAddedRecord', ({ record }) => {
+          // console.log("IMPORTED REC", record)
+          this.salesforce.bulk.numImported = Math.max(0, this.salesforce.bulk.numImported)
+          this.salesforce.bulk.numImported++
         })
 
         EuphoritechSocket.on('githubBulkFinished', () => this.github.bulk.isProcessing = false)
@@ -165,6 +173,7 @@
           return toast.open(`Please enter a valid entity type to classify the records being bulk imported.`, 'error')
 
         this.github.bulk.isProcessing = true
+        this.github.bulk.numImported = -1
         EuphoritechSocket.emit('githubBulkRecordImportStart', { org: this.github.org, repo: this.github.bulk.repo, entityTypeId: this.github.bulk.entityTypeId })
         toast.open(`Starting your bulk import now!`)
       },
@@ -210,7 +219,7 @@
         }
 
         const response = await ApiIntegrations.saveTeamIntegration(requestObject)
-        toast.open(`Starting your bulk import now!`)
+        toast.open(`Successfully saved your integration configuration!`)
       }
     },
 

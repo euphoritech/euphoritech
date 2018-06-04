@@ -4,7 +4,10 @@
       span There are no Salesforce object integrations yet.
     b-row.margin-top-medium(v-if="objectTeamIntegrations.length > 0")
       b-col(cols="12")
-        h5 Current Integrations
+        h5
+          span Current Integrations
+          //- loader-inline(v-if="salesforce.bulk.numImported === -1")
+          //- b-badge.margin-left-small(v-if="salesforce.bulk.numImported && salesforce.bulk.numImported > 0",variant="primary",:pill="true") {{ salesforce.bulk.numImported }} processed
         table.table.thin.table-bordered.table-striped
           thead
             tr

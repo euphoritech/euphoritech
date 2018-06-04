@@ -104,7 +104,7 @@ export default {
     if (entity1Id == entity2Id)
       return res.status(400).json({ error: res.__("You cannot create a link between the same record.") })
 
-    const linkId = await links.getLinkId(entity1Id, entity2Id)
+    const linkId = await links.getLinkId(currentTeamId, entity1Id, entity2Id)
     if (linkId) {
       links.setRecord({ id: linkId, status: 'active' })
       await links.save()

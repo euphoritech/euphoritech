@@ -18,7 +18,7 @@
   import TopMainNavBar from './TopMainNavBar'
   import ChatWidget from './ChatWidget'
   import SideMainNav from './SideMainNav'
-  import CreateEntityModal from './entities/CreateEntityModal'
+  import CreateEntityModal from './entities/create/CreateEntityModal'
   import SettingsContainer from './settings/SettingsContainer'
   import ApiAuth from '../factories/ApiAuth'
   import euphoritechSocket from '../factories/EuphoritechSocket'

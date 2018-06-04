@@ -4,6 +4,22 @@
       loader
     div(v-if="!isLoadingLocal")
       b-row
+        b-col.margin-bottom-medium(cols="12")
+          div
+            a(href="javascript:void(0)",@click="showCreateTypeForm = !showCreateTypeForm") Create New Record Type
+          b-row
+            b-col(cols="12",md="4")
+              b-card.subtle-bg(v-if="showCreateTypeForm",:no-body="true")
+                b-card-body
+                  b-row
+                    b-col(cols="12")
+                      b-form-group(label="New Type Name")
+                        b-form-input(type="text",v-model="newType.name",size="sm")
+                    b-col(cols="12")
+                      b-form-group(label="Description")
+                        b-form-input(type="text",v-model="newType.description",size="sm")
+                    b-col.text-center(cols="12")
+                      b-button(variant="primary",@click="saveNewRecordType") Create New Type
         b-col(cols="12")
           table.table
             thead
@@ -22,21 +38,6 @@
                   i
                     a(:id="'update-active-status-' + entity.id",href="javascript:void(0)",@click="updateTypeRecordStatus(entity)") {{ getActiveStatus(entity.is_active) }}
                     b-tooltip(:target="'update-active-status-' + entity.id",:title="'Click here to ' + getActiveStatus(entity.is_active, true) + ' this record type. This will allow or disallow records from being linked to this type in the future.'")
-        b-col(cols="12")
-          hr
-          div
-            a(href="javascript:void(0)",@click="showCreateTypeForm = !showCreateTypeForm") Create New Record Type
-          b-row(v-if="showCreateTypeForm")
-            b-col(cols="12",md="4")
-              b-row
-                b-col(cols="12")
-                  b-form-group(label="Name")
-                    b-form-input(type="text",v-model="newType.name",size="sm")
-                b-col(cols="12")
-                  b-form-group(label="Description")
-                    b-form-input(type="text",v-model="newType.description",size="sm")
-                b-col.text-center(cols="12")
-                  b-button(variant="primary",@click="saveNewRecordType") Create New Type
 </template>
 
 <script>
@@ -104,6 +105,7 @@
         this.isLoadingLocal = true
         await ApiEntities.createType(this.newType.name, this.newType.description)
         this.entityTypes = (await ApiTeams.getTeamEntityTypes()).types
+        this.showCreateTypeForm = false
         this.isLoadingLocal = false
         toast.open("Successfully saved new record type!")
       }

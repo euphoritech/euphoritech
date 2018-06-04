@@ -73,13 +73,21 @@ export default function GithubApi(oauthToken, userOrOrganization=null) {
 
       // http://github-tools.github.io/github/docs/3.1.0/Repository.html#listPullRequests
       async listPullRequests(options={ state: 'all' }) {
-        return await _repo.listPullRequests(options)
+        // return await _repo.listPullRequests(options)
+        return await _repo._requestAllPages(`/repos/${_repo.__fullname}/pulls`, options)
       },
 
       // http://github-tools.github.io/github/docs/3.1.0/Issue.html#listIssues
-      async listIssues(repo, options={ state: 'open' }, userOrOrganization=userOrOrg) {
+      async listIssues(repo, options={ state: 'all' }, userOrOrganization=userOrOrg) {
         const issueInst = await client.getIssues(userOrOrganization, repo)
-        return await issueInst.listIssues(options)
+        const res = await issueInst.listIssues(options)
+
+        // per docs here: https://developer.github.com/v3/issues/#list-issues-for-a-repository
+        // the /repos/:owner/:repo/issues endpoint will list both issues and
+        // pull requests in the response. Because of that, we will filter out
+        // pull requests here before returning the response object.
+        res.data = res.data.filter(i => !i.pull_request)
+        return res
       },
 
       // http://github-tools.github.io/github/docs/3.1.0/Search.html#forIssues

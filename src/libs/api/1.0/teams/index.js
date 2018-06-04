@@ -49,7 +49,7 @@ export default {
       return res.status(400).json({ error: res.__(`There is already a team with ID: ${teamExtId}`) })
 
     const newTeamRecord = await teams.create({ teamExtId, teamName, userId })
-    const teamMapRecord = await teamMap.findOrCreateBy({ team_id: newTeamRecord.id, primary_contact_user_id: userId, role: 'teamadmin' })
+    const teamMapRecord = await teamMap.findOrCreateBy({ team_id: newTeamRecord.id, user_id: userId, role: 'teamadmin' })
 
     const [ teamRoleMapRecords, _ ] = await Promise.all([
       teamMap.getAllByUserId(userId),
@@ -60,7 +60,7 @@ export default {
     return res.json(null)
   },
 
-  async ['team/join/request']({ req, res, postgres, redis }) {
+  async ['join/request']({ req, res, postgres, redis }) {
     const queue       = new NodeResque.Queue({ connection: { redis: redis.client }})
     const teams       = Teams(postgres)
     const users       = Users(postgres, req.session)
@@ -81,7 +81,32 @@ export default {
       user_id: userId
     }])
 
-    return res.json(null)
+    return res.json(true)
+  },
+
+  async ['user/invite']({ req, res, postgres }) {
+    const queue         = new NodeResque.Queue({ connection: { redis: redis.client }})
+    const teams         = Teams(postgres)
+    const teamMap       = TeamsUsersRolesMap(postgres)
+    const users         = Users(postgres, req.session)
+    const session       = SessionHandler(req.session)
+    const userRecord    = users.getLoggedInUser()
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const newUserName   = req.body.name
+    const newUserEmail  = req.body.email
+
+    // const newUser = await users.findOrCreateBy({ username_email: newUserEmail, name: newUserName })
+    // const teamMapRecord = await teamMap.findOrCreateBy({ team_id: currentTeamId, user_id: newUser.id, role: 'teamadmin' })
+
+    // await queue.connect()
+    // await queue.enqueue(config.resque.default_queue, 'sendUserInvitation', [{
+    //   team_id: teamRecord.id,
+    //   inviting_user_name: userRecord.name,
+    //   new_user_name: newUserName,
+    //   new_user_email: newUserEmail
+    // }])
+    //
+    // res.json(true)
   },
 
   async access({ req, res, postgres, redis }) {

@@ -25,8 +25,17 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async inviteNewUser(name, email) {
+    const response = await euphoritechFetch(`/api/1.0/teams/user/invite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    })
+    return await handleFetchResponse(response)
+  },
+
   async requestJoinTeam({ teamId }) {
-    const response = await euphoritechFetch(`/api/1.0/teams/team/join/request`, {
+    const response = await euphoritechFetch(`/api/1.0/teams/join/request`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId })

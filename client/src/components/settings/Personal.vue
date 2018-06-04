@@ -5,7 +5,8 @@
         b-col(cols="12")
           a#reset-password-popover(href="javascript:void(0)")
             small Add/Reset Password
-          reset-password-popover(target="reset-password-popover")
+          b-popover(ref="reset-password-popover",target="reset-password-popover",title="Reset Password")
+            reset-password(@reset="closePasswordPopover")
         b-col(cols="12",md="2",lg="2")
           strong Username:
         b-col(cols="12",md="10",lg="10")
@@ -28,7 +29,7 @@
 </template>
 
 <script>
-  import ResetPasswordPopover from '../ResetPasswordPopover'
+  import ResetPasswordForm from '../ResetPasswordForm'
   import TimeHelpers from '../../factories/TimeHelpers'
 
   export default {
@@ -42,6 +43,10 @@
 
     methods: {
       getFormattedDate: TimeHelpers.getFormattedDate,
+
+      closePasswordPopover() {
+        this.$refs['reset-password-popover'].$emit('close')
+      },
 
       submitPersonal(evt) {
         evt.preventDefault()
@@ -64,7 +69,7 @@
     },
 
     components: {
-      ResetPasswordPopover
+      'reset-password': ResetPasswordForm
     }
   }
 </script>

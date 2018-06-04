@@ -3,7 +3,7 @@
     b-form(@submit="validateForm($event)",:action="formAction",method="post")
       div(v-if="isLoadingLocal")
         loader
-      div.row.d-flex.justify-content-center
+      div.row.d-flex.justify-content-center(v-if="!isLoadingLocal")
         div.col-xs-12.col-sm-8.col-sm-offset-2.col-lg-4.col-lg-offset-4
           h1.text-center {{ title }}
           div.d-flex.justify-content-center(style="margin-bottom:25px")
@@ -52,7 +52,7 @@
   export default {
     data() {
       return {
-        isLoadingLocal: false,
+        isLoadingLocal: true,
         error: null,
         data: {
           username: null,
@@ -140,13 +140,16 @@
     },
 
     created() {
-      if (location.pathname === '/createaccount') {
+      if (this.$store.state.auth.user && this.$store.state.auth.user.id) {
+        return location.href = '/'
+      } else if (location.pathname === '/createaccount') {
         this.formAction = '/auth/createaccount'
         this.title = 'Create Account'
         this.createValue = true
       }
 
       this.error = StringHelpers.unserialize(location.search).error
+      this.isLoadingLocal = false
     },
 
     components: {

@@ -17,7 +17,13 @@ export default function WebSocket({ io, log, postgres, redis }) {
 
     Object.keys(handlers).forEach(category => {
       Object.keys(handlers[category]).forEach(evt => {
-        socket.on(evt, handlers[category][evt])
+        socket.on(evt, async function(...args) {
+          try {
+            await handlers[category][evt](...args)
+          } catch(err) {
+            log.error(`Error with socket handler: ${category} - ${evt}`, err)
+          }
+        })
       })
     })
     socket.on('disconnect', disconnectSocket)

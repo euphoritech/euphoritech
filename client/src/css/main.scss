@@ -7,6 +7,7 @@ $body_color: #007bff;
 // $body_color: #2e529a;
 $soft_color1: #f8f8f8;
 $soft_color2: #c0c0c0;
+$soft_color3: #f0f0f0;
 $dark_color: #343a40;
 
 html, body {
@@ -20,6 +21,13 @@ html, body {
   background-position:center center;
   background-repeat:no-repeat;
   */
+}
+
+a {
+  &.und-only {
+    color: inherit;
+    text-decoration: underline;
+  }
 }
 
 .center-everything {
@@ -37,6 +45,10 @@ html, body {
 
 .soft-text {
   color: $soft_color2;
+}
+
+.subtle-bg {
+  background: $soft_color3;
 }
 
 table {
