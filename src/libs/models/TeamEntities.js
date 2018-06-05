@@ -86,7 +86,8 @@ export default function TeamEntities(postgres) {
           where
             team_id = $1 and
             ${additionalQueryInfo}
-            coalesce(name, '') || coalesce(uid, '') || coalesce(mod1, '') || coalesce(mod2, '') ilike '%' || $${queryParams.length} || '%'
+            -- coalesce(name, '') || coalesce(uid, '') || coalesce(mod1, '') || coalesce(mod2, '') ilike '%' || $${queryParams.length} || '%'
+            coalesce(name, '') || coalesce(uid, '') ilike '%' || $${queryParams.length} || '%'
           order by lower(name)`
 
         return await PostgresSqlParser().runPaginationQuery(postgres, query, queryParams, page, pageSize)

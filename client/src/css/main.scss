@@ -51,6 +51,10 @@ a {
   background: $soft_color3;
 }
 
+.no-margin {
+  margin: 0px !important;
+}
+
 table {
   &.thin {
     th, td {
@@ -213,6 +217,10 @@ table {
 
 .max-200 {
   max-width: 200px;
+}
+
+.max-250 {
+  max-width: 250px;
 }
 
 .max-300 {

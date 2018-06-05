@@ -58,7 +58,7 @@
                     strong
                       a.entity-link(:href="'/dashboard/entity/' + record.id") {{ record.name }}
                     b-tooltip(:target="'record-name-' + ind") {{ record.name }}
-                  td.nowrap-ellipses.max-300(:id="'record-desc-' + ind") {{ record.description }}
+                  td.nowrap-ellipses.max-250(:id="'record-desc-' + ind") {{ record.description }}
                     b-tooltip(:target="'record-desc-' + ind") {{ truncateString(record.description, 400) }}
                   td {{ record.source }}
                   td {{ record.uid }}

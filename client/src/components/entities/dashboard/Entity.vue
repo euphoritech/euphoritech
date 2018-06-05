@@ -4,26 +4,31 @@
     div(v-if="!isLoadingLocal")
       b-alert(:show="!!error",variant="warning") {{ error }}
       b-row(v-if="!error")
-        b-col(cols="12")
+        b-col.d-flex.justify-content-between(cols="12")
           h2
             div {{ truncateString(entityRecord.name, 40) }}
             div.soft-text(style="font-size: 12px")
               a.und-only(:href="'/dashboard/type/' + entityType.id") {{ entityType.name }}
+          div.soft-text(style="font-size: 16px",v-if="entityRecord.status != 'active'") {{ titleCase(entityRecord.status) }}
+        b-col(cols="12")
           hr
         b-col(cols="12",md="7")
-          b-row.border-subtle
-            b-col(cols="12",md="3")
-              strong Source:
-            b-col(cols="12",md="9") {{ titleCase(entityRecord.source) }}
-          b-row.border-subtle(v-for="(string, col) in $store.state.dataLabelMaps.github",:key="col",v-if="entityRecord[col] && entityRecord[col].length > 0")
-            b-col(cols="12",md="3")
-              strong {{ $store.state.dataLabelMaps[entityRecord.source][col] }}:
-            b-col(cols="12",md="9") {{ truncateString(entityRecord[col], 50) }}
+          b-row.margin-bottom-medium
+            b-col(cols="12")
+              h4.soft-text.no-margin Source
+            b-col(cols="12") {{ titleCase(entityRecord.source) }}
+          b-row.margin-bottom-medium(v-for="(string, col) in $store.state.dataLabelMaps.github",:key="col",v-if="entityRecord[col] && entityRecord[col].length > 0")
+            b-col(cols="12")
+              h4.soft-text.no-margin {{ $store.state.dataLabelMaps[entityRecord.source][col] }}
+            b-col.entity-content(cols="12")
+              b-card(:no-body="true",v-if="shouldWrapInCard(entityRecord[col])")
+                b-card-body(v-html="markdownToHtml(entityRecord[col])")
+              div(v-if="!shouldWrapInCard(entityRecord[col])",v-html="markdownToHtml(entityRecord[col])")
         b-col(cols="12",md="5")
           h5 Records Linked ({{ links.length }})
           div
             small Add record link:
-          typeahead-input.margin-bottom-small(src="/api/1.0/entities/search",:params="{ keysFromResponse: 'info.data', showProp: 'name', minChars: 3 }",@onHit="createLink")
+          typeahead-input.margin-bottom-small(src="/api/1.0/entities/search",:params="{ keysFromResponse: 'info.data', showPropFunction: parseEntitySearchItem, minChars: 3, limit: 25 }",@onHit="createLink")
           table.table.very-thin.table-striped.table-bordered(v-if="links.length > 0")
             thead
               tr
@@ -40,6 +45,7 @@
 </template>
 
 <script>
+  import markdown from 'markdown'
   import ApiEntities from '../../../factories/ApiEntities'
   import StringHelpers from '../../../factories/StringHelpers'
   import TimeHelpers from '../../../factories/TimeHelpers'
@@ -73,6 +79,22 @@
       async createLink(record) {
         await ApiEntities.createLink(this.id, record.id)
         this.links = (await ApiEntities.getLinkedEntities(this.id)).records
+      },
+
+      shouldWrapInCard(string) {
+        return string && string.length > 300
+      },
+
+      markdownToHtml(string) {
+        return markdown.markdown.toHTML(string)
+      },
+
+      getEntityType(id) {
+        return this.$store.state.session.current_team_types.find(t => t.id == id)
+      },
+
+      parseEntitySearchItem(item) {
+        return `${item.name} (${this.getEntityType(item.entity_type_id).name})`
       }
     },
 
@@ -93,8 +115,14 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .border-subtle {
     border-bottom: 1px #f0f0f0 solid;
+  }
+
+  .entity-content {
+    * {
+      font-size: 1em;
+    }
   }
 </style>
