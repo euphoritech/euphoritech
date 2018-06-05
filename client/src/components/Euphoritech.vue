@@ -4,7 +4,7 @@
       loader
     div(v-if="!$store.state.isLoading")
       top-main-nav-bar
-      div.primary-view-wrapper
+      div
         div.d-none.d-sm-block(v-if="isLoggedIn")
           side-main-nav
         router-view
@@ -47,7 +47,7 @@
         this.$store.commit('CHECK_LOGGED_IN', isLoggedIn)
 
         if (!this.$store.state.isLoggedIn) {
-          if (this.$route.path !== '/createaccount' && this.$route.path !== '/login' && this.$route.path.indexOf('/autherror/') !== 0)
+          if (this.$route.path.indexOf('/gatekeeper/') !== 0 && this.$route.path.indexOf('/autherror/') !== 0)
             this.$store.dispatch('redirectToLogin')
 
           return this.$store.commit('APP_NO_LONGER_LOADING')

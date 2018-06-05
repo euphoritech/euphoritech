@@ -41,7 +41,7 @@
               tbody
                 tr(v-for="(record, ind) in recordsSorted")
                   td
-                    span {{ (ind + 1) + ((data.currentPage - 1) * 30) }}.
+                    span {{ (ind + 1) + ((data.currentPage - 1) * perPage) }}.
                     a.cog.margin-left-small(v-if="isRealType()",:id="'edit-record-' + ind",href="javascript:void(0)")
                       i.fa.fa-cog
                     b-popover(ref="edit-popover",:target="'edit-record-' + ind",title="Edit")
@@ -67,7 +67,7 @@
                     a(href="javascript:void(0)",@click="restoreEntity(record.id, ind)") Restore Record
             div(v-if="numberOfPages > 1")
               hr
-              b-pagination(size="sm",align="right",:total-rows="data.totalCount",v-model="data.currentPage",:per-page="30",@change="changePage")
+              b-pagination(size="sm",align="right",:total-rows="data.totalCount",v-model="data.currentPage",:per-page="perPage",@change="changePage")
 </template>
 
 <script>
@@ -99,9 +99,13 @@
         })
       },
 
+      perPage() {
+        return (this.data.numberPages <= 1) ? this.data.totalCount : Math.ceil(this.data.totalCount / this.data.numberPages)
+      },
+
       numberOfPages() {
-        return (this.data.totalCount && 30)
-          ? Math.ceil(this.data.totalCount / 30)
+        return (this.data.totalCount > this.perPage)
+          ? Math.ceil(this.data.totalCount / this.perPage)
           : 1
       }
     },

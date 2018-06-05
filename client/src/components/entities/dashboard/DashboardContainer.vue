@@ -30,6 +30,7 @@
         isLoadingLocal: true,
         partialComponent: null,
         recordInfo: {},
+        recordsPerPage: 10
       }
     },
 
@@ -47,13 +48,13 @@
     methods: {
       async changePage(searchTerm, newPage) {
         if (searchTerm)
-          return this.recordInfo = (await ApiEntities.search({ type_id: this.type_id, search: searchTerm, page: newPage })).info
+          return this.recordInfo = (await ApiEntities.search({ type_id: this.type_id, search: searchTerm, page: newPage, perPage: this.recordsPerPage })).info
 
-        this.recordInfo = (await ApiEntities.getEntityListByType({ type_id: this.type_id, page: newPage })).info
+        this.recordInfo = (await ApiEntities.getEntityListByType({ type_id: this.type_id, page: newPage, perPage: this.recordsPerPage })).info
       },
 
       async recordSearch(search) {
-        this.recordInfo = (await ApiEntities.search({ type_id: this.type_id, page: 1, search })).info
+        this.recordInfo = (await ApiEntities.search({ type_id: this.type_id, page: 1, perPage: this.recordsPerPage, search })).info
       },
 
       removeEntity(id) {
@@ -78,7 +79,7 @@
         }
 
       if (this.type_id) {
-        this.recordInfo = (await ApiEntities.getEntityListByType({ type_id: this.type_id })).info
+        this.recordInfo = (await ApiEntities.getEntityListByType({ type_id: this.type_id, perPage: this.recordsPerPage })).info
         this.partialComponent = 'entity-records'
         return this.isLoadingLocal = false
       }

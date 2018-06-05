@@ -8,9 +8,9 @@
           h1.text-center {{ title }}
           div.d-flex.justify-content-center(style="margin-bottom:25px")
             div(v-if="createValue")
-              a(href="/login") Login to Existing Account
+              a(href="/gatekeeper/login") Login to Existing Account
             div(v-if="!createValue")
-              a(href="/createaccount") Create New Account
+              a(href="/gatekeeper/createaccount") Create New Account
           b-card.shadow-small
             div.card-text
               input(type="hidden",id="create",name="create",:value="createValue")

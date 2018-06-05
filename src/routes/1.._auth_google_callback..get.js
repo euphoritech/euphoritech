@@ -7,7 +7,7 @@ export default function AuthGoogleCallback(req, res, next) {
       return next(err)
 
     if (!user)
-      return res.redirect('/login')
+      return res.redirect('/gatekeeper/login')
 
     return Routes.checkAndRedirect(req, res, '/')
   })(req, res, next)

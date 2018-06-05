@@ -46,7 +46,7 @@ export default {
   },
 
   redirectToLogin() {
-    window.vueRouter.push('/login')
+    window.vueRouter.push('/gatekeeper/login')
   },
 
   redirectToNoTeamForm() {

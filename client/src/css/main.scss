@@ -10,7 +10,8 @@ $soft_color2: #c0c0c0;
 $soft_color3: #f0f0f0;
 $dark_color: #343a40;
 
-html, body {
+html,
+body {
   -webkit-text-size-adjust: none;    /* This is attempting to not have the text change on a mobile device */
   min-width: 100%;
   // color: $body_color;
@@ -28,6 +29,11 @@ a {
     color: inherit;
     text-decoration: underline;
   }
+}
+
+.extend-vertical {
+  min-height: 100%;
+  height: 100%;
 }
 
 .center-everything {
@@ -245,4 +251,11 @@ table {
 .remove-icon {
   color: red;
   cursor: pointer;
+}
+
+tr.sortable-headers {
+  > th,
+  > td {
+    cursor: pointer;
+  }
 }

@@ -16,7 +16,10 @@
           b-row.margin-bottom-medium
             b-col(cols="12")
               h4.soft-text.no-margin Source
-            b-col(cols="12") {{ titleCase(entityRecord.source) }}
+            b-col(cols="12")
+              h4
+                i.margin-right-small(:class="vendorClass(entityRecord.source)")
+                span {{ titleCase(entityRecord.source) }}
           b-row.margin-bottom-medium(v-for="(string, col) in $store.state.dataLabelMaps.github",:key="col",v-if="entityRecord[col] && entityRecord[col].length > 0")
             b-col(cols="12")
               h4.soft-text.no-margin {{ $store.state.dataLabelMaps[entityRecord.source][col] }}
@@ -31,16 +34,24 @@
           typeahead-input.margin-bottom-small(src="/api/1.0/entities/search",:params="{ keysFromResponse: 'info.data', showPropFunction: parseEntitySearchItem, minChars: 3, limit: 25 }",@onHit="createLink")
           table.table.very-thin.table-striped.table-bordered(v-if="links.length > 0")
             thead
-              tr
+              tr.sortable-headers
                 th #
-                th Source
-                th Name
+                th(@click="toggleSort('name')")
+                  span Name
+                  i.margin-left-small.fa(v-if="linksSortCol == 'name'",:class="linksSortDir == 'desc' ? 'fa-chevron-circle-down' : 'fa-chevron-circle-up'")
+                th(@click="toggleSort('type')")
+                  span Type
+                  i.margin-left-small.fa(v-if="linksSortCol == 'type'",:class="linksSortDir == 'desc' ? 'fa-chevron-circle-down' : 'fa-chevron-circle-up'")
+                th(@click="toggleSort('source')")
+                  span Source
+                  i.margin-left-small.fa(v-if="linksSortCol == 'source'",:class="linksSortDir == 'desc' ? 'fa-chevron-circle-down' : 'fa-chevron-circle-up'")
             tbody
-              tr(v-for="(link, ind) in links",:key="link.id")
+              tr(v-for="(link, ind) in sortedLinks",:key="link.id")
                 td {{ ind+1 }}
-                td {{ titleCase(link.source) }}
                 td
                   a(:href="'/dashboard/entity/' + link.id") {{ truncateString(link.name, 30) }}
+                td {{ getEntityType(link.entity_type_id).name }}
+                td {{ titleCase(link.source) }}
           b-alert(:show="links.length === 0",variant="warning") There are no other records linked to this one yet.
 </template>
 
@@ -50,6 +61,7 @@
   import StringHelpers from '../../../factories/StringHelpers'
   import TimeHelpers from '../../../factories/TimeHelpers'
   import SnackbarFactory from '../../../factories/SnackbarFactory'
+  import { vendorClass } from '../../../factories/IconHelpers'
 
   export default {
     props: {
@@ -61,6 +73,8 @@
         isLoadingLocal: true,
         entityRecord: null,
         links: [],
+        linksSortCol: 'name',
+        linksSortDir: 'asc',
         error: null
       }
     },
@@ -68,6 +82,20 @@
     computed: {
       entityType() {
         return this.$store.state.session.current_team_types.find(t => t.id == this.entityRecord.entity_type_id)
+      },
+
+      sortedLinks() {
+        const sortedLinks = this.links.sort((l1, l2) => {
+          switch(this.linksSortCol) {
+            case 'name':
+              return (l1.name.toLowerCase() < l2.name.toLowerCase()) ? -1 : 1
+            case 'source':
+              return (l1.source.toLowerCase() < l2.source.toLowerCase()) ? -1 : 1
+            case 'type':
+              return (this.getEntityType(l1.entity_type_id).name.toLowerCase() < this.getEntityType(l2.entity_type_id).name.toLowerCase()) ? -1 : 1
+          }
+        })
+        return (this.linksSortDir === 'desc') ? sortedLinks.reverse() : sortedLinks
       }
     },
 
@@ -75,6 +103,16 @@
       getFormattedDate: TimeHelpers.getFormattedDate,
       truncateString: StringHelpers.truncateString,
       titleCase: StringHelpers.titleCase,
+      vendorClass,
+
+      toggleSort(col) {
+        if (this.linksSortCol !== col)
+          this.linksSortDir = 'asc'
+        else
+          this.linksSortDir = (this.linksSortDir === 'asc') ? 'desc' : 'asc'
+
+        this.linksSortCol = col
+      },
 
       async createLink(record) {
         await ApiEntities.createLink(this.id, record.id)
@@ -121,8 +159,14 @@
   }
 
   .entity-content {
+    overflow: hidden;
+
     * {
       font-size: 1em;
+    }
+
+    img {
+      max-width: 100%;
     }
   }
 </style>

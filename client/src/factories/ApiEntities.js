@@ -6,8 +6,8 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  async search({ search, page, type_id }) {
-    const response = await euphoritechFetch(`/api/1.0/entities/search?type_id=${type_id}&page=${page || 1}&search=${search}`)
+  async search({ search, page, perPage, type_id }) {
+    const response = await euphoritechFetch(`/api/1.0/entities/search?type_id=${type_id}&page=${page || 1}&perPage=${perPage || 30}&search=${search}`)
     return await handleFetchResponse(response)
   },
 

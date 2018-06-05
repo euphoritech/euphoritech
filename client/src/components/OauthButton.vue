@@ -5,6 +5,8 @@
 </template>
 
 <script>
+  import { vendorClass } from '../factories/IconHelpers'
+
   export default {
     props: {
       type: { type: String },
@@ -17,21 +19,21 @@
 
         typeMap: {
           github: {
-            deviconClass: 'devicon-github-plain',
+            deviconClass: vendorClass('github'),
             link:         '/auth/github',
             mainClass:    'github',
             text:         'GitHub'
           },
 
           google: {
-            deviconClass: 'devicon-google-plain',
+            deviconClass: vendorClass('google'),
             link:         '/auth/google',
             mainClass:    'google',
             text:         'Google'
           },
 
           salesforce: {
-            deviconClass: [ 'fa', 'fa-cloud' ],
+            deviconClass: vendorClass('salesforce'),
             link:         '/oauth/salesforce',
             mainClass:    'salesforce',
             text:         'Salesforce'

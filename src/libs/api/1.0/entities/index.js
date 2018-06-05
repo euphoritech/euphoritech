@@ -23,9 +23,10 @@ export default {
     const currentTeamId = session.getCurrentLoggedInTeam()
     const query         = req.query.search
     const page          = req.query.page
+    const pageSize      = req.query.perPage
     const type_id       = req.query.type_id
 
-    const info = await entities.recordSearch(currentTeamId, query, { page, type_id })
+    const info = await entities.recordSearch(currentTeamId, query, { page, pageSize, type_id })
     res.json({ info })
   },
 
@@ -124,7 +125,7 @@ export default {
     const status        = req.query.status || 'active'
     const entityTypeId  = req.query.type_id
     const pageNumber    = req.query.page || 1
-    const numPerPage    = req.query.per_page || 30
+    const numPerPage    = req.query.perPage || 30
     // const orderBy       = req.query.order_by
 
     let info

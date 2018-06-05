@@ -7,7 +7,7 @@
       //-   b-nav-item(href="/") Home
       b-navbar-nav(class="ml-auto")
         //- b-form-input.mr-sm-2(size="sm",placeholder="Search..")
-        b-nav-item(v-if="!isLoggedIn",href="/login") Login
+        b-nav-item(v-if="!isLoggedIn",href="/gatekeeper/login") Login
         b-nav-item(id="create-entity-modal",v-if="isLoggedIn",@click="showCreateEntityModal")
           i.fa.fa-plus-square
         b-tooltip(target="create-entity-modal",title="Create a new record to link to.")
