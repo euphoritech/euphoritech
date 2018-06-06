@@ -13,14 +13,14 @@
         b-col(cols="12")
           hr
         b-col(cols="12",md="7")
-          b-row.margin-bottom-medium
+          b-row.margin-bottom-small
             b-col(cols="12")
               h4.soft-text.no-margin Source
             b-col(cols="12")
               h4
                 i.margin-right-small(:class="vendorClass(entityRecord.source)")
                 span {{ titleCase(entityRecord.source) }}
-          b-row.margin-bottom-medium(v-for="(string, col) in $store.state.dataLabelMaps.github",:key="col",v-if="entityRecord[col] && entityRecord[col].length > 0")
+          b-row.margin-bottom-small(v-for="(string, col) in $store.state.dataLabelMaps.github",:key="col",v-if="entityRecord[col] && entityRecord[col].length > 0")
             b-col(cols="12")
               h4.soft-text.no-margin {{ $store.state.dataLabelMaps[entityRecord.source][col] }}
             b-col.entity-content(cols="12")
