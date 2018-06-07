@@ -24,7 +24,7 @@ export default {
     res.json(true)
   },
 
-  async usernameAvailable({ req, res, postgres }) {
+  async ['username/available']({ req, res, postgres }) {
     const users     = Users(postgres)
     const username  = req.query.username
 
