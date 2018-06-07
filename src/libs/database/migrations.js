@@ -186,7 +186,6 @@ export function migrations(postgres) {
           filename varchar(255),
           name varchar(255),
           description text,
-          method varchar(255),
           params jsonb,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()

@@ -30,7 +30,7 @@
         isLoadingLocal: true,
         partialComponent: null,
         recordInfo: {},
-        recordsPerPage: 10
+        recordsPerPage: 30
       }
     },
 

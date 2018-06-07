@@ -49,11 +49,11 @@ export default {
     const typesInst     = TeamEntityTypes(postgres)
     const session       = SessionHandler(req.session, { redis })
     const currentTeamId = session.getCurrentLoggedInTeam()
+    const user          = session.getLoggedInUserId(true)
     const typeName      = req.body.name
     const typeDesc      = req.body.description
 
     const dbRecord = await typesInst.findBy({ team_id: currentTeamId, name: typeName })
-    console.log("REC", dbRecord)
     if (dbRecord) {
       typesInst.setRecord(Object.assign(dbRecord, { description: typeDesc }))
     } else {
@@ -64,7 +64,7 @@ export default {
     await session.resetTeamSessionRefresh(currentTeamId)
     res.json({ new_id: newId })
 
-    await events.fire(currentTeamId, events.types.CREATE_ENTITY_TYPE)
+    await events.fire(currentTeamId, events.types.CREATE_ENTITY_TYPE, { team_id: currentTeamId, user: user.username_email, type: typesInst.record.name })
   },
 
   async ['type/update']({ req, res, postgres, redis, events }) {
@@ -72,6 +72,7 @@ export default {
     const typesInst     = TeamEntityTypes(postgres)
     const session       = SessionHandler(req.session, { redis })
     const currentTeamId = session.getCurrentLoggedInTeam()
+    const user          = session.getLoggedInUserId(true)
 
     const dbRecord = await typesInst.findBy({ team_id: currentTeamId, id: typeRecord.id })
     if (!dbRecord)
@@ -82,7 +83,7 @@ export default {
     await session.resetTeamSessionRefresh(currentTeamId)
     res.json(true)
 
-    await events.fire(currentTeamId, events.types.UPDATE_ENTITY_TYPE)
+    await events.fire(currentTeamId, events.types.UPDATE_ENTITY_TYPE, { team_id: currentTeamId, user: user.username_email, type: typesInst.record.name })
   },
 
   async ['links/get']({ req, res, postgres }) {
@@ -143,17 +144,19 @@ export default {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
+    const user          = session.getLoggedInUserId(true)
     const entityRecord  = req.body.entity
     const newEntityId   = await entities.createOrUpdate(currentTeamId, entityRecord)
     res.json({ id: newEntityId })
 
-    await events.fire(currentTeamId, events.types.CREATE_ENTITY)
+    await events.fire(currentTeamId, events.types.CREATE_ENTITY, { team_id: currentTeamId, user: user.username_email, record: entityRecord })
   },
 
   async update({ req, res, postgres, events }) {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
+    const user          = session.getLoggedInUserId(true)
     const entityRecord  = req.body.entity
 
     const record = await entities.findBy({ team_id: currentTeamId, id: entityRecord.id })
@@ -162,7 +165,7 @@ export default {
       await entities.save()
       res.json(true)
 
-      return await events.fire(currentTeamId, events.types.UPDATE_ENTITY)
+      return await events.fire(currentTeamId, events.types.UPDATE_ENTITY, { team_id: currentTeamId, user: user.username_email, record: entityRecord })
     }
     res.status(404).json({ error: res.__("There is no entity record that we found to update.") })
   },
@@ -171,6 +174,7 @@ export default {
     const entities      = TeamEntities(postgres)
     const session       = SessionHandler(req.session)
     const currentTeamId = session.getCurrentLoggedInTeam()
+    const user          = session.getLoggedInUserId(true)
     const entityId      = req.query.id
 
     const record = await entities.findBy({ team_id: currentTeamId, id: parseInt(entityId) })
@@ -179,7 +183,7 @@ export default {
       await entities.save()
       res.json(true)
 
-      return await events.fire(currentTeamId, events.types.DELETE_ENTITY)
+      return await events.fire(currentTeamId, events.types.DELETE_ENTITY, { team_id: currentTeamId, user: user.username_email, record_id: entityId })
     }
     res.status(404).json({ error: res.__("There is no entity record that we found to delete.") })
   }

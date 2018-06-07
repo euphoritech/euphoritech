@@ -15,4 +15,5 @@
 /tasks
 /tests
 /config.js
+plugin_packages/
 *.env

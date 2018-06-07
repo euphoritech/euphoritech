@@ -13,14 +13,19 @@ export default function Aws(options={}) {
       _s3: new AWS.S3({ accessKeyId: accessKeyId, secretAccessKey: secretAccessKey }),
       defaultbucket: options.bucket || config.aws.s3.bucket,
 
-      async getFile(options) {
-        const filename      = options.filename
-        const bucket        = options.bucket || this.defaultbucket
-        const extraOptions  = options.options || {}
-        const params        = Object.assign({ Bucket: bucket, Key: filename }, extraOptions)
-        // Note the raw buffer data in the file is returned in callback(err,data) {}
-        // as data.Body
-        return await this._s3.getObject(params)
+      getFile(options) {
+        return new Promise((resolve, reject) => {
+          const filename      = options.filename
+          const bucket        = options.bucket || this.defaultbucket
+          const extraOptions  = options.options || {}
+          const params        = Object.assign({ Bucket: bucket, Key: filename }, extraOptions)
+          // Note the raw buffer data in the file is returned in callback(err,data) {}
+          // as data.Body
+          this._s3.getObject(params, (err, res) => {
+            if (err) return reject(err)
+            resolve(res)
+          })
+        })
       },
 
       getFileStreamWithBackoff(streamToPipeTo, options, backoffAttempt=1) {
@@ -51,11 +56,16 @@ export default function Aws(options={}) {
         })
       },
 
-      async getFileUrl(options) {
-        const filename  = options.filename
-        const bucket    = options.bucket || this.defaultbucket
-        const params    = { Bucket: bucket, Key: filename }
-        return await this._s3.getSignedUrl('getObject', params)
+      getFileUrl(options) {
+        return new Promise((resolve, reject) => {
+          const filename  = options.filename
+          const bucket    = options.bucket || this.defaultbucket
+          const params    = { Bucket: bucket, Key: filename }
+          this._s3.getSignedUrl('getObject', params, (err, res) => {
+            if (err) return reject(err)
+            resolve(res)
+          })
+        })
       },
 
       writeFile(options) {
