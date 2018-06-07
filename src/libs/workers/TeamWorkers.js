@@ -63,14 +63,16 @@ export default function TeamWorkers(options={}) {
         }
       },
       perform: async options => {
+        const teamId              = options.team_id
         const teamAccessRecordId  = options.record_id
-        const accessRecord        = await accessReq.findBy({ unique_id: teamAccessRecordId })
+        const accessRecord        = await accessReq.findBy({ team_id: teamId, unique_id: teamAccessRecordId })
         const userIdToSendEmail   = accessRecord.requesting_user_id
         const userRecord          = await users.findBy({ id: userIdToSendEmail })
         const requestUserEmail    = userRecord.username_email
 
         const mailerConfig  = await MailerHelpers.getGmailConfig()
         const mailer        = Mailer(mailerConfig)
+        const teamRecord    = await teams.find(teamId)
 
         let subject           = `${config.app.name}: You now have access to team - ${teamRecord.name}!`
         let templateFilePath  = path.join(config.app.rootDir, 'mailers', 'teams', 'request_access_confirm.pug')
@@ -87,6 +89,29 @@ export default function TeamWorkers(options={}) {
             host:     config.server.host,
             teamName: teamRecord.name
           })
+        })
+      }
+    },
+
+    sendUserInvitation: {
+      plugins: [ 'Retry' ],
+      pluginOptions: {
+        retry: {
+          retryLimit: 5,
+          retryDelay: 1000 * 5,
+        }
+      },
+      perform: async options => {
+        const mailerConfig  = await MailerHelpers.getGmailConfig()
+        const mailer        = Mailer(mailerConfig)
+
+        let subject           = `${config.app.name}: You have been invited to join the team - ${options.team_name}!`
+        let templateFilePath  = path.join(config.app.rootDir, 'mailers', 'teams', 'team_join_invitation.pug')
+
+        await mailer.send({
+          to: options.new_user_email,
+          subject: subject,
+          html: await MailerHelpers.getTemplateHtml(templateFilePath, Object.assign({ host: config.server.host }, options))
         })
       }
     }

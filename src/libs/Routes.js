@@ -61,6 +61,7 @@ export default {
 
 function routesNotNeedingAuth() {
   return [
+    '/api/1.0/auth/password/forgot',
     '/api/1.0/auth/usernameAvailable',
     '/api/1.0/teams/teamAvailable',
     '/api/1.0/teams/teamExists'

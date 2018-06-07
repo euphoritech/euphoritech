@@ -6,7 +6,7 @@
           <b-form-group label="Record Type">
             <b-form-select v-model="$store.state.entityModalTypeId" size="lg" :options="entityTypes" placeholder="Select a record type to create." />
           </b-form-group>
-          <hr class="separate-vert-large" />
+          <hr class="margin-vert-large" />
           <b-card>
             <b-tabs :card="true">
               <b-tab title="Manual">

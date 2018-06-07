@@ -9,8 +9,9 @@ export default function Global({ app, socket, log, io, postgres, redis }) {
 
   return {
     subscribe() {
-      const loggedIn = users.isLoggedIn()
-      socket.emit('isLoggedIn', loggedIn)
+      const userRecord = users.getLoggedInUser()
+      const loggedIn = !!userRecord
+      socket.emit('isLoggedIn', userRecord)
 
       if (loggedIn) {
         const teamId = sessionHandler.getCurrentLoggedInTeam

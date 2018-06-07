@@ -27,5 +27,10 @@ export default {
   nouser: `
     We didn't find a user record with the provided e-mail address. Make sure you
     typed it in correctly or create a new user to continue.
-  `
+  `,
+
+  resetpassword: {
+    component: 'reset-password-page',
+    error: false
+  }
 }

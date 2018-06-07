@@ -44,7 +44,7 @@
             i.remove-icon.margin-left-small.fa.fa-times(@click="clearSfdcObjectAndAttrs()")
         b-col(cols="12",lg="8")
           div Current parameters:
-          b-badge.margin-left-small(v-for="(sfdcField, col) in current.fieldsMap",variant="secondary",v-if="doesCurrentDataHaveAttributeSelected(col)",:key="col") {{ columnKeyMap[col] }} - '{{ sfdcField }}'
+          b-badge.margin-left-small.margin-bottom-small(v-for="(sfdcField, col) in current.fieldsMap",variant="secondary",v-if="doesCurrentDataHaveAttributeSelected(col)",:key="col") {{ columnKeyMap[col] }} - '{{ sfdcField }}'
             i.remove-icon.margin-left-small.fa.fa-times(v-if="col !== 'uid'",@click="clearSfdcAttr(col)")
           hr
           div Select a type of attribute to tie to records you create:

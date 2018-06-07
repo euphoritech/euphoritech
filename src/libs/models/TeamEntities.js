@@ -96,8 +96,9 @@ export default function TeamEntities(postgres) {
       seedTypes: [
         { name: 'Customer', description: 'Your customers or clients.' },
         { name: 'Customer User', description: 'Users that belong to your customers or clients.' },
+        { name: 'Integration Request', description: 'Requests to integrate with third party systems.' },
+        { name: 'Product Issue', description: 'A bug or other requested code change.' },
         { name: 'R&D Record', description: 'A development version control pull request, issue, or commit.' },
-        { name: 'QA Note', description: 'A bug or feature request or other requested code change.' },
         { name: 'Release Note', description: 'Documentation about a code update or release to describe new or changed functionality.' },
         { name: 'Support Ticket', description: 'Tickets submitted by your customers as support requests.' }
       ],

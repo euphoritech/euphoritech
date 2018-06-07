@@ -43,13 +43,19 @@
 
       // Begin app initialization after we determine the logged in state of
       // the user
-      euphoritechSocket.on('isLoggedIn', async isLoggedIn => {
+      euphoritechSocket.on('isLoggedIn', async userRecord => {
+        this.$store.commit('CACHE_INIT_USER_RECORD', userRecord)
+
+        const isLoggedIn = !!userRecord
         this.$store.commit('CHECK_LOGGED_IN', isLoggedIn)
 
         if (!this.$store.state.isLoggedIn) {
           if (this.$route.path.indexOf('/gatekeeper/') !== 0 && this.$route.path.indexOf('/autherror/') !== 0)
             this.$store.dispatch('redirectToLogin')
 
+          return this.$store.commit('APP_NO_LONGER_LOADING')
+        } else if (userRecord.needs_password_reset) {
+          this.$store.dispatch('redirectToPasswordReset')
           return this.$store.commit('APP_NO_LONGER_LOADING')
         }
 

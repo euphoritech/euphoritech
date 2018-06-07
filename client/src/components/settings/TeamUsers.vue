@@ -79,8 +79,8 @@
         if (!(await ApiAuth.checkUsernameAvailability(this.newUser.email)))
           return toast.open(`The e-mail entered has already been registered. Please confirm you entered the correct email address or try to login.`, 'error')
 
-        console.log("USER", this.newUser)
-        toast.open('Success!')
+        await ApiTeams.inviteNewUser(this.newUser.name, this.newUser.email)
+        toast.open('Successfully sent team invitation to user!')
       }
     },
 

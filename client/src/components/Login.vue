@@ -7,23 +7,23 @@
         div.col-xs-12.col-sm-8.col-sm-offset-2.col-lg-4.col-lg-offset-4
           h1.text-center {{ title }}
           div.d-flex.justify-content-center(style="margin-bottom:25px")
-            div(v-if="createValue")
+            div(v-if="isCreatingAccount")
               a(href="/gatekeeper/login") Login to Existing Account
-            div(v-if="!createValue")
+            div(v-if="!isCreatingAccount")
               a(href="/gatekeeper/createaccount") Create New Account
           b-card.shadow-small
             div.card-text
-              input(type="hidden",id="create",name="create",:value="createValue")
+              input(type="hidden",id="create",name="create",:value="isCreatingAccount")
               input(type="hidden",id="create_team",name="create_team",:value="createNewTeam")
               b-form-group(label="Email Address",label-for="username")
                 b-form-input(id="username",name="username",v-model="data.username")
-              hr.separate-vert-large(v-if="createValue")
+              hr.margin-vert-large(v-if="isCreatingAccount")
               b-form-group(label="Password",label-for="password")
                 b-form-input(id="password",name="password",v-model="data.password",type="password")
-              b-form-group(v-if="createValue",label="Confirm Password",label-for="cpassword")
+              b-form-group(v-if="isCreatingAccount",label="Confirm Password",label-for="cpassword")
                 b-form-input(id="cpassword",name="cpassword",v-model="data.confirm_password",type="password")
-              div(v-if="createValue")
-                hr.separate-vert-large
+              div(v-if="isCreatingAccount")
+                hr.margin-vert-large
                 div.d-flex.justify-content-center.margin-bottom-medium
                   b-button-group
                     b-button(@click="createNewTeam = !createNewTeam",:variant="createNewTeamButtonVariant('create')") Create New Team
@@ -37,10 +37,23 @@
               b-alert.margin-medium(variant="warning",:show="!!error") {{ error }}
           oauth-button(type="google")
           - //oauth-button(type="github")
-          - //div.center-everything.separate-vert-large
+          div#forgot-password-link.margin-top-large.text-center(v-if="!isCreatingAccount")
+            small
+              a(href="javascript:void(0)") Forgot Password
+          - //div.center-everything.margin-vert-large
           - //  a(href="javascript:void(0)",onclick="window.open('/privacy','','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no')")
           - //    small
           - //      small Privacy Policy
+    b-popover(target="forgot-password-link",title="Forgot Password",placement="top")
+      div.
+        Enter your email address below and submit to get a temporary
+        password you can use to login and reset it.
+      hr
+      b-form-group(label="Email Address")
+        b-form-input#forgot-email-address(name="forgot-email-address",v-model="forgot.email",size="sm",:required="true",placeholder="Email Address")
+      div.text-center
+        b-button(type="button",variant="primary",size="sm",@click="forgotPassword") Submit
+      b-alert.margin-top-medium(:show="!!forgot.error",variant="danger") {{ forgot.error }}
 </template>
 
 <script>
@@ -48,6 +61,7 @@
   import ApiAuth from '../factories/ApiAuth'
   import ApiTeams from '../factories/ApiTeams'
   import StringHelpers from '../factories/StringHelpers'
+  import SnackbarFactory from '../factories/SnackbarFactory'
 
   export default {
     data() {
@@ -61,8 +75,12 @@
           team_id: null,
           team_name: null
         },
+        forgot: {
+          email: null,
+          error: null
+        },
         createNewTeam: true,
-        createValue: null,
+        isCreatingAccount: false,
         formAction: '/auth/local',
         title: 'Login'
       }
@@ -71,6 +89,17 @@
     methods: {
       isValidEmail: ApiAuth.isValidEmail,
       isValidTeamId: ApiAuth.isValidTeamId,
+
+      async forgotPassword() {
+        try {
+          this.forgot.error = null
+          const toast = SnackbarFactory(this)
+          await ApiAuth.forgotPassword(this.forgot.email)
+          toast.open(`Please check your email shortly for a temporary password to login.`)
+        } catch(err) {
+          this.forgot.error = err.message
+        }
+      },
 
       hasDataClass(string) {
         if (string)
@@ -96,7 +125,7 @@
           return 'Please enter a valid e-mail address and password.'
         }
 
-        if (this.createValue) {
+        if (this.isCreatingAccount) {
           if (!this.isValidEmail(this.data.username))
             return `Please enter a valid e-mail address as your username and try again.`
 
@@ -142,10 +171,10 @@
     created() {
       if (this.$store.state.auth.user && this.$store.state.auth.user.id) {
         return location.href = '/'
-      } else if (location.pathname === '/createaccount') {
+      } else if (location.pathname.includes('createaccount')) {
         this.formAction = '/auth/createaccount'
         this.title = 'Create Account'
-        this.createValue = true
+        this.isCreatingAccount = true
       }
 
       this.error = StringHelpers.unserialize(location.search).error

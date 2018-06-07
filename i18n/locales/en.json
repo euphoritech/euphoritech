@@ -13,5 +13,7 @@
 	"No issue or PR with the ID provided.": "No issue or PR with the ID provided.",
 	"Please provide a valid type ID to search for records.": "Please provide a valid type ID to search for records.",
 	"No GitHub team integration found for your user ID": "No GitHub team integration found for your user ID",
-	"You cannot create a link between the same record.": "You cannot create a link between the same record."
+	"You cannot create a link between the same record.": "You cannot create a link between the same record.",
+	"Please enter a different password than your previous one.": "Please enter a different password than your previous one.",
+	"We didn't find a user record with the email address provided.": "We didn't find a user record with the email address provided."
 }

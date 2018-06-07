@@ -1,7 +1,9 @@
+import NodeResque from 'node-resque'
 import objectAssignDeep from 'object-assign-deep'
 import SessionHandler from '../../../SessionHandler'
 import Users from '../../../models/Users'
 import UserOauthIntegrations from '../../../models/UserOauthIntegrations'
+import config from '../../../../config'
 
 export default {
   session({ req, res }) {
@@ -43,14 +45,37 @@ export default {
   },
 
   async ['integrations/get']({ req, res, postgres }) {
-    const users   = Users(postgres, req.session)
     const integ   = UserOauthIntegrations(postgres)
-    const records = await integ.getAllByUserId(users.getLoggedInUserId())
+    const session = SessionHandler(req.session)
+    const records = await integ.getAllByUserId(session.getLoggedInUserId())
     const recordObj = records.reduce((obj, record) => {
       obj[record.type] = record
       return obj
     }, {})
     res.json({ integrations: recordObj })
+  },
+
+  async ['password/forgot']({ req, res, redis, postgres }) {
+    const queue     = new NodeResque.Queue({ connection: { redis: redis.client }})
+    const users     = Users(postgres, req.session)
+    const username  = req.body.email
+
+    const userRecord = await users.findBy({ username_email: username })
+    if (!userRecord)
+      return res.status(404).json({ error: res.__(`We didn't find a user record with the email address provided.`) })
+
+    const tempPassword  = users.generateTempPassword()
+    const tempPwHash    = await users.hashPassword(tempPassword)
+    users.setRecord({ id: userRecord.id, needs_password_reset: true, password_hash: tempPwHash })
+    await users.save()
+
+    await queue.connect()
+    await queue.enqueue(config.resque.default_queue, 'forgotPasswordMailer', [{
+      user_email: userRecord.username_email,
+      temp_pw:    tempPassword
+    }])
+
+    res.json(true)
   },
 
   async ['password/reset']({ req, res, redis, postgres }) {
@@ -65,13 +90,16 @@ export default {
       if (!currentPassword)
         return res.status(401).json({ error: res.__(`Please enter your current password to validate before changing.`) })
 
+      if (currentPassword === newPassword)
+        return res.status(400).json({ error: res.__(`Please enter a different password than your previous one.`) })
+
       const isCurrentPasswordCorrect = await users.validateUserPassword(userRec.username_email, currentPassword)
       if (!isCurrentPasswordCorrect)
         return res.status(401).json({ error: res.__(`The current password you provided is not correct. Please try again.`) })
     }
 
     const newHashedPassword = await users.hashPassword(newPassword)
-    users.setRecord({ id: userRec.id, password_hash: newHashedPassword })
+    users.setRecord({ id: userRec.id, password_hash: newHashedPassword, needs_password_reset: null, last_password_reset: new Date() })
     await users.save()
     await session.resetTeamSessionRefresh(currentTeamId)
 

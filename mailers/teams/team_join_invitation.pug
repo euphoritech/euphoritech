@@ -1,0 +1,9 @@
+div= "Hi, " + new_user_name + ", you've been invited to join team: " + team_name + "!"
+if new_user_temp_pw
+  div Your username and temporary password is listed below:
+  div(style="margin:25px 0px")
+    strong
+      div= new_user_email
+      div= new_user_temp_pw
+div
+  a(href=host) Login Now!

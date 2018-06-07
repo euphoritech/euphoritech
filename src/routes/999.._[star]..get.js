@@ -19,7 +19,7 @@ export default async function Index(req, res) {
     const sessionHandler  = SessionHandler(req.session, { redis: redisClient })
     const users           = Users(postgres, req.session)
     const currentTeamId   = sessionHandler.getCurrentLoggedInTeam()
-    const currentUser     = sessionHandler.getLoggedInUserId(true)
+    const currentUserId   = sessionHandler.getLoggedInUserId()
 
     if (req.params[0].indexOf("favicon.ico") !== 0 && currentTeamId) {
       req.session.returnTo = req.params[0]
@@ -30,8 +30,9 @@ export default async function Index(req, res) {
 
     if (currentTeamId) {
       if (await sessionHandler.checkIfShouldRefreshSession(currentTeamId)) {
+        const currentUser = await users.find(currentUserId)
         log.info(`Resetting session cache for user '${currentUser.username_email}' in team ID: ${currentTeamId}`)
-        users.setRecord(Object.assign(currentUser, { last_session_refresh: new Date() }))
+        users.setRecord(Object.assign({}, currentUser, { last_session_refresh: new Date() }))
         await users.save()
         await loginHandler.standardLogin(users.record)
         // await sessionHandler.resetTeamSessionRefresh(currentTeamId)

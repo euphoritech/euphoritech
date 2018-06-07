@@ -19,6 +19,15 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async forgotPassword(email) {
+    const response = await euphoritechFetch(`/api/1.0/auth/password/forgot`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+    return await handleFetchResponse(response)
+  },
+
   async resetPassword({ current_password, new_password }) {
     const response = await euphoritechFetch(`/api/1.0/auth/password/reset`, {
       method: 'POST',

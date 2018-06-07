@@ -6,6 +6,7 @@ const encryption = new Encryption()
 
 export default function Users(postgres, session=null) {
   const factoryToExtend = DatabaseModel(postgres, 'users')
+  const sessionHandler  = SessionHandler(session)
 
   return Object.assign(
     factoryToExtend,
@@ -40,23 +41,21 @@ export default function Users(postgres, session=null) {
         return await Encryption.hashPassword(plainPassword)
       },
 
+      generateTempPassword(length=18) {
+        const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        return new Array(length).fill(0).map(v => possible.charAt(Math.floor(Math.random() * possible.length))).join('')
+      },
+
       setSession(object, sessionObj=session) {
-        const sessionHandler = SessionHandler(session)
         return sessionHandler.setSession(object, sessionObj)
       },
 
       getLoggedInUser() {
-        if (this.isLoggedIn())
-          return session.user
-
-        return false
+        return sessionHandler.getLoggedInUserId(true)
       },
 
       getLoggedInUserId() {
-        if (this.isLoggedIn())
-          return session.user.id
-
-        return false
+        return sessionHandler.getLoggedInUserId()
       },
 
       isLoggedIn() {

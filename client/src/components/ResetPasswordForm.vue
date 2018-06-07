@@ -1,6 +1,6 @@
 <template lang="pug">
   b-form(@submit="submitPasswordReset")
-    div(v-if="$store.state.auth.user.password_hash")
+    div(v-if="$store.state.auth.user.password_hash || $store.state.initUser.password_hash")
       b-form-group(label="Current Password")
         b-form-input(type="password",v-model="curPw",size="sm",autocomplete="current-password")
       hr

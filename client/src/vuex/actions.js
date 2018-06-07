@@ -51,5 +51,9 @@ export default {
 
   redirectToNoTeamForm() {
     window.vueRouter.push('/autherror/noteam')
+  },
+
+  redirectToPasswordReset() {
+    window.vueRouter.push('/autherror/resetpassword')
   }
 }

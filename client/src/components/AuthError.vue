@@ -9,6 +9,7 @@
 <script>
   import ErrorMessages from '../factories/ErrorMessages'
   import CreateOrJoinTeam from './CreateOrJoinTeam'
+  import ResetPasswordPage from './ResetPasswordPage'
   import Login from './Login'
 
   export default {
@@ -22,13 +23,19 @@
     },
 
     created() {
-      this.errorMessage = ((ErrorMessages[this.error].toString() === '[object Object]') ? ErrorMessages[this.error].error : ErrorMessages[this.error]) || 'There was an error with your request. Please try again.'
+      this.errorMessage = ((ErrorMessages[this.error].toString() === '[object Object]') ? ErrorMessages[this.error].error : ErrorMessages[this.error])
       this.subComponent = (ErrorMessages[this.error].toString() === '[object Object]') ?ErrorMessages[this.error].component : this.subComponent
+
+      // Force entering `false` as the error message if you don't want
+      // the alert to show with the default message.
+      if (!this.errorMessage && this.errorMessage !== false)
+        this.errorMessage = 'There was an error with your request. Please try again.'
     },
 
     components: {
       CreateOrJoinTeam,
-      Login
+      Login,
+      ResetPasswordPage
     }
   }
 </script>

@@ -84,29 +84,43 @@ export default {
     return res.json(true)
   },
 
-  async ['user/invite']({ req, res, postgres }) {
+  async ['user/invite']({ req, res, postgres, redis }) {
     const queue         = new NodeResque.Queue({ connection: { redis: redis.client }})
     const teams         = Teams(postgres)
     const teamMap       = TeamsUsersRolesMap(postgres)
     const users         = Users(postgres, req.session)
     const session       = SessionHandler(req.session)
-    const userRecord    = users.getLoggedInUser()
+    const loggedInUser  = users.getLoggedInUser()
     const currentTeamId = session.getCurrentLoggedInTeam()
     const newUserName   = req.body.name
     const newUserEmail  = req.body.email
+    const teamRecord    = await teams.find(currentTeamId)
 
-    // const newUser = await users.findOrCreateBy({ username_email: newUserEmail, name: newUserName })
-    // const teamMapRecord = await teamMap.findOrCreateBy({ team_id: currentTeamId, user_id: newUser.id, role: 'teamadmin' })
+    let newUser = await users.findBy({ username_email: newUserEmail })
+    let tempPassword = null
+    if (!newUser) {
+      newUser             = await users.findOrCreateBy({ username_email: newUserEmail, name: newUserName })
+      tempPassword        = users.generateTempPassword()
+      const tempPwHash    = await users.hashPassword(tempPassword)
+      users.setRecord(Object.assign({ needs_password_reset: true, password_hash: tempPwHash }, newUser))
+      await users.save()
+    }
 
-    // await queue.connect()
-    // await queue.enqueue(config.resque.default_queue, 'sendUserInvitation', [{
-    //   team_id: teamRecord.id,
-    //   inviting_user_name: userRecord.name,
-    //   new_user_name: newUserName,
-    //   new_user_email: newUserEmail
-    // }])
-    //
-    // res.json(true)
+    // TODO: Make role dynamic based on admin selection
+    const teamMapRecord = await teamMap.findOrCreateBy({ team_id: currentTeamId, user_id: newUser.id, role: 'teamadmin' })
+
+    await queue.connect()
+    await queue.enqueue(config.resque.default_queue, 'sendUserInvitation', [{
+      team_id:              teamRecord.id,
+      team_name:            teamRecord.name,
+      inviting_user_name:   loggedInUser.name,
+      inviting_user_email:  loggedInUser.username_email,
+      new_user_name:        newUserName,
+      new_user_email:       newUserEmail,
+      new_user_temp_pw:     tempPassword
+    }])
+
+    res.json(true)
   },
 
   async access({ req, res, postgres, redis }) {
@@ -127,13 +141,13 @@ export default {
         teamAccess.setRecord(Object.assign(teamAccRecord, { status: 'confirmed' }))
         await teamAccess.save()
         await teamUserMap.findOrCreateBy({ team_id: teamAccRecord.team_id, user_id: teamAccRecord.requesting_user_id, role: userType || 'teamadmin' })
-        await queue.enqueue(config.resque.default_queue, 'sendTeamAccessConfirmation', [{ record_id: teamAccRecord.id }])
+        await queue.enqueue(config.resque.default_queue, 'sendTeamAccessConfirmation', [{ team_id: teamAccRecord.team_id, record_id: teamAccRecord.id }])
         return res.redirect('/')
 
       case 'deny':
         teamAccess.setRecord(Object.assign(teamAccRecord, { status: 'denied' }))
         await teamAccess.save()
-        await queue.enqueue(config.resque.default_queue, 'sendTeamAccessConfirmation', [{ record_id: teamAccRecord.id }])
+        await queue.enqueue(config.resque.default_queue, 'sendTeamAccessConfirmation', [{ team_id: teamAccRecord.team_id, record_id: teamAccRecord.id }])
         return res.redirect('/')
 
       default:

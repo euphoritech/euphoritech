@@ -269,10 +269,14 @@ export default {
     const onlyUpdateOrg   = req.body.onlyUpdateOrg
 
     let integration = userInteg[intType]
-    let userIntegrationId = integration.id
+    let userIntegrationId
     if (onlyUpdateOrg) {
       integration = teamInteg[intType]
       userIntegrationId = integration.user_oauth_int_id
+    } else if (integration) {
+      userIntegrationId = integration.id
+    } else {
+      return res.status(400).json({ error: res.__(`We couldn't find an integration to use for the team.`) })
     }
 
     if (integration) {

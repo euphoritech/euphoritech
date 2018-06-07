@@ -19,7 +19,7 @@
                   small The organization that you can pull down PRs and Issues from:
                   h3 {{ github.org }}
                     i.remove-icon.margin-left-small.fa.fa-times(@click="selectGithubOrg({ login: null })")
-                  b-button.separate-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Save Organization
+                  b-button.margin-vert-medium(@click="useUserIntegration('github')",variant="primary",size="sm") Save Organization
                 div(v-if="!github.org")
                   b-form-checkbox(@change="selectGithubOrg({ login: true })") Use your personal GitHub account as the team's organization
                   typeahead-input(src="/api/1.0/integrations/github/orgs/search",:params="{ keysFromResponse: 'results', showProp: 'login', minChars: 1 }",@onHit="selectGithubOrg")
@@ -37,7 +37,7 @@
                   Would you like to use your GitHub authentication information for
                   your team to search your repositories for PRs and issues that you and your
                   team would like to link to other records?
-                b-button.separate-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info and Save
+                b-button.margin-vert-medium(@click="useUserIntegration('github', false)",variant="primary",size="sm") Use my API Info and Save
             div(v-if="github.orgType == 'org' && !!github.org")
               hr
               h3
@@ -77,7 +77,7 @@
                   Would you like to use your Salesforce authentication information
                   for your team to search your SF objects that you and your team
                   would like to link to other records?
-                b-button.separate-vert-medium(@click="useUserIntegration('salesforce', false)",variant="primary",size="sm") Use my Info and Save
+                b-button.margin-vert-medium(@click="useUserIntegration('salesforce', false)",variant="primary",size="sm") Use my Info and Save
 </template>
 
 <script>

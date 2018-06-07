@@ -45,4 +45,14 @@ describe('Users', function() {
       assert.equal('my_val', session.user.my_key)
     })
   })
+
+  describe('#generateTempPassword', function() {
+    it('should generate a random string of alphanumeric characters of length specified', function() {
+      const users = Users()
+      const password = users.generateTempPassword(10)
+
+      assert.equal(10, password.length)
+      assert.equal(true, /[\w\d]{10}/.test(password))
+    })
+  })
 })
