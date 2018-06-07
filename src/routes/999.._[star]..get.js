@@ -46,11 +46,11 @@ export default async function Index(req, res) {
       const redisCacheKey = `ip_recent_${realClientIpAddress}`
       const currentCache = await redisClient.get(redisCacheKey)
       if (currentCache) {
-        await redisClient.set(redisCacheKey, 'true', { ttl: 60 * 10 })
+        await redisClient.set(redisCacheKey, 'true', 'EX', 60 * 10)
       } else {
         const location = await GeoIp.location(realClientIpAddress)
         await Slack.send(`Someone visited the main page -- IP: ${realClientIpAddress} (location: ${location.city}, ${location.region_code}, ${location.country_name}), hostname: ${req.hostname}, User-Agent: ${req.headers['user-agent']}`)
-        await redisClient.set(redisCacheKey, 'true', { ttl: 60 * 10 })
+        await redisClient.set(redisCacheKey, 'true', 'EX', 60 * 10)
       }
     }
 
