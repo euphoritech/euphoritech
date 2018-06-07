@@ -1,5 +1,4 @@
 import NodeResque from 'node-resque'
-import requireFromString from 'require-from-string'
 import Aws from '../Aws'
 import DatabaseModel from './DatabaseModel'
 import Extensions from './Extensions'
@@ -42,7 +41,7 @@ export default function TeamEvents(postgres, { redis }={}) {
               // params passed as an argument in fireSync is any information
               // passed about the event itself. Determine how to link them here
               // before passing them to extension#execute
-              return await extensions.execute(evt.extension_id, Object.assign({}, evt.params || {}, params || {}))
+              return await extensions.execute(evt.extension_id, Object.assign({ event_type: type }, evt.params || {}, params || {}))
             })
           )
         }

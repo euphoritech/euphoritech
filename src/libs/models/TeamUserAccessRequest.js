@@ -1,4 +1,3 @@
-import requireFromString from 'require-from-string'
 import config from '../../config'
 import DatabaseModel from './DatabaseModel'
 
