@@ -1,9 +1,7 @@
 <template lang="pug">
   div.container.margin-top-large
     b-form(@submit="validateForm($event)",:action="formAction",method="post")
-      div(v-if="isLoadingLocal")
-        loader
-      div.row.d-flex.justify-content-center(v-if="!isLoadingLocal")
+      div.row.d-flex.justify-content-center
         div.col-xs-12.col-sm-8.col-sm-offset-2.col-lg-4.col-lg-offset-4
           h1.text-center {{ title }}
           div.d-flex.justify-content-center(style="margin-bottom:25px")
@@ -11,6 +9,7 @@
               a(href="/gatekeeper/login") Login to Existing Account
             div(v-if="!isCreatingAccount")
               a(href="/gatekeeper/createaccount") Create New Account
+          b-alert.margin-medium(variant="warning",:show="!!error && isCreatingAccount") {{ error }}
           b-card.shadow-small
             div.card-text
               input(type="hidden",id="create",name="create",:value="isCreatingAccount")
@@ -66,7 +65,6 @@
   export default {
     data() {
       return {
-        isLoadingLocal: true,
         error: null,
         data: {
           username: null,
@@ -150,18 +148,15 @@
 
       async validateForm(e) {
         e.preventDefault()
-        this.isLoadingLocal = true
         try {
           const error = await this.getCreateSubmissionError()
           if (error) {
-            this.isLoadingLocal = false
             return this.error = error
           }
 
           e.srcElement.submit()
 
         } catch(err) {
-          this.isLoadingLocal = false
           console.log("ERROR", err)
           return this.error = `There was an error creating your account: ${err.message}`
         }
@@ -178,7 +173,6 @@
       }
 
       this.error = StringHelpers.unserialize(location.search).error
-      this.isLoadingLocal = false
     },
 
     components: {
