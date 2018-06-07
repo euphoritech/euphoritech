@@ -43,7 +43,7 @@ export default {
   },
 
   async checkUsernameAvailability(username) {
-    const response = await euphoritechFetch(`/api/1.0/auth/usernameAvailable?username=${encodeURIComponent(username)}`)
+    const response = await euphoritechFetch(`/api/1.0/auth/username/available?username=${encodeURIComponent(username)}`)
     return await handleFetchResponse(response)
   },
 
