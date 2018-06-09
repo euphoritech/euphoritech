@@ -12,7 +12,7 @@ export default function Extensions(postgres) {
     factoryToExtend,
     {
       accessibleColumns: [
-        'description', 'filename', 'name', 'params'
+        'description', 'filename', 'name', 'docs_link', 'params'
       ],
 
       // NOTE: Any extension needs to be approved before it gets into

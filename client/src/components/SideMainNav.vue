@@ -4,7 +4,7 @@
       i.fa.fa-2x.fa-home
     a.nav-item.d-flex.justify-content-center.align-items-center(href="/dashboard",:class="isActiveClass('dashboard')")
       i.fa.fa-2x.fa-list-ul
-    a.nav-item.d-flex.justify-content-center.align-items-center(href="/topten",:class="isActiveClass('topten')")
+    a.nav-item.d-flex.justify-content-center.align-items-center(href="/leaderboard",:class="isActiveClass('leaderboard')")
       i.fa.fa-2x.fa-users
 </template>
 
@@ -19,8 +19,8 @@
               return (path == '/') ? 'active' : null
             case 'dashboard':
               return (/^\/dashboard.*$/.test(path)) ? 'active': null
-            case 'topten':
-              return (/^\/topten.*$/.test(path)) ? 'active': null
+            case 'leaderboard':
+              return (/^\/leaderboard.*$/.test(path)) ? 'active': null
           }
         }
 

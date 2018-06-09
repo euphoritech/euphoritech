@@ -81,4 +81,14 @@ export default {
     })
     return await handleFetchResponse(response)
   },
+
+  async getByLinkCount() {
+    const response = await euphoritechFetch(`/api/1.0/entities/get/by/link/count`)
+    return await handleFetchResponse(response)
+  },
+
+  async getLeaderboard() {
+    const response = await euphoritechFetch(`/api/1.0/entities/leaderboard`)
+    return await handleFetchResponse(response)
+  }
 }

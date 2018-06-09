@@ -2,6 +2,7 @@ import SessionHandler from '../../../SessionHandler'
 import TeamEntities from '../../../models/TeamEntities'
 import TeamEntityLinks from '../../../models/TeamEntityLinks'
 import TeamEntityTypes from '../../../models/TeamEntityTypes'
+import TeamLeaderboardEntities from '../../../models/TeamLeaderboardEntities'
 
 export default {
   async get({ req, res, postgres }) {
@@ -186,5 +187,29 @@ export default {
       return await events.fire(currentTeamId, events.types.DELETE_ENTITY, { team_id: currentTeamId, user: user.username_email, record_id: entityId })
     }
     res.status(404).json({ error: res.__("There is no entity record that we found to delete.") })
+  },
+
+  async ['get/by/link/count']({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const links         = TeamEntityLinks(postgres)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+    const recordLimit   = req.query.limit || 10
+    const records       = await links.getByLinkCount(currentTeamId, recordLimit)
+
+    return res.json({ records })
+  },
+
+  async leaderboard({ req, res, postgres }) {
+    const session       = SessionHandler(req.session)
+    const links         = TeamEntityLinks(postgres)
+    const leaderboard   = TeamLeaderboardEntities(postgres)
+    const currentTeamId = session.getCurrentLoggedInTeam()
+
+    const leaderboardEntities = await leaderboard.getAllBy({ team_id: currentTeamId })
+    if (leaderboardEntities.length > 0)
+      return res.json({ records: leaderboardEntities, hasLeaderboard: true })
+
+    const records = await links.getByLinkCount(currentTeamId, 10)
+    return res.json({ records, hasLeaderboard: false })
   }
 }

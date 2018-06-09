@@ -31,7 +31,7 @@
           h5 Records Linked ({{ links.length }})
           div
             small Add record link:
-          typeahead-input.margin-bottom-small(src="/api/1.0/entities/search",:params="{ keysFromResponse: 'info.data', showPropFunction: parseEntitySearchItem, minChars: 3, limit: 25 }",@onHit="createLink")
+          entity-search(@select="createLink")
           table.table.very-thin.table-striped.table-bordered(v-if="links.length > 0")
             thead
               tr.sortable-headers
@@ -57,6 +57,7 @@
 
 <script>
   import markdown from 'markdown'
+  import EntitySearch from '../../EntitySearch'
   import ApiEntities from '../../../factories/ApiEntities'
   import StringHelpers from '../../../factories/StringHelpers'
   import TimeHelpers from '../../../factories/TimeHelpers'
@@ -129,10 +130,6 @@
 
       getEntityType(id) {
         return this.$store.state.session.current_team_types.find(t => t.id == id)
-      },
-
-      parseEntitySearchItem(item) {
-        return `${item.name} (${this.getEntityType(item.entity_type_id).name})`
       }
     },
 
@@ -149,6 +146,10 @@
       } finally {
         this.isLoadingLocal = false
       }
+    },
+
+    components: {
+      EntitySearch
     }
   }
 </script>

@@ -186,6 +186,7 @@ export function migrations(postgres) {
           filename varchar(255),
           name varchar(255),
           description text,
+          docs_link varchar(255),
           params jsonb,
           created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
           updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
@@ -281,6 +282,25 @@ export function migrations(postgres) {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entities_team_id_entity_type_id_idx on team_entities (team_id, entity_type_id)`)
     },
 
+    async function createTeamEntityAssignments() {
+      await postgres.query(`
+        CREATE TABLE IF NOT EXISTS team_entity_assignments (
+          id bigserial PRIMARY KEY,
+          team_id bigint REFERENCES teams,
+          entity_id bigint REFERENCES team_entities,
+          user_id bigint REFERENCES users,
+          reminders jsonb,
+          created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
+          updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
+        );
+      `)
+    },
+
+    async function createTeamEntityAssignmentsIndexes() {
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_assignments_team_id_entity_id_idx on team_entity_assignments (team_id, entity_id)`)
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_entity_assignments_team_id_user_id_idx on team_entity_assignments (team_id, user_id)`)
+    },
+
     async function createTeamEntityLinks() {
       await postgres.query(`
         CREATE TABLE IF NOT EXISTS team_entity_links (
@@ -338,6 +358,23 @@ export function migrations(postgres) {
 
     async function createTeamApiKeysIndexes() {
       await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_api_keys_team_id_idx on team_api_keys (team_id)`)
+    },
+
+    async function createTeamLeaderboardEntities() {
+      await postgres.query(`
+        CREATE TABLE IF NOT EXISTS team_leaderboard_entities (
+          id bigserial PRIMARY KEY,
+          team_id bigint REFERENCES teams,
+          entity_id bigint REFERENCES team_entities,
+          position integer,
+          created_at timestamp(6) without time zone NOT NULL DEFAULT now(),
+          updated_at timestamp(6) without time zone NOT NULL DEFAULT now()
+        );
+      `)
+    },
+
+    async function createTeamLeaderboardEntitiesIndexes() {
+      await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS team_leaderboard_entities_team_id_idx on team_leaderboard_entities (team_id)`)
     }
 
     // async function createEventLocationAndTvListingsInEvents() {

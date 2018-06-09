@@ -30,6 +30,7 @@ export default {
       uid: 'Unique ID',
       name: 'Title',
       description: 'Description',
+      external_link: 'External Link',
       // dueDate: 'Due Date',
       mod1: 'Repository',
       mod2: 'Number',

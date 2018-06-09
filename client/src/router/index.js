@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import AuthError from '@/components/AuthError'
 import DashboardContainer from '@/components/entities/dashboard/DashboardContainer'
-import TopTenContainer from '@/components/topten/TopTenContainer'
+import LeaderboardContainer from '@/components/leaderboard/LeaderboardContainer'
 import Login from '@/components/Login'
 import NoPageFound from '@/components/NoPageFound'
 
@@ -14,7 +14,7 @@ export default new VueRouter({
     { path: '/autherror/:error', component: AuthError, props: true },
     { path: '/gatekeeper/forgot/password', component: Login },
     { path: '/gatekeeper*', component: Login },
-    { path: '/topten*', component: TopTenContainer },
+    { path: '/leaderboard*', component: LeaderboardContainer },
     { path: '/dashboard/entity/:id', component: DashboardContainer, props: true },
     { path: '/dashboard/type/:type_id', component: DashboardContainer, props: true },
     { path: '/dashboard*', component: DashboardContainer },
